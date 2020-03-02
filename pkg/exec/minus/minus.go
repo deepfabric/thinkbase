@@ -1,19 +1,19 @@
-package intersect
+package minus
 
 import (
 	"sync"
 
 	"github.com/deepfabric/thinkbase/pkg/exec/unit"
+	"github.com/deepfabric/thinkbase/pkg/sql/algebra/intersect"
 	"github.com/deepfabric/thinkbase/pkg/sql/algebra/relation"
-	"github.com/deepfabric/thinkbase/pkg/sql/algebra/union"
 )
 
-func New(us []unit.Unit) *intersect {
-	return &intersect{us}
+func New(us []unit.Unit) *minus {
+	return &minus{us}
 }
 
-// A ^ B = (A1 V A2 ...) ^ A3
-func (e *intersect) Intersect() (relation.Relation, error) {
+// A - B = A - (B1 V B2 ...) = (A - B1) ^ (A - B2) ...
+func (e *minus) Minus() (relation.Relation, error) {
 	var err error
 	var wg sync.WaitGroup
 
@@ -35,7 +35,7 @@ func (e *intersect) Intersect() (relation.Relation, error) {
 	}
 	r := rs[0]
 	for i, j := 1, len(rs); i < j; i++ {
-		r, err = union.New(true, r, rs[i]).Union()
+		r, err = intersect.New(r, rs[i]).Intersect()
 		if err != nil {
 			return nil, err
 		}
