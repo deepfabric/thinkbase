@@ -12,7 +12,7 @@ func New(us []unit.Unit) *intersect {
 	return &intersect{us}
 }
 
-// A ^ B = (A1 V A2 ...) ^ A3
+// A ∩  B = (A1 ∪  A2 ...) ∩  A3
 func (e *intersect) Intersect() (relation.Relation, error) {
 	var err error
 	var wg sync.WaitGroup

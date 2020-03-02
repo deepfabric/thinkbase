@@ -12,7 +12,7 @@ func New(isNub bool, us []unit.Unit) *union {
 	return &union{isNub, us}
 }
 
-// A U B = (A1 V A2 ...) V (B1 V B2 ...)
+// A ∪  B = (A1 ∪  A2 ...) ∪  (B1 ∪  B2 ...)
 func (e *union) Union() (relation.Relation, error) {
 	var err error
 	var wg sync.WaitGroup

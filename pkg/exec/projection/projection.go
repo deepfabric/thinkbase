@@ -1,19 +1,19 @@
-package minus
+package projection
 
 import (
 	"sync"
 
 	"github.com/deepfabric/thinkbase/pkg/exec/unit"
-	"github.com/deepfabric/thinkbase/pkg/sql/algebra/intersect"
 	"github.com/deepfabric/thinkbase/pkg/sql/algebra/relation"
+	"github.com/deepfabric/thinkbase/pkg/sql/algebra/union"
 )
 
-func New(us []unit.Unit) *minus {
-	return &minus{us}
+func New(us []unit.Unit) *projection {
+	return &projection{us}
 }
 
-// A - B = A - (B1 ∪  B2 ...) = (A - B1) ∩  (A - B2) ...
-func (e *minus) Minus() (relation.Relation, error) {
+// ρ(A) = ρ(A1) ∪  ρ(A2) ...
+func (e *projection) Projection() (relation.Relation, error) {
 	var err error
 	var wg sync.WaitGroup
 
@@ -35,7 +35,7 @@ func (e *minus) Minus() (relation.Relation, error) {
 	}
 	r := rs[0]
 	for i, j := 1, len(rs); i < j; i++ {
-		r, err = intersect.New(r, rs[i]).Intersect()
+		r, err = union.New(false, r, rs[i]).Union()
 		if err != nil {
 			return nil, err
 		}
