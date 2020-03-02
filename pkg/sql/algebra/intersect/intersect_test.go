@@ -18,20 +18,11 @@ func TestIntersect(t *testing.T) {
 	{
 		fmt.Printf("b:\n%s\n", b)
 	}
-	{
-		r, err := New(true, a, b).Intersect()
-		if err != nil {
-			log.Fatal(err)
-		}
-		fmt.Printf("r:\n%s\n", r)
+	r, err := New(a, b).Intersect()
+	if err != nil {
+		log.Fatal(err)
 	}
-	{
-		r, err := New(false, a, b).Intersect()
-		if err != nil {
-			log.Fatal(err)
-		}
-		fmt.Printf("r:\n%s\n", r)
-	}
+	fmt.Printf("r:\n%s\n", r)
 }
 
 func newTestRelation0() relation.Relation {

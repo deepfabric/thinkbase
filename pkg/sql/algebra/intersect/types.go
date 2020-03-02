@@ -7,6 +7,5 @@ type Intersect interface {
 }
 
 type intersect struct {
-	isNub bool
-	a, b  relation.Relation
+	a, b relation.Relation
 }

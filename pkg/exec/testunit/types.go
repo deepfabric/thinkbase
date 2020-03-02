@@ -1,11 +1,7 @@
-package minus
+package testunit
 
 import "github.com/deepfabric/thinkbase/pkg/sql/algebra/relation"
 
-type Minus interface {
-	Minus() relation.Relation
-}
-
-type minus struct {
+type intersectUnit struct {
 	a, b relation.Relation
 }

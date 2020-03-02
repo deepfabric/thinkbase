@@ -1,15 +1,17 @@
-package minus
+package intersect
 
 import (
 	"fmt"
 	"log"
 	"testing"
 
+	"github.com/deepfabric/thinkbase/pkg/exec/testunit"
+	"github.com/deepfabric/thinkbase/pkg/exec/unit"
 	"github.com/deepfabric/thinkbase/pkg/sql/algebra/relation"
 	"github.com/deepfabric/thinkbase/pkg/sql/algebra/value"
 )
 
-func TestMinus(t *testing.T) {
+func TestIntersect(t *testing.T) {
 	a := newTestRelation0()
 	b := newTestRelation1()
 	{
@@ -18,7 +20,11 @@ func TestMinus(t *testing.T) {
 	{
 		fmt.Printf("b:\n%s\n", b)
 	}
-	r, err := New(a, b).Minus()
+	us, err := testunit.New(1, unit.Intersect, a, b)
+	if err != nil {
+		log.Fatal(err)
+	}
+	r, err := New(us).Intersect()
 	if err != nil {
 		log.Fatal(err)
 	}

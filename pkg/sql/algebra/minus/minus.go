@@ -7,8 +7,8 @@ import (
 	"github.com/deepfabric/thinkbase/pkg/sql/algebra/util"
 )
 
-func New(isNub bool, a, b relation.Relation) *minus {
-	return &minus{isNub, a, b}
+func New(a, b relation.Relation) *minus {
+	return &minus{a, b}
 }
 
 func (m *minus) Minus() (relation.Relation, error) {
@@ -36,10 +36,8 @@ func (m *minus) Minus() (relation.Relation, error) {
 			r.AddTuple(a)
 		}
 	}
-	if m.isNub {
-		if err := r.Nub(); err != nil {
-			return nil, err
-		}
+	if err := r.Nub(); err != nil {
+		return nil, err
 	}
 	return r, nil
 }

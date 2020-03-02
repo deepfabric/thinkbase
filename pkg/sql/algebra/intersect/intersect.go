@@ -7,8 +7,8 @@ import (
 	"github.com/deepfabric/thinkbase/pkg/sql/algebra/util"
 )
 
-func New(isNub bool, a, b relation.Relation) *intersect {
-	return &intersect{isNub, a, b}
+func New(a, b relation.Relation) *intersect {
+	return &intersect{a, b}
 }
 
 func (i *intersect) Intersect() (relation.Relation, error) {
@@ -36,10 +36,8 @@ func (i *intersect) Intersect() (relation.Relation, error) {
 			r.AddTuple(a)
 		}
 	}
-	if i.isNub {
-		if err := r.Nub(); err != nil {
-			return nil, err
-		}
+	if err := r.Nub(); err != nil {
+		return nil, err
 	}
 	return r, nil
 }
