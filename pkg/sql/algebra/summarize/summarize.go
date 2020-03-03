@@ -87,7 +87,7 @@ func (s *summarize) summarizeByGroup() (relation.Relation, error) {
 			return nil, err
 		}
 	default:
-		r = relation.New("", nil, s.r.Metadata())
+		r = relation.New("", nil, util.DupMetadata(s.r.Metadata()))
 	}
 	gs, err := s.group()
 	if err != nil {

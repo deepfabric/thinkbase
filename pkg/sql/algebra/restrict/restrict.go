@@ -21,7 +21,7 @@ func (r *restrict) Restrict() (relation.Relation, error) {
 	if err != nil {
 		return nil, err
 	}
-	rr := relation.New("", nil, r.r.Metadata())
+	rr := relation.New("", nil, util.DupMetadata(r.r.Metadata()))
 	for _, t := range ts {
 		ok, err := r.e.Eval([]value.Tuple{t, t})
 		if err != nil {

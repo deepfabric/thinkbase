@@ -23,7 +23,7 @@ func (i *intersect) Intersect() (relation.Relation, error) {
 	if err != nil {
 		return nil, err
 	}
-	r := relation.New("", nil, i.a.Metadata())
+	r := relation.New("", nil, util.DupMetadata(i.a.Metadata()))
 	for _, a := range as {
 		ok := false
 		for _, b := range bs {

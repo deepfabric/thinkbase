@@ -6,6 +6,13 @@ import (
 	"github.com/deepfabric/thinkbase/pkg/sql/algebra/relation"
 )
 
+type orderUnit struct {
+	isNub bool
+	descs []bool
+	attrs []string
+	r     relation.Relation
+}
+
 type unionUnit struct {
 	a relation.Relation
 }

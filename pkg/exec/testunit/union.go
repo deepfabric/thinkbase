@@ -5,6 +5,7 @@ import (
 
 	"github.com/deepfabric/thinkbase/pkg/exec/unit"
 	"github.com/deepfabric/thinkbase/pkg/sql/algebra/relation"
+	"github.com/deepfabric/thinkbase/pkg/sql/algebra/util"
 )
 
 func newUnion(n int, a, b relation.Relation) ([]unit.Unit, error) {
@@ -25,7 +26,7 @@ func newUnion(n int, a, b relation.Relation) ([]unit.Unit, error) {
 		step = 1
 	}
 	for i := 0; i < an; i += step {
-		r := relation.New("", nil, a.Metadata())
+		r := relation.New("", nil, util.DupMetadata(a.Metadata()))
 		cnt := step
 		if cnt > an-i {
 			cnt = an - i
@@ -38,7 +39,7 @@ func newUnion(n int, a, b relation.Relation) ([]unit.Unit, error) {
 		us = append(us, &unionUnit{r})
 	}
 	for i := 0; i < bn; i += step {
-		r := relation.New("", nil, a.Metadata())
+		r := relation.New("", nil, util.DupMetadata(a.Metadata()))
 		cnt := step
 		if cnt > bn-i {
 			cnt = bn - i

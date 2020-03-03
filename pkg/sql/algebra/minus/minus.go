@@ -23,7 +23,7 @@ func (m *minus) Minus() (relation.Relation, error) {
 	if err != nil {
 		return nil, err
 	}
-	r := relation.New("", nil, m.a.Metadata())
+	r := relation.New("", nil, util.DupMetadata(m.a.Metadata()))
 	for _, a := range as {
 		ok := true
 		for _, b := range bs {

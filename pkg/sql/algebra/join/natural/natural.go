@@ -62,13 +62,13 @@ func getMetadata(a, b relation.Relation) (map[int]struct{}, []*index, []*relatio
 	for i, j := 0, len(as); i < j; i++ {
 		mp[as[i].Name] = i
 		as[i].Name = a.Name() + "." + as[i].Name
-		rs = append(rs, as[i])
+		rs = append(rs, &relation.AttributeMetadata{as[i].Name, make(map[int32]int)})
 	}
 	mq := make(map[int]struct{})
 	for i, j := 0, len(bs); i < j; i++ {
 		if idx, ok := mp[bs[i].Name]; !ok {
 			bs[i].Name = b.Name() + "." + bs[i].Name
-			rs = append(rs, bs[i])
+			rs = append(rs, &relation.AttributeMetadata{bs[i].Name, make(map[int32]int)})
 		} else {
 			mq[i] = struct{}{}
 			is = append(is, &index{idx, i})

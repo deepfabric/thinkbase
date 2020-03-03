@@ -23,7 +23,7 @@ func (u *union) Union() (relation.Relation, error) {
 	if err != nil {
 		return nil, err
 	}
-	r := relation.New("", nil, u.A.Metadata())
+	r := relation.New("", nil, util.DupMetadata(u.A.Metadata()))
 	r.AddTuples(as)
 	r.AddTuples(bs)
 	if u.IsNub {

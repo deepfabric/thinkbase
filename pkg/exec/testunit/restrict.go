@@ -7,6 +7,7 @@ import (
 	"github.com/deepfabric/thinkbase/pkg/sql/algebra/extend"
 	"github.com/deepfabric/thinkbase/pkg/sql/algebra/relation"
 	"github.com/deepfabric/thinkbase/pkg/sql/algebra/restrict"
+	"github.com/deepfabric/thinkbase/pkg/sql/algebra/util"
 )
 
 func NewRestrict(n int, e extend.Extend, r relation.Relation) ([]unit.Unit, error) {
@@ -23,7 +24,7 @@ func NewRestrict(n int, e extend.Extend, r relation.Relation) ([]unit.Unit, erro
 		step = 1
 	}
 	for i := 0; i < rn; i += step {
-		u := relation.New("", nil, r.Metadata())
+		u := relation.New("", nil, util.DupMetadata(r.Metadata()))
 		cnt := step
 		if cnt > rn-i {
 			cnt = rn - i
