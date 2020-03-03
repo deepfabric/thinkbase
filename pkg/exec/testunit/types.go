@@ -21,6 +21,10 @@ type minusUnit struct {
 	a, b relation.Relation
 }
 
+type productUnit struct {
+	a, b relation.Relation
+}
+
 type intersectUnit struct {
 	a, b relation.Relation
 }

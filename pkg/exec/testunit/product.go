@@ -1,18 +1,13 @@
 package testunit
 
 import (
-	"errors"
-
 	"github.com/deepfabric/thinkbase/pkg/exec/unit"
-	"github.com/deepfabric/thinkbase/pkg/sql/algebra/intersect"
+	"github.com/deepfabric/thinkbase/pkg/sql/algebra/join/product"
 	"github.com/deepfabric/thinkbase/pkg/sql/algebra/relation"
 	"github.com/deepfabric/thinkbase/pkg/sql/algebra/util"
 )
 
-func newIntersect(n int, a, b relation.Relation) ([]unit.Unit, error) {
-	if len(a.Metadata()) != len(b.Metadata()) {
-		return nil, errors.New("size is different")
-	}
+func newProduct(n int, a, b relation.Relation) ([]unit.Unit, error) {
 	an, err := a.GetTupleCount()
 	if err != nil {
 		return nil, err
@@ -38,7 +33,7 @@ func newIntersect(n int, a, b relation.Relation) ([]unit.Unit, error) {
 				return nil, err
 			}
 			r.AddTuples(ts)
-			us = append(us, &intersectUnit{a, r})
+			us = append(us, &productUnit{a, r})
 		}
 		return us, nil
 	}
@@ -57,11 +52,12 @@ func newIntersect(n int, a, b relation.Relation) ([]unit.Unit, error) {
 			return nil, err
 		}
 		r.AddTuples(ts)
-		us = append(us, &intersectUnit{r, b})
+		us = append(us, &productUnit{r, b})
 	}
 	return us, nil
+
 }
 
-func (u *intersectUnit) Result() (relation.Relation, error) {
-	return intersect.New(u.a, u.b).Intersect()
+func (u *productUnit) Result() (relation.Relation, error) {
+	return product.New(u.a, u.b).Join()
 }

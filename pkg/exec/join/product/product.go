@@ -1,4 +1,4 @@
-package intersect
+package product
 
 import (
 	"sync"
@@ -8,12 +8,12 @@ import (
 	"github.com/deepfabric/thinkbase/pkg/sql/algebra/union"
 )
 
-func New(us []unit.Unit) *intersect {
-	return &intersect{us}
+func New(us []unit.Unit) *product {
+	return &product{us}
 }
 
-// A ∩  B = (A1 ∩  B) ∪  (A2 ∩  B) ...
-func (e *intersect) Intersect() (relation.Relation, error) {
+// A ⨯ B = (A ⨯ B1) ∪  (A ⨯ B2) ...
+func (e *product) Join() (relation.Relation, error) {
 	var err error
 	var wg sync.WaitGroup
 
