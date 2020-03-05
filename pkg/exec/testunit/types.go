@@ -1,9 +1,9 @@
 package testunit
 
 import (
-	"github.com/deepfabric/thinkbase/pkg/sql/algebra/extend"
-	"github.com/deepfabric/thinkbase/pkg/sql/algebra/projection"
-	"github.com/deepfabric/thinkbase/pkg/sql/algebra/relation"
+	"github.com/deepfabric/thinkbase/pkg/algebra/extend"
+	"github.com/deepfabric/thinkbase/pkg/algebra/projection"
+	"github.com/deepfabric/thinkbase/pkg/algebra/relation"
 )
 
 type orderUnit struct {

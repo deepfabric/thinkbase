@@ -1,10 +1,10 @@
 package testunit
 
 import (
+	"github.com/deepfabric/thinkbase/pkg/algebra/projection"
+	"github.com/deepfabric/thinkbase/pkg/algebra/relation"
+	"github.com/deepfabric/thinkbase/pkg/algebra/relation/mem"
 	"github.com/deepfabric/thinkbase/pkg/exec/unit"
-	"github.com/deepfabric/thinkbase/pkg/sql/algebra/projection"
-	"github.com/deepfabric/thinkbase/pkg/sql/algebra/relation"
-	"github.com/deepfabric/thinkbase/pkg/sql/algebra/util"
 )
 
 func NewProjection(n int, as []*projection.Attribute, r relation.Relation) ([]unit.Unit, error) {
@@ -18,7 +18,7 @@ func NewProjection(n int, as []*projection.Attribute, r relation.Relation) ([]un
 		step = 1
 	}
 	for i := 0; i < rn; i += step {
-		u := relation.New("", nil, util.DupMetadata(r.Metadata()))
+		u := mem.New("", r.Metadata())
 		cnt := step
 		if cnt > rn-i {
 			cnt = rn - i

@@ -3,10 +3,11 @@ package order
 import (
 	"sync"
 
+	"github.com/deepfabric/thinkbase/pkg/algebra/relation"
+	"github.com/deepfabric/thinkbase/pkg/algebra/relation/mem"
+	"github.com/deepfabric/thinkbase/pkg/algebra/util"
+	"github.com/deepfabric/thinkbase/pkg/algebra/value"
 	"github.com/deepfabric/thinkbase/pkg/exec/unit"
-	"github.com/deepfabric/thinkbase/pkg/sql/algebra/relation"
-	"github.com/deepfabric/thinkbase/pkg/sql/algebra/util"
-	"github.com/deepfabric/thinkbase/pkg/sql/algebra/value"
 )
 
 func New(us []unit.Unit, cmp func(value.Tuple, value.Tuple) bool) *order {
@@ -37,7 +38,7 @@ func (e *order) Order() (relation.Relation, error) {
 	if err != nil {
 		return nil, err
 	}
-	r := relation.New("", nil, util.DupMetadata(rs[0].Metadata()))
+	r := mem.New("", rs[0].Metadata())
 	r.AddTuples(ts)
 	return r, nil
 }

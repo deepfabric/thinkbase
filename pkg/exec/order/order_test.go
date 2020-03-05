@@ -5,9 +5,10 @@ import (
 	"log"
 	"testing"
 
+	"github.com/deepfabric/thinkbase/pkg/algebra/relation"
+	"github.com/deepfabric/thinkbase/pkg/algebra/relation/mem"
+	"github.com/deepfabric/thinkbase/pkg/algebra/value"
 	"github.com/deepfabric/thinkbase/pkg/exec/testunit"
-	"github.com/deepfabric/thinkbase/pkg/sql/algebra/relation"
-	"github.com/deepfabric/thinkbase/pkg/sql/algebra/value"
 )
 
 func TestOrder(t *testing.T) {
@@ -42,16 +43,11 @@ func TestOrder(t *testing.T) {
 }
 
 func newTestRelation() relation.Relation {
-	attrs := make([]*relation.AttributeMetadata, 2)
-	attrs[0] = &relation.AttributeMetadata{
-		Name:  "a",
-		Types: make(map[int32]int),
-	}
-	attrs[1] = &relation.AttributeMetadata{
-		Name:  "b",
-		Types: make(map[int32]int),
-	}
-	r := relation.New("A", nil, attrs)
+	var attrs []string
+
+	attrs = append(attrs, "a")
+	attrs = append(attrs, "b")
+	r := mem.New("A", attrs)
 	{
 		var t value.Tuple
 
@@ -97,7 +93,7 @@ func newTestRelation() relation.Relation {
 	return r
 }
 
-func newCompare(isNub bool, descs []bool, attrs []string, md []*relation.AttributeMetadata) func(value.Tuple, value.Tuple) bool {
+func newCompare(isNub bool, descs []bool, attrs []string, md []string) func(value.Tuple, value.Tuple) bool {
 	var is []int
 
 	for _, attr := range attrs {
@@ -118,9 +114,9 @@ func newCompare(isNub bool, descs []bool, attrs []string, md []*relation.Attribu
 	}
 }
 
-func getAttributeIndex(name string, md []*relation.AttributeMetadata) int {
+func getAttributeIndex(attr string, md []string) int {
 	for i, a := range md {
-		if a.Name == name {
+		if a == attr {
 			return i
 		}
 	}

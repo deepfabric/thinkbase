@@ -3,9 +3,9 @@ package product
 import (
 	"sync"
 
+	"github.com/deepfabric/thinkbase/pkg/algebra/relation"
+	"github.com/deepfabric/thinkbase/pkg/algebra/union"
 	"github.com/deepfabric/thinkbase/pkg/exec/unit"
-	"github.com/deepfabric/thinkbase/pkg/sql/algebra/relation"
-	"github.com/deepfabric/thinkbase/pkg/sql/algebra/union"
 )
 
 func New(us []unit.Unit) *product {

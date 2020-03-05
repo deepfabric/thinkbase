@@ -3,10 +3,10 @@ package testunit
 import (
 	"errors"
 
+	"github.com/deepfabric/thinkbase/pkg/algebra/intersect"
+	"github.com/deepfabric/thinkbase/pkg/algebra/relation"
+	"github.com/deepfabric/thinkbase/pkg/algebra/relation/mem"
 	"github.com/deepfabric/thinkbase/pkg/exec/unit"
-	"github.com/deepfabric/thinkbase/pkg/sql/algebra/intersect"
-	"github.com/deepfabric/thinkbase/pkg/sql/algebra/relation"
-	"github.com/deepfabric/thinkbase/pkg/sql/algebra/util"
 )
 
 func newIntersect(n int, a, b relation.Relation) ([]unit.Unit, error) {
@@ -28,7 +28,7 @@ func newIntersect(n int, a, b relation.Relation) ([]unit.Unit, error) {
 			step = 1
 		}
 		for i := 0; i < bn; i += step {
-			r := relation.New("", nil, util.DupMetadata(b.Metadata()))
+			r := mem.New("", b.Metadata())
 			cnt := step
 			if cnt > bn-i {
 				cnt = bn - i
@@ -47,7 +47,7 @@ func newIntersect(n int, a, b relation.Relation) ([]unit.Unit, error) {
 		step = 1
 	}
 	for i := 0; i < an; i += step {
-		r := relation.New("", nil, util.DupMetadata(a.Metadata()))
+		r := mem.New("", a.Metadata())
 		cnt := step
 		if cnt > an-i {
 			cnt = an - i

@@ -1,6 +1,6 @@
 package unit
 
-import "github.com/deepfabric/thinkbase/pkg/sql/algebra/relation"
+import "github.com/deepfabric/thinkbase/pkg/algebra/relation"
 
 const (
 	Intersect = iota

@@ -1,10 +1,10 @@
 package testunit
 
 import (
+	"github.com/deepfabric/thinkbase/pkg/algebra/order"
+	"github.com/deepfabric/thinkbase/pkg/algebra/relation"
+	"github.com/deepfabric/thinkbase/pkg/algebra/relation/mem"
 	"github.com/deepfabric/thinkbase/pkg/exec/unit"
-	"github.com/deepfabric/thinkbase/pkg/sql/algebra/order"
-	"github.com/deepfabric/thinkbase/pkg/sql/algebra/relation"
-	"github.com/deepfabric/thinkbase/pkg/sql/algebra/util"
 )
 
 func NewOrder(n int, isNub bool, descs []bool, attrs []string, r relation.Relation) ([]unit.Unit, error) {
@@ -18,7 +18,7 @@ func NewOrder(n int, isNub bool, descs []bool, attrs []string, r relation.Relati
 		step = 1
 	}
 	for i := 0; i < rn; i += step {
-		u := relation.New("", nil, util.DupMetadata(r.Metadata()))
+		u := mem.New("", r.Metadata())
 		cnt := step
 		if cnt > rn-i {
 			cnt = rn - i

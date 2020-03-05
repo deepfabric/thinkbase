@@ -5,11 +5,12 @@ import (
 	"log"
 	"testing"
 
+	"github.com/deepfabric/thinkbase/pkg/algebra/extend"
+	"github.com/deepfabric/thinkbase/pkg/algebra/extend/overload"
+	"github.com/deepfabric/thinkbase/pkg/algebra/relation"
+	"github.com/deepfabric/thinkbase/pkg/algebra/relation/mem"
+	"github.com/deepfabric/thinkbase/pkg/algebra/value"
 	"github.com/deepfabric/thinkbase/pkg/exec/testunit"
-	"github.com/deepfabric/thinkbase/pkg/sql/algebra/extend"
-	"github.com/deepfabric/thinkbase/pkg/sql/algebra/extend/overload"
-	"github.com/deepfabric/thinkbase/pkg/sql/algebra/relation"
-	"github.com/deepfabric/thinkbase/pkg/sql/algebra/value"
 )
 
 func TestRestrict(t *testing.T) {
@@ -44,16 +45,11 @@ func TestRestrict(t *testing.T) {
 }
 
 func newTestRelation() relation.Relation {
-	attrs := make([]*relation.AttributeMetadata, 2)
-	attrs[0] = &relation.AttributeMetadata{
-		Name:  "a",
-		Types: make(map[int32]int),
-	}
-	attrs[1] = &relation.AttributeMetadata{
-		Name:  "b",
-		Types: make(map[int32]int),
-	}
-	r := relation.New("A", nil, attrs)
+	var attrs []string
+
+	attrs = append(attrs, "a")
+	attrs = append(attrs, "b")
+	r := mem.New("A", attrs)
 	{
 		var t value.Tuple
 

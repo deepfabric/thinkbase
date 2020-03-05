@@ -3,9 +3,9 @@ package union
 import (
 	"sync"
 
+	"github.com/deepfabric/thinkbase/pkg/algebra/relation"
+	aunion "github.com/deepfabric/thinkbase/pkg/algebra/union"
 	"github.com/deepfabric/thinkbase/pkg/exec/unit"
-	"github.com/deepfabric/thinkbase/pkg/sql/algebra/relation"
-	aunion "github.com/deepfabric/thinkbase/pkg/sql/algebra/union"
 )
 
 func New(isNub bool, us []unit.Unit) *union {

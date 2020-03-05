@@ -3,11 +3,11 @@ package testunit
 import (
 	"errors"
 
+	"github.com/deepfabric/thinkbase/pkg/algebra/extend"
+	"github.com/deepfabric/thinkbase/pkg/algebra/relation"
+	"github.com/deepfabric/thinkbase/pkg/algebra/relation/mem"
+	"github.com/deepfabric/thinkbase/pkg/algebra/restrict"
 	"github.com/deepfabric/thinkbase/pkg/exec/unit"
-	"github.com/deepfabric/thinkbase/pkg/sql/algebra/extend"
-	"github.com/deepfabric/thinkbase/pkg/sql/algebra/relation"
-	"github.com/deepfabric/thinkbase/pkg/sql/algebra/restrict"
-	"github.com/deepfabric/thinkbase/pkg/sql/algebra/util"
 )
 
 func NewRestrict(n int, e extend.Extend, r relation.Relation) ([]unit.Unit, error) {
@@ -24,7 +24,7 @@ func NewRestrict(n int, e extend.Extend, r relation.Relation) ([]unit.Unit, erro
 		step = 1
 	}
 	for i := 0; i < rn; i += step {
-		u := relation.New("", nil, util.DupMetadata(r.Metadata()))
+		u := mem.New("", r.Metadata())
 		cnt := step
 		if cnt > rn-i {
 			cnt = rn - i

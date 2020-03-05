@@ -5,10 +5,11 @@ import (
 	"log"
 	"testing"
 
+	"github.com/deepfabric/thinkbase/pkg/algebra/relation"
+	"github.com/deepfabric/thinkbase/pkg/algebra/relation/mem"
+	"github.com/deepfabric/thinkbase/pkg/algebra/value"
 	"github.com/deepfabric/thinkbase/pkg/exec/testunit"
 	"github.com/deepfabric/thinkbase/pkg/exec/unit"
-	"github.com/deepfabric/thinkbase/pkg/sql/algebra/relation"
-	"github.com/deepfabric/thinkbase/pkg/sql/algebra/value"
 )
 
 func TestProduct(t *testing.T) {
@@ -34,21 +35,12 @@ func TestProduct(t *testing.T) {
 }
 
 func newTestRelation0() relation.Relation {
-	attrs := make([]*relation.AttributeMetadata, 3)
-	attrs[0] = &relation.AttributeMetadata{
-		Name:  "a",
-		Types: make(map[int32]int),
-	}
-	attrs[1] = &relation.AttributeMetadata{
-		Name:  "b",
-		Types: make(map[int32]int),
-	}
-	attrs[2] = &relation.AttributeMetadata{
-		Name:  "c",
-		Types: make(map[int32]int),
-	}
+	var attrs []string
 
-	r := relation.New("A", nil, attrs)
+	attrs = append(attrs, "a")
+	attrs = append(attrs, "b")
+	attrs = append(attrs, "c")
+	r := mem.New("A", attrs)
 	{
 		var t value.Tuple
 
@@ -93,16 +85,11 @@ func newTestRelation0() relation.Relation {
 }
 
 func newTestRelation1() relation.Relation {
-	attrs := make([]*relation.AttributeMetadata, 2)
-	attrs[0] = &relation.AttributeMetadata{
-		Name:  "b",
-		Types: make(map[int32]int),
-	}
-	attrs[1] = &relation.AttributeMetadata{
-		Name:  "d",
-		Types: make(map[int32]int),
-	}
-	r := relation.New("B", nil, attrs)
+	var attrs []string
+
+	attrs = append(attrs, "b")
+	attrs = append(attrs, "d")
+	r := mem.New("B", attrs)
 	{
 		var t value.Tuple
 

@@ -1,0 +1,4 @@
+#!/bin/bash
+
+rm -r test.db
+go run main.go

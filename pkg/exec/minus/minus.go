@@ -3,9 +3,9 @@ package minus
 import (
 	"sync"
 
+	"github.com/deepfabric/thinkbase/pkg/algebra/intersect"
+	"github.com/deepfabric/thinkbase/pkg/algebra/relation"
 	"github.com/deepfabric/thinkbase/pkg/exec/unit"
-	"github.com/deepfabric/thinkbase/pkg/sql/algebra/intersect"
-	"github.com/deepfabric/thinkbase/pkg/sql/algebra/relation"
 )
 
 func New(us []unit.Unit) *minus {
