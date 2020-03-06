@@ -5,7 +5,6 @@ import (
 
 	"github.com/deepfabric/thinkbase/pkg/algebra/extend"
 	"github.com/deepfabric/thinkbase/pkg/algebra/relation"
-	"github.com/deepfabric/thinkbase/pkg/algebra/relation/mem"
 	"github.com/deepfabric/thinkbase/pkg/algebra/restrict"
 	"github.com/deepfabric/thinkbase/pkg/exec/unit"
 )
@@ -14,27 +13,13 @@ func NewRestrict(n int, e extend.Extend, r relation.Relation) ([]unit.Unit, erro
 	if !e.IsLogical() {
 		return nil, errors.New("extend must be a boolean expression")
 	}
-	rn, err := r.GetTupleCount()
+	rs, err := r.Split(n)
 	if err != nil {
 		return nil, err
 	}
 	var us []unit.Unit
-	step := rn / n
-	if step < 1 {
-		step = 1
-	}
-	for i := 0; i < rn; i += step {
-		u := mem.New("", r.Metadata())
-		cnt := step
-		if cnt > rn-i {
-			cnt = rn - i
-		}
-		ts, err := r.GetTuples(i, i+cnt)
-		if err != nil {
-			return nil, err
-		}
-		u.AddTuples(ts)
-		us = append(us, &restrictUnit{e, u})
+	for i, j := 0, len(rs); i < j; i++ {
+		us = append(us, &restrictUnit{e, rs[i]})
 	}
 	return us, nil
 }

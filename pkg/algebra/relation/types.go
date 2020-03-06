@@ -8,6 +8,8 @@ type Relation interface {
 
 	Nub() error
 
+	Split(int) ([]Relation, error)
+
 	Rename(string) error
 	RenameAttribute(string, string) error
 

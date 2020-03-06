@@ -9,3 +9,9 @@ type bgStore struct {
 type bgBatch struct {
 	tx *badger.Txn
 }
+
+type bgIterator struct {
+	k   []byte
+	tx  *badger.Txn
+	itr *badger.Iterator
+}

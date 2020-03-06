@@ -49,7 +49,7 @@ func (db *database) Tables() ([]string, error) {
 	return db.ids, nil
 }
 
-func (db *database) Table(id string) (*table, error) {
+func (db *database) Table(id string) (Table, error) {
 	if id == System {
 		return nil, storerror.CannotOpenSystemTable
 	}
@@ -109,9 +109,8 @@ func (tbl *table) GetTupleCount() (int, error) {
 	return int(tbl.cnt), nil
 }
 
-func (tbl *table) GetTuple(idx int) (value.Tuple, error) {
+func (tbl *table) GetTuple(idx int, attrs []string) (value.Tuple, error) {
 	tbl.RLock()
-	attrs := tbl.attrs
 	cnt := int(tbl.cnt)
 	tbl.RUnlock()
 	if idx < 0 || idx >= cnt {
@@ -120,11 +119,10 @@ func (tbl *table) GetTuple(idx int) (value.Tuple, error) {
 	return tbl.getTuple(idx, attrs)
 }
 
-func (tbl *table) GetTuples(start, end int) ([]value.Tuple, error) {
+func (tbl *table) GetTuples(start, end int, attrs []string) ([]value.Tuple, error) {
 	var ts []value.Tuple
 
 	tbl.RLock()
-	attrs := tbl.attrs
 	cnt := int(tbl.cnt)
 	tbl.RUnlock()
 	if start < 0 {
@@ -141,34 +139,6 @@ func (tbl *table) GetTuples(start, end int) ([]value.Tuple, error) {
 		}
 	}
 	return ts, nil
-}
-
-func (tbl *table) GetAttribute(attr string) (value.Attribute, error) {
-	var a value.Attribute
-
-	tbl.RLock()
-	mp := tbl.mp
-	cnt := int(tbl.cnt)
-	tbl.RUnlock()
-	if _, ok := mp[attr]; !ok {
-		return nil, fmt.Errorf("attribute '%s' not exist", attr)
-	}
-	for i := 0; i < cnt; i++ {
-		v, err := tbl.db.Get(colKey(tbl.id, strconv.Itoa(i), attr))
-		switch {
-		case err == nil:
-			if e, err := getElement(int(v[0]), v[1:]); err != nil {
-				return nil, err
-			} else {
-				a = append(a, e)
-			}
-		case err == storerror.NotExist:
-			a = append(a, value.ConstNull)
-		default:
-			return nil, err
-		}
-	}
-	return a, nil
 }
 
 func (tbl *table) GetAttributeByLimit(attr string, start, end int) (value.Attribute, error) {
@@ -287,7 +257,7 @@ func (tbl *table) addTuple(row string, attrs []string, tuple map[string]interfac
 		}
 	}
 	{
-		v, err := encoding.Encode(tbl.ids)
+		v, err := encoding.Encode(tbl.attrs)
 		if err != nil {
 			return err
 		}
@@ -343,10 +313,11 @@ func (db *database) addTupleByArray(id string, xs []interface{}, bat Batch) erro
 }
 
 func (db *database) addTupleBysubTable(id string, tuple map[string]interface{}, bat Batch) error {
-	tbl, err := db.Table(id)
+	t, err := db.Table(id)
 	if err != nil {
 		return err
 	}
+	tbl := t.(*table)
 	attrs := tbl.updateAttributes([]map[string]interface{}{tuple})
 	row := strconv.FormatInt(tbl.cnt, 10)
 	return tbl.addTuple(row, attrs, tuple, bat)

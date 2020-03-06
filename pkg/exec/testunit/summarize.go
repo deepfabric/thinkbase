@@ -2,7 +2,6 @@ package testunit
 
 import (
 	"github.com/deepfabric/thinkbase/pkg/algebra/relation"
-	"github.com/deepfabric/thinkbase/pkg/algebra/relation/mem"
 	"github.com/deepfabric/thinkbase/pkg/algebra/summarize"
 	"github.com/deepfabric/thinkbase/pkg/algebra/summarize/overload"
 	"github.com/deepfabric/thinkbase/pkg/exec/unit"
@@ -30,27 +29,13 @@ func NewSummarize(n int, ops []int, gs []string, attrs []*summarize.Attribute, r
 			attrs = append(attrs, &summarize.Attribute{Name: r.Metadata()[0], Alias: "_"})
 		}
 	}
-	rn, err := r.GetTupleCount()
+	rs, err := r.Split(n)
 	if err != nil {
 		return nil, err
 	}
 	var us []unit.Unit
-	step := rn / n
-	if step < 1 {
-		step = 1
-	}
-	for i := 0; i < rn; i += step {
-		u := mem.New("", r.Metadata())
-		cnt := step
-		if cnt > rn-i {
-			cnt = rn - i
-		}
-		ts, err := r.GetTuples(i, i+cnt)
-		if err != nil {
-			return nil, err
-		}
-		u.AddTuples(ts)
-		us = append(us, &summarizeUnit{ops, gs, u, attrs})
+	for i, j := 0, len(rs); i < j; i++ {
+		us = append(us, &summarizeUnit{ops, gs, rs[i], attrs})
 	}
 	return us, nil
 }

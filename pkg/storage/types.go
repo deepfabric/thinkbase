@@ -27,16 +27,17 @@ type Table interface {
 	AddTuples([]map[string]interface{}) error
 
 	GetTupleCount() (int, error)
-	GetTuple(int) (value.Tuple, error)
-	GetTuples(int, int) ([]value.Tuple, error)
+	GetTuple(int, []string) (value.Tuple, error)
+	GetTuples(int, int, []string) ([]value.Tuple, error)
 
-	GetAttribute(string) (value.Attribute, error)
 	GetAttributeByLimit(string, int, int) (value.Attribute, error)
 }
 
 type DB interface {
 	Close() error
 	NewBatch() (Batch, error)
+	NewIterator([]byte) (Iterator, error)
+
 	Del([]byte) error
 	Set([]byte, []byte) error
 	Get([]byte) ([]byte, error)
@@ -47,6 +48,14 @@ type Batch interface {
 	Commit() error
 	Del([]byte) error
 	Set([]byte, []byte) error
+}
+
+type Iterator interface {
+	Next() error
+	Valid() bool
+	Close() error
+	Key() []byte
+	Value() ([]byte, error)
 }
 
 type database struct {

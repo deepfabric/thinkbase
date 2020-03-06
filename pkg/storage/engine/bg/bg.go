@@ -8,7 +8,7 @@ import (
 
 func New(name string) storage.DB {
 	opts := badger.DefaultOptions(name)
-	opts.SyncWrites = true
+	opts.SyncWrites = false
 	if db, err := badger.Open(opts); err != nil {
 		return nil
 	} else {
@@ -22,6 +22,14 @@ func (db *bgStore) Close() error {
 
 func (db *bgStore) NewBatch() (storage.Batch, error) {
 	return &bgBatch{db.db.NewTransaction(true)}, nil
+}
+
+func (db *bgStore) NewIterator(k []byte) (storage.Iterator, error) {
+	tx := db.db.NewTransaction(false)
+	opt := badger.DefaultIteratorOptions
+	opt.Prefix = k
+	opt.PrefetchValues = true
+	return &bgIterator{k, tx, tx.NewIterator(opt)}, nil
 }
 
 func (db *bgStore) Del(k []byte) error {
@@ -63,6 +71,29 @@ func (tx *bgBatch) Del(k []byte) error {
 
 func (tx *bgBatch) Set(k, v []byte) error {
 	return set(tx.tx, k, v)
+}
+
+func (itr *bgIterator) Close() error {
+	itr.itr.Close()
+	itr.tx.Discard()
+	return nil
+}
+
+func (itr *bgIterator) Next() error {
+	itr.itr.Seek(itr.k)
+	return nil
+}
+
+func (itr *bgIterator) Valid() bool {
+	return itr.itr.ValidForPrefix(itr.k)
+}
+
+func (itr *bgIterator) Key() []byte {
+	return itr.itr.Item().KeyCopy(nil)
+}
+
+func (itr *bgIterator) Value() ([]byte, error) {
+	return itr.itr.Item().ValueCopy(nil)
 }
 
 func del(tx *badger.Txn, k []byte) error {

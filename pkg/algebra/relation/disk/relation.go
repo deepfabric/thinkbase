@@ -1,4 +1,4 @@
-package mem
+package disk
 
 import (
 	"errors"
@@ -7,31 +7,43 @@ import (
 
 	arelation "github.com/deepfabric/thinkbase/pkg/algebra/relation"
 	"github.com/deepfabric/thinkbase/pkg/algebra/value"
+	"github.com/deepfabric/thinkbase/pkg/storage"
 )
 
-func New(name string, attrs []string) *relation {
+func New(id string, db storage.Database) (*relation, error) {
+	tbl, err := db.Table(id)
+	if err != nil {
+		return nil, err
+	}
+	cnt, err := tbl.GetTupleCount()
+	if err != nil {
+		return nil, err
+	}
+	attrs := tbl.Metadata()
 	mp := make(map[string]int)
 	for i, attr := range attrs {
 		mp[attr] = i
 	}
 	return &relation{
 		mp:    mp,
-		name:  name,
+		name:  id,
+		tbl:   tbl,
 		attrs: attrs,
-	}
+		md:    newMetadata(cnt, 0, id, attrs),
+	}, nil
 }
 
 func (r *relation) Split(n int) ([]arelation.Relation, error) {
 	var rs []arelation.Relation
 
-	step := len(r.tuple) / n
+	step := r.md.cnt / n
 	if step < 1 {
 		step = 1
 	}
-	for i, j := 0, len(r.tuple); i < j; i += step {
+	for i := 0; i < r.md.cnt; i += step {
 		cnt := step
-		if cnt > j-i {
-			cnt = j - i
+		if cnt > r.md.cnt-i {
+			cnt = r.md.cnt - i
 		}
 		attrs := make([]string, len(r.attrs))
 		copy(attrs, r.attrs)
@@ -41,9 +53,10 @@ func (r *relation) Split(n int) ([]arelation.Relation, error) {
 		}
 		rs = append(rs, &relation{
 			mp:    mp,
+			tbl:   r.tbl,
 			attrs: attrs,
 			name:  r.name,
-			tuple: r.tuple[i : i+cnt],
+			md:    newMetadata(cnt, i, r.md.id, r.md.attrs),
 		})
 	}
 	return rs, nil
@@ -58,6 +71,9 @@ func (r *relation) Metadata() []string {
 }
 
 func (r *relation) Nub() error {
+	if err := r.load(); err != nil {
+		return err
+	}
 	if len(r.tuple) > 1 {
 		for i, j := 0, len(r.tuple); i < j; i++ {
 			remove(i+1, r.tuple[i], &r.tuple)
@@ -87,35 +103,24 @@ func (r *relation) RenameAttribute(name, alias string) error {
 	return fmt.Errorf("cannot find attribute '%s'", name)
 }
 
-func (r *relation) AddTuple(t value.Tuple) error {
-	r.tuple = append(r.tuple, t)
-	return nil
+func (r *relation) AddTuple(_ value.Tuple) error {
+	return errors.New("illegal operation")
 }
 
-func (r *relation) AddTuples(ts []value.Tuple) error {
-	r.tuple = append(r.tuple, ts...)
-	return nil
+func (r *relation) AddTuples(_ []value.Tuple) error {
+	return errors.New("illegal operation")
 }
 
 func (r *relation) GetTupleCount() (int, error) {
-	return len(r.tuple), nil
+	return r.md.cnt, nil
 }
 
 func (r *relation) GetTuple(idx int) (value.Tuple, error) {
-	if idx >= len(r.tuple) {
-		return nil, errors.New("tuple not exist")
-	}
-	return r.tuple[idx], nil
+	return r.tbl.GetTuple(r.md.start+idx, r.md.attrs)
 }
 
 func (r *relation) GetTuples(start, end int) ([]value.Tuple, error) {
-	if start < 0 {
-		start = 0
-	}
-	if end < 0 || end > len(r.tuple) {
-		end = len(r.tuple)
-	}
-	return r.tuple[start:end], nil
+	return r.tbl.GetTuples(r.md.start+start, r.md.start+end, r.md.attrs)
 }
 
 func (r *relation) GetAttributeIndex(name string) (int, error) {
@@ -126,41 +131,32 @@ func (r *relation) GetAttributeIndex(name string) (int, error) {
 }
 
 func (r *relation) GetAttribute(name string) (value.Attribute, error) {
-	var attr value.Attribute
-
-	i, ok := r.mp[name]
-	if !ok {
-		return nil, fmt.Errorf("cannot find attribute '%s'", name)
-	}
-	for _, t := range r.tuple {
-		attr = append(attr, t[i])
-	}
-	return attr, nil
+	return r.tbl.GetAttributeByLimit(name, r.md.start, r.md.start+r.md.cnt)
 }
 
 func (r *relation) GetAttributeByLimit(name string, start, end int) (value.Attribute, error) {
-	var attr value.Attribute
-
-	idx, ok := r.mp[name]
-	if !ok {
-		return nil, fmt.Errorf("cannot find attribute '%s'", name)
-	}
-	if start < 0 {
-		start = 0
-	}
-	if end < 0 || end > len(r.tuple) {
-		end = len(r.tuple)
-	}
-	for i := start; i < end; i++ {
-		attr = append(attr, r.tuple[i][idx])
-	}
-	return attr, nil
+	return r.tbl.GetAttributeByLimit(name, r.md.start+start, r.md.start+end)
 }
 
 func (r *relation) Sort(attrs []string, descs []bool) error {
+	if err := r.load(); err != nil {
+		return err
+	}
 	ts := &tuples{descs, attrs, r, r.tuple}
 	sort.Sort(ts)
 	r.tuple = ts.tuple
+	return nil
+}
+
+func (r *relation) load() error {
+	if len(r.tuple) >= r.md.cnt {
+		return nil
+	}
+	if ts, err := r.tbl.GetTuples(r.md.start, r.md.start+r.md.cnt, r.md.attrs); err != nil {
+		return err
+	} else {
+		r.tuple = ts
+	}
 	return nil
 }
 
@@ -193,4 +189,10 @@ func less(desc bool, r int) bool {
 		return r > 0
 	}
 	return r < 0
+}
+
+func newMetadata(cnt int, start int, id string, attrs []string) *metadata {
+	as := make([]string, len(attrs))
+	copy(as, attrs)
+	return &metadata{cnt, start, id, attrs}
 }
