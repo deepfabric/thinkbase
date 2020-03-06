@@ -4,6 +4,7 @@ import (
 	"github.com/deepfabric/thinkbase/pkg/algebra/extend"
 	"github.com/deepfabric/thinkbase/pkg/algebra/projection"
 	"github.com/deepfabric/thinkbase/pkg/algebra/relation"
+	"github.com/deepfabric/thinkbase/pkg/algebra/summarize"
 )
 
 type orderUnit struct {
@@ -23,6 +24,13 @@ type minusUnit struct {
 
 type productUnit struct {
 	a, b relation.Relation
+}
+
+type summarizeUnit struct {
+	ops   []int
+	gs    []string
+	r     relation.Relation
+	attrs []*summarize.Attribute
 }
 
 type intersectUnit struct {

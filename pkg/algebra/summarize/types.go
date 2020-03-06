@@ -11,7 +11,7 @@ type Attribute struct {
 }
 
 type Summarize interface {
-	Summarize() (relation.Relation, error)
+	Summarize(int) (relation.Relation, error)
 }
 
 type summarize struct {

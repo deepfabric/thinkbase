@@ -36,14 +36,14 @@ func New(ops []int, gs []string, as []*Attribute, r relation.Relation) *summariz
 	return &summarize{r: r, is: is, gs: gs, as: as, aggs: aggs}
 }
 
-func (s *summarize) Summarize() (relation.Relation, error) {
+func (s *summarize) Summarize(n int) (relation.Relation, error) {
 	if len(s.is) > 0 {
-		return s.summarizeByGroup()
+		return s.summarizeByGroup(n)
 	}
-	return s.summarize()
+	return s.summarize(n)
 }
 
-func (s *summarize) summarize() (relation.Relation, error) {
+func (s *summarize) summarize(_ int) (relation.Relation, error) {
 	r, err := s.newRelation()
 	if err != nil {
 		return nil, err
@@ -68,7 +68,7 @@ func (s *summarize) summarize() (relation.Relation, error) {
 	return r, nil
 }
 
-func (s *summarize) summarizeByGroup() (relation.Relation, error) {
+func (s *summarize) summarizeByGroup(n int) (relation.Relation, error) {
 	var r relation.Relation
 
 	mp := make(map[string]int)
@@ -83,7 +83,7 @@ func (s *summarize) summarizeByGroup() (relation.Relation, error) {
 			}
 			mp[a.Name] = idx
 		}
-		r, err = s.newRelationByGroup()
+		r, err = s.newRelationByGroup(n)
 		if err != nil {
 			return nil, err
 		}
@@ -108,7 +108,7 @@ func (s *summarize) summarizeByGroup() (relation.Relation, error) {
 					t = append(t, v)
 				}
 			}
-			g.r = append(g.r, t...)
+			g.r = append(g.r[:n], t...)
 		}
 	}
 	for _, g := range gs {
@@ -130,8 +130,8 @@ func (s *summarize) newRelation() (relation.Relation, error) {
 	return mem.New("", attrs), nil
 }
 
-func (s *summarize) newRelationByGroup() (relation.Relation, error) {
-	attrs := s.r.Metadata()
+func (s *summarize) newRelationByGroup(n int) (relation.Relation, error) {
+	attrs := s.r.Metadata()[:n]
 	for _, a := range s.as {
 		attr, err := getAttributeName(a)
 		if err != nil {

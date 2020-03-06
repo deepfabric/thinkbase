@@ -472,10 +472,16 @@ func compareTable(a, b Value) int {
 
 func (_ *Table) IsLogical() bool { return false }
 
-func (_ Null) Compare(_ Value) int    { return 1 }
 func (_ Null) String() string         { return "null" }
 func (_ Null) ResolvedType() *types.T { return types.Null }
 func (_ Null) IsLogical() bool        { return false }
+
+func (a Null) Compare(v Value) int {
+	if v == ConstNull {
+		return 0
+	}
+	return 1 // NULL is less than any non-NULL value
+}
 
 func (_ Array) ResolvedType() *types.T { return types.Array }
 func (_ Array) IsLogical() bool        { return false }

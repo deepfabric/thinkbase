@@ -5,91 +5,52 @@ import (
 	"log"
 	"testing"
 
-	"github.com/deepfabric/thinkbase/pkg/algebra/extend"
-	"github.com/deepfabric/thinkbase/pkg/algebra/projection"
 	"github.com/deepfabric/thinkbase/pkg/algebra/relation"
 	"github.com/deepfabric/thinkbase/pkg/algebra/relation/mem"
+	asummarize "github.com/deepfabric/thinkbase/pkg/algebra/summarize"
 	"github.com/deepfabric/thinkbase/pkg/algebra/summarize/overload"
 	"github.com/deepfabric/thinkbase/pkg/algebra/value"
+	"github.com/deepfabric/thinkbase/pkg/exec/testunit"
 )
 
 func TestSummarize(t *testing.T) {
-	r := newSummarize()
-	{
-		fmt.Printf("r:\n%s\n", r)
-	}
-	attrs := []*projection.Attribute{}
-	{
-		a, err := extend.NewAttribute("A", r)
-		if err != nil {
-			log.Fatal(err)
-		}
-		attrs = append(attrs, &projection.Attribute{E: a})
-	}
-	{
-		a, err := extend.NewAttribute("a", r)
-		if err != nil {
-			log.Fatal(err)
-		}
-		attrs = append(attrs, &projection.Attribute{E: a})
-	}
-	{
-		a, err := extend.NewAttribute("B", r)
-		if err != nil {
-			log.Fatal(err)
-		}
-		attrs = append(attrs, &projection.Attribute{E: a})
-	}
-	{
-		a, err := extend.NewAttribute("C", r)
-		if err != nil {
-			log.Fatal(err)
-		}
-		attrs = append(attrs, &projection.Attribute{E: a})
-	}
-	p := projection.New(r, attrs)
-	pr, err := p.Projection()
-	if err != nil {
-		log.Fatal(err)
-	}
-	{
-		fmt.Printf("pr:\n%s\n", pr)
-	}
-}
-
-func newSummarize() relation.Relation {
 	r := newTestRelation()
 	{
 		fmt.Printf("r:\n%s\n", r)
 	}
 	ops := []int{}
 	gs := []string{}
-	attrs := []*Attribute{}
+	attrs := []*asummarize.Attribute{}
 	{
 		gs = append(gs, "b")
 	}
 	{
 		ops = append(ops, overload.Avg)
-		attrs = append(attrs, &Attribute{Name: "a", Alias: "A"})
+		attrs = append(attrs, &asummarize.Attribute{Name: "a", Alias: "A"})
 	}
 	{
 		ops = append(ops, overload.Sum)
-		attrs = append(attrs, &Attribute{Name: "a", Alias: "B"})
+		attrs = append(attrs, &asummarize.Attribute{Name: "a", Alias: "B"})
 	}
 	{
 		ops = append(ops, overload.Max)
-		attrs = append(attrs, &Attribute{Name: "b", Alias: "C"})
+		attrs = append(attrs, &asummarize.Attribute{Name: "b", Alias: "C"})
 	}
 	{
 		ops = append(ops, overload.Count)
-		attrs = append(attrs, &Attribute{Name: "b", Alias: "D"})
+		attrs = append(attrs, &asummarize.Attribute{Name: "b", Alias: "D"})
 	}
-	s := New(ops, gs, attrs, r)
-	sr, err := s.Summarize(len(r.Metadata()))
+	us, err := testunit.NewSummarize(4, ops, gs, attrs, r)
 	if err != nil {
 		log.Fatal(err)
 	}
-	return sr
+	{
+		sr, err := New(ops, gs, attrs, r, us).Summarize()
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Printf("sr:\n%s\n", sr)
+	}
 }
 
 func newTestRelation() relation.Relation {
