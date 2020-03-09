@@ -1,12 +1,6 @@
 package testunit
 
-import (
-	"github.com/deepfabric/thinkbase/pkg/algebra/join/product"
-	"github.com/deepfabric/thinkbase/pkg/algebra/relation"
-	"github.com/deepfabric/thinkbase/pkg/algebra/relation/mem"
-	"github.com/deepfabric/thinkbase/pkg/exec/unit"
-)
-
+/*
 func newProduct(n int, a, b relation.Relation) ([]unit.Unit, error) {
 	an, err := a.GetTupleCount()
 	if err != nil {
@@ -61,3 +55,4 @@ func newProduct(n int, a, b relation.Relation) ([]unit.Unit, error) {
 func (u *productUnit) Result() (relation.Relation, error) {
 	return product.New(u.a, u.b).Join()
 }
+*/

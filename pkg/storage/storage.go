@@ -77,8 +77,7 @@ func (tbl *table) AddTuple(tuple map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	row := strconv.FormatInt(tbl.cnt, 10)
-	if err := tbl.addTuple(row, attrs, tuple, bat); err != nil {
+	if err := tbl.addTuple(uint64(tbl.cnt), attrs, tuple, bat); err != nil {
 		bat.Cancel()
 		return err
 	}
@@ -93,9 +92,8 @@ func (tbl *table) AddTuples(tuples []map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	row := strconv.FormatInt(tbl.cnt, 10)
 	for _, tuple := range tuples {
-		if err := tbl.addTuple(row, attrs, tuple, bat); err != nil {
+		if err := tbl.addTuple(uint64(tbl.cnt), attrs, tuple, bat); err != nil {
 			bat.Cancel()
 			return err
 		}
@@ -116,7 +114,11 @@ func (tbl *table) GetTuple(idx int, attrs []string) (value.Tuple, error) {
 	if idx < 0 || idx >= cnt {
 		return nil, errors.New("out of size")
 	}
-	return tbl.getTuple(idx, attrs)
+	if data, err := tbl.db.Get(rowKey(tbl.id, uint64(idx))); err != nil {
+		return nil, err
+	} else {
+		return tbl.getTuple(data, attrs)
+	}
 }
 
 func (tbl *table) GetTuples(start, end int, attrs []string) ([]value.Tuple, error) {
@@ -131,14 +133,70 @@ func (tbl *table) GetTuples(start, end int, attrs []string) ([]value.Tuple, erro
 	if end > cnt || end < 0 {
 		end = cnt
 	}
-	for i := start; i < end; i++ {
-		if t, err := tbl.getTuple(i, attrs); err != nil {
-			return nil, err
-		} else {
-			ts = append(ts, t)
+	itr, err := tbl.db.NewIterator(rowPrefixKey(tbl.id))
+	if err != nil {
+		return nil, err
+	}
+	defer itr.Close()
+	itr.Seek(rowKey(tbl.id, uint64(start)))
+	for itr.Valid() {
+		key := itr.Key()
+		idx := int(encoding.DecodeUint64(key[len(key)-8:]))
+		switch {
+		case idx < start:
+			continue
+		case idx >= end:
+			return ts, nil
+		default:
+			v, err := itr.Value()
+			if err != nil {
+				return nil, err
+			}
+			if t, err := tbl.getTuple(v, attrs); err != nil {
+				return nil, err
+			} else {
+				ts = append(ts, t)
+			}
 		}
+		itr.Next()
 	}
 	return ts, nil
+}
+
+// is is sorted
+func (tbl *table) GetTuplesByIndex(is []int, attrs []string) ([]value.Tuple, error) {
+	var ts []value.Tuple
+
+	itr, err := tbl.db.NewIterator(rowPrefixKey(tbl.id))
+	if err != nil {
+		return nil, err
+	}
+	defer itr.Close()
+	itr.Seek(rowKey(tbl.id, uint64(is[0])))
+	for len(is) > 0 && itr.Valid() {
+		key := itr.Key()
+		idx := int(encoding.DecodeUint64(key[len(key)-8:]))
+		switch {
+		case idx < is[0]:
+			break
+		case idx > is[len(is)-1]:
+			return ts, nil
+		default:
+			v, err := itr.Value()
+			if err != nil {
+				return nil, err
+			}
+			if t, err := tbl.getTuple(v, attrs); err != nil {
+				return nil, err
+			} else {
+				ts = append(ts, t)
+			}
+			is = is[1:]
+		}
+		itr.Next()
+	}
+	return ts, nil
+
 }
 
 func (tbl *table) GetAttributeByLimit(attr string, start, end int) (value.Attribute, error) {
@@ -157,42 +215,54 @@ func (tbl *table) GetAttributeByLimit(attr string, start, end int) (value.Attrib
 	if end > cnt || end < 0 {
 		end = cnt
 	}
-	for i := start; i < end; i++ {
-		v, err := tbl.db.Get(colKey(tbl.id, strconv.Itoa(i), attr))
+	itr, err := tbl.db.NewIterator(colPrefixKey(tbl.id, attr))
+	if err != nil {
+		return nil, err
+	}
+	defer itr.Close()
+	curr := start
+	itr.Seek(colKey(tbl.id, attr, uint64(curr)))
+	for itr.Valid() {
+		key := itr.Key()
+		idx := int(encoding.DecodeUint64(key[len(key)-8:]))
 		switch {
-		case err == nil:
+		case idx < start:
+			break
+		case idx >= end:
+			for curr < end {
+				curr++
+				a = append(a, value.ConstNull)
+			}
+			return a, nil
+		default:
+			for curr < idx {
+				curr++
+				a = append(a, value.ConstNull)
+			}
+			v, err := itr.Value()
+			if err != nil {
+				return nil, err
+			}
 			if e, err := getElement(int(v[0]), v[1:]); err != nil {
 				return nil, err
 			} else {
 				a = append(a, e)
 			}
-		case err == storerror.NotExist:
-			a = append(a, value.ConstNull)
-		default:
-			return nil, err
+			curr++
 		}
+		itr.Next()
 	}
 	return a, nil
 }
 
-func (tbl *table) getTuple(idx int, attrs []string) (value.Tuple, error) {
-	var t value.Tuple
-
-	row := strconv.Itoa(idx)
-	for _, attr := range attrs {
-		v, err := tbl.db.Get(rowKey(tbl.id, row, attr))
-		switch {
-		case err == nil:
-			if e, err := getElement(int(v[0]), v[1:]); err != nil {
-				return nil, err
-			} else {
-				t = append(t, e)
-			}
-		case err == storerror.NotExist:
-			t = append(t, value.ConstNull)
-		default:
-			return nil, err
-		}
+func (tbl *table) getTuple(data []byte, attrs []string) (value.Tuple, error) {
+	v, err := getElement(int(data[0]), data[1:])
+	if err != nil {
+		return nil, err
+	}
+	t := value.Tuple(v.(value.Array))
+	for i, j := len(t), len(attrs); i < j; i++ {
+		t = append(t, value.ConstNull)
 	}
 	return t, nil
 }
@@ -209,51 +279,66 @@ func (tbl *table) updateAttributes(tuples []map[string]interface{}) []string {
 	return attrs
 }
 
-func (tbl *table) addTuple(row string, attrs []string, tuple map[string]interface{}, bat Batch) error {
+func (tbl *table) addTuple(row uint64, attrs []string, tuple map[string]interface{}, bat Batch) error {
+	var xs []interface{}
+
 	for _, attr := range attrs {
 		if e, ok := tuple[attr]; ok {
 			var v []byte
 			switch t := e.(type) {
 			case nil:
+				xs = append(xs, value.ConstNull)
 				v, _ = encoding.Encode(value.ConstNull)
 				v = append([]byte{byte(types.T_null)}, v...)
 			case bool:
+				xs = append(xs, value.NewBool(t))
 				v, _ = encoding.Encode(*value.NewBool(t))
 				v = append([]byte{byte(types.T_bool)}, v...)
 			case int64:
+				xs = append(xs, value.NewInt(t))
 				v, _ = encoding.Encode(*value.NewInt(t))
 				v = append([]byte{byte(types.T_int)}, v...)
 			case string:
+				xs = append(xs, value.NewString(t))
 				v, _ = encoding.Encode(*value.NewString(t))
 				v = append([]byte{byte(types.T_string)}, v...)
 			case float64:
+				xs = append(xs, value.NewFloat(t))
 				v, _ = encoding.Encode(*value.NewFloat(t))
 				v = append([]byte{byte(types.T_float)}, v...)
 			case time.Time:
+				xs = append(xs, value.NewTime(t))
 				v, _ = encoding.Encode(*value.NewTime(t))
 				v = append([]byte{byte(types.T_time)}, v...)
 			case []interface{}:
 				if err := tbl.database.addTupleByArray(tbl.id+"."+attr, t, bat); err != nil {
 					return err
 				}
+				xs = append(xs, getArray(t))
 				v, _ = encoding.Encode(t)
 				v = append([]byte{byte(types.T_array)}, v...)
 			case map[string]interface{}:
 				if err := tbl.database.addTupleBysubTable(tbl.id+"."+attr, t, bat); err != nil {
 					return err
 				}
+				xs = append(xs, value.NewTable(tbl.id+"."+attr))
 				v, _ = encoding.Encode(*value.NewTable(tbl.id + "." + attr))
 				v = append([]byte{byte(types.T_table)}, v...)
 			}
-			if err := bat.Set(rowKey(tbl.id, row, attr), v); err != nil {
+			if err := bat.Set(colKey(tbl.id, attr, row), v); err != nil {
 				return err
 			}
-			if err := bat.Set(colKey(tbl.id, row, attr), v); err != nil {
+			if err := bat.Set(invertedKey(tbl.id, attr, string(v), row), []byte{}); err != nil {
 				return err
 			}
-			if err := bat.Set(invertedKey(tbl.id, row, attr, string(v)), []byte{}); err != nil {
-				return err
-			}
+		} else {
+			xs = append(xs, value.ConstNull)
+		}
+	}
+	{
+		v, _ := encoding.Encode(xs)
+		if err := bat.Set(rowKey(tbl.id, row), append([]byte{byte(types.T_array)}, v...)); err != nil {
+			return err
 		}
 	}
 	{
@@ -319,8 +404,7 @@ func (db *database) addTupleBysubTable(id string, tuple map[string]interface{}, 
 	}
 	tbl := t.(*table)
 	attrs := tbl.updateAttributes([]map[string]interface{}{tuple})
-	row := strconv.FormatInt(tbl.cnt, 10)
-	return tbl.addTuple(row, attrs, tuple, bat)
+	return tbl.addTuple(uint64(tbl.cnt), attrs, tuple, bat)
 }
 
 func (db *database) openTable(id string) (*table, error) {
@@ -387,29 +471,45 @@ func countKey(id string) []byte {
 	return []byte(id)
 }
 
-func rowKey(id, row, attr string) []byte {
+func rowKey(id string, row uint64) []byte {
 	var buf bytes.Buffer
 
 	buf.WriteString(id)
 	buf.WriteString(".R.")
-	buf.WriteString(row)
-	buf.WriteString(".")
-	buf.WriteString(attr)
+	buf.Write(encoding.EncodeUint64(row))
 	return buf.Bytes()
 }
 
-func colKey(id, row, attr string) []byte {
+func rowPrefixKey(id string) []byte {
+	var buf bytes.Buffer
+
+	buf.WriteString(id)
+	buf.WriteString(".R.")
+	return buf.Bytes()
+}
+
+func colKey(id, attr string, row uint64) []byte {
 	var buf bytes.Buffer
 
 	buf.WriteString(id)
 	buf.WriteString(".C.")
 	buf.WriteString(attr)
 	buf.WriteString(".")
-	buf.WriteString(row)
+	buf.Write(encoding.EncodeUint64(row))
 	return buf.Bytes()
 }
 
-func invertedKey(id, row, attr, value string) []byte {
+func colPrefixKey(id, attr string) []byte {
+	var buf bytes.Buffer
+
+	buf.WriteString(id)
+	buf.WriteString(".C.")
+	buf.WriteString(attr)
+	buf.WriteString(".")
+	return buf.Bytes()
+}
+
+func invertedKey(id, attr, value string, row uint64) []byte {
 	var buf bytes.Buffer
 
 	buf.WriteString(id)
@@ -418,7 +518,7 @@ func invertedKey(id, row, attr, value string) []byte {
 	buf.WriteString(".")
 	buf.WriteString(value)
 	buf.WriteString(".")
-	buf.WriteString(row)
+	buf.Write(encoding.EncodeUint64(row))
 	return buf.Bytes()
 }
 

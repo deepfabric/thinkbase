@@ -1,38 +1,36 @@
 package testunit
 
 import (
+	"github.com/deepfabric/thinkbase/pkg/algebra/extend"
 	"github.com/deepfabric/thinkbase/pkg/algebra/projection"
 	"github.com/deepfabric/thinkbase/pkg/algebra/relation"
-	"github.com/deepfabric/thinkbase/pkg/algebra/relation/mem"
+	"github.com/deepfabric/thinkbase/pkg/context"
 	"github.com/deepfabric/thinkbase/pkg/exec/unit"
 )
 
-func NewProjection(n int, as []*projection.Attribute, r relation.Relation) ([]unit.Unit, error) {
-	rn, err := r.GetTupleCount()
+func NewProjection(n int, as []*projection.Attribute, c context.Context, r relation.Relation) ([]unit.Unit, error) {
+	rs, err := r.Split(n)
 	if err != nil {
 		return nil, err
 	}
 	var us []unit.Unit
-	step := rn / n
-	if step < 1 {
-		step = 1
-	}
-	for i := 0; i < rn; i += step {
-		u := mem.New("", r.Metadata())
-		cnt := step
-		if cnt > rn-i {
-			cnt = rn - i
-		}
-		ts, err := r.GetTuples(i, i+cnt)
-		if err != nil {
-			return nil, err
-		}
-		u.AddTuples(ts)
-		us = append(us, &projectionUnit{u, as})
+	plh := r.Placeholder()
+	for i, j := 0, len(rs); i < j; i++ {
+		us = append(us, &projectionUnit{plh, c, rs[i], as})
 	}
 	return us, nil
 }
 
 func (u *projectionUnit) Result() (relation.Relation, error) {
-	return projection.New(u.r, u.as).Projection()
+	var as []*projection.Attribute
+
+	mp := make(map[int]int)
+	mp[u.plh] = u.r.Placeholder()
+	for _, a := range u.as {
+		as = append(as, &projection.Attribute{
+			Alias: a.Alias,
+			E:     extend.Dup(a.E, mp),
+		})
+	}
+	return projection.New(u.r, u.c, as).Projection()
 }

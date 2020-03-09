@@ -8,39 +8,68 @@ import (
 	"github.com/deepfabric/thinkbase/pkg/algebra/relation/mem"
 	"github.com/deepfabric/thinkbase/pkg/algebra/util"
 	"github.com/deepfabric/thinkbase/pkg/algebra/value"
+	"github.com/deepfabric/thinkbase/pkg/context"
 )
 
-func New(r relation.Relation, as []*Attribute) *projection {
-	return &projection{r: r, as: as}
+func New(r relation.Relation, c context.Context, as []*Attribute) *projection {
+	return &projection{r: r, c: c, as: as}
 }
 
 func (p *projection) Projection() (relation.Relation, error) {
-	var attrs []string
-
-	for _, a := range p.as {
-		name, err := getAttributeName(a)
-		if err != nil {
-			return nil, err
-		}
-		attrs = append(attrs, name)
-	}
-	ts, err := util.GetTuples(p.r)
+	cnt, err := p.r.GetTupleCount()
 	if err != nil {
 		return nil, err
 	}
-	r := mem.New("", attrs)
-	for _, t := range ts {
-		var rt value.Tuple
+	mp, as, err := util.Getattribute(p.r.Placeholder(), getattributes(p.r.Placeholder(), p.as), p.c)
+	if err != nil {
+		return nil, err
+	}
+	var r relation.Relation
+	{
+		var attrs []string
 		for _, a := range p.as {
-			if v, err := a.E.Eval([]value.Tuple{t, t}); err != nil {
+			name, err := getAttributeName(a)
+			if err != nil {
 				return nil, err
-			} else {
-				rt = append(rt, v)
 			}
+			attrs = append(attrs, name)
 		}
-		r.AddTuple(rt)
+		r = mem.New("", attrs, p.c)
+	}
+	for i := 0; i < cnt; i++ {
+		var t, et value.Tuple
+		for _, attrs := range as {
+			et = append(et, attrs[i])
+		}
+		for _, a := range p.as {
+			v, err := a.E.Eval([]value.Tuple{et, et}, mp)
+			if err != nil {
+				return nil, err
+			}
+			t = append(t, v)
+		}
+		r.AddTuple(t)
 	}
 	return r, nil
+	/*
+		ts, err := util.GetTuples(p.r)
+		if err != nil {
+			return nil, err
+		}
+		r := mem.New("", attrs)
+		for _, t := range ts {
+			var rt value.Tuple
+			for _, a := range p.as {
+				if v, err := a.E.Eval([]value.Tuple{t, t}); err != nil {
+					return nil, err
+				} else {
+					rt = append(rt, v)
+				}
+			}
+			r.AddTuple(rt)
+		}
+		return r, nil
+	*/
 }
 
 func getAttributeName(a *Attribute) (string, error) {
@@ -56,4 +85,16 @@ func getAttributeName(a *Attribute) (string, error) {
 		}
 	}
 	return a.Alias, nil
+}
+
+func getattributes(plh int, as []*Attribute) map[int][]string {
+	mp := make(map[int][]string)
+	for i, a := range as {
+		if i == 0 {
+			mp[plh] = a.E.Attributes()[plh]
+		} else {
+			mp[plh] = append(mp[plh], a.E.Attributes()[plh]...)
+		}
+	}
+	return mp
 }

@@ -28,7 +28,7 @@ func (db *bgStore) NewIterator(k []byte) (storage.Iterator, error) {
 	tx := db.db.NewTransaction(false)
 	opt := badger.DefaultIteratorOptions
 	opt.Prefix = k
-	opt.PrefetchValues = true
+	opt.PrefetchValues = false
 	return &bgIterator{k, tx, tx.NewIterator(opt)}, nil
 }
 
@@ -80,12 +80,17 @@ func (itr *bgIterator) Close() error {
 }
 
 func (itr *bgIterator) Next() error {
-	itr.itr.Seek(itr.k)
+	itr.itr.Next()
 	return nil
 }
 
 func (itr *bgIterator) Valid() bool {
 	return itr.itr.ValidForPrefix(itr.k)
+}
+
+func (itr *bgIterator) Seek(k []byte) error {
+	itr.itr.Seek(k)
+	return nil
 }
 
 func (itr *bgIterator) Key() []byte {

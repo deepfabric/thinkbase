@@ -11,43 +11,29 @@ import (
 	"github.com/deepfabric/thinkbase/pkg/algebra/relation/mem"
 	"github.com/deepfabric/thinkbase/pkg/algebra/summarize/overload"
 	"github.com/deepfabric/thinkbase/pkg/algebra/value"
+	"github.com/deepfabric/thinkbase/pkg/context"
 )
 
 func TestSummarize(t *testing.T) {
-	r := newSummarize()
+	ct := context.New()
+	r := newSummarize(ct)
 	{
 		fmt.Printf("r:\n%s\n", r)
 	}
 	attrs := []*projection.Attribute{}
 	{
-		a, err := extend.NewAttribute("A", r)
-		if err != nil {
-			log.Fatal(err)
-		}
-		attrs = append(attrs, &projection.Attribute{E: a})
+		attrs = append(attrs, &projection.Attribute{E: &extend.Attribute{r.Placeholder(), "A"}})
 	}
 	{
-		a, err := extend.NewAttribute("a", r)
-		if err != nil {
-			log.Fatal(err)
-		}
-		attrs = append(attrs, &projection.Attribute{E: a})
+		attrs = append(attrs, &projection.Attribute{E: &extend.Attribute{r.Placeholder(), "a"}})
 	}
 	{
-		a, err := extend.NewAttribute("B", r)
-		if err != nil {
-			log.Fatal(err)
-		}
-		attrs = append(attrs, &projection.Attribute{E: a})
+		attrs = append(attrs, &projection.Attribute{E: &extend.Attribute{r.Placeholder(), "B"}})
 	}
 	{
-		a, err := extend.NewAttribute("C", r)
-		if err != nil {
-			log.Fatal(err)
-		}
-		attrs = append(attrs, &projection.Attribute{E: a})
+		attrs = append(attrs, &projection.Attribute{E: &extend.Attribute{r.Placeholder(), "C"}})
 	}
-	p := projection.New(r, attrs)
+	p := projection.New(r, ct, attrs)
 	pr, err := p.Projection()
 	if err != nil {
 		log.Fatal(err)
@@ -57,8 +43,8 @@ func TestSummarize(t *testing.T) {
 	}
 }
 
-func newSummarize() relation.Relation {
-	r := newTestRelation()
+func newSummarize(c context.Context) relation.Relation {
+	r := newTestRelation(c)
 	{
 		fmt.Printf("r:\n%s\n", r)
 	}
@@ -84,7 +70,7 @@ func newSummarize() relation.Relation {
 		ops = append(ops, overload.Count)
 		attrs = append(attrs, &Attribute{Name: "b", Alias: "D"})
 	}
-	s := New(ops, gs, attrs, r)
+	s := New(ops, gs, attrs, c, r)
 	sr, err := s.Summarize(len(r.Metadata()))
 	if err != nil {
 		log.Fatal(err)
@@ -92,13 +78,13 @@ func newSummarize() relation.Relation {
 	return sr
 }
 
-func newTestRelation() relation.Relation {
+func newTestRelation(c context.Context) relation.Relation {
 	var attrs []string
 
 	attrs = append(attrs, "a")
 	attrs = append(attrs, "b")
 	attrs = append(attrs, "c")
-	r := mem.New("A", attrs)
+	r := mem.New("A", attrs, c)
 	{
 		var t value.Tuple
 

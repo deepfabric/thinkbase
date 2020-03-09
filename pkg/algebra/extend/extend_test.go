@@ -10,89 +10,104 @@ import (
 	"github.com/deepfabric/thinkbase/pkg/algebra/relation/mem"
 	"github.com/deepfabric/thinkbase/pkg/algebra/util"
 	"github.com/deepfabric/thinkbase/pkg/algebra/value"
+	"github.com/deepfabric/thinkbase/pkg/context"
 )
 
 func TestExtend(t *testing.T) {
 	testLT()
+	//	testTypeof()
 }
 
 func testLT() {
-	a := newTestRelation0()
+	ct := context.New()
+	a := newTestRelation0(ct)
 	{
 		fmt.Printf("%s\n", a)
 	}
-	b := newTestRelation1()
+	b := newTestRelation1(ct)
 	{
 		fmt.Printf("%s\n", b)
 	}
-	ea, err := NewAttribute("b", a)
-	if err != nil {
-		log.Fatal(err)
-	}
-	eb, err := NewAttribute("b", b)
-	if err != nil {
-		log.Fatal(err)
-	}
+	ea := &Attribute{a.Placeholder(), "b"}
+	eb := &Attribute{b.Placeholder(), "b"}
 	e := &BinaryExtend{
 		Op:    overload.LT,
 		Left:  ea,
 		Right: eb,
 	}
-	as, err := util.GetTuples(a)
+	acnt, err := a.GetTupleCount()
 	if err != nil {
 		log.Fatal(err)
 	}
-	bs, err := util.GetTuples(b)
+	bcnt, err := b.GetTupleCount()
 	if err != nil {
 		log.Fatal(err)
 	}
-	for _, a := range as {
-		for _, b := range bs {
-			ok, err := e.Eval([]value.Tuple{a, b})
+	mp, as, bs, err := util.GetattributeByJoin(a.Placeholder(), b.Placeholder(), e.Attributes(), ct)
+	if err != nil {
+		log.Fatal(err)
+	}
+	for i := 0; i < acnt; i++ {
+		for j := 0; j < bcnt; j++ {
+			var at, bt value.Tuple
+
+			for _, attrs := range as {
+				at = append(at, attrs[i])
+			}
+			for _, attrs := range bs {
+				bt = append(bt, attrs[j])
+			}
+			ok, err := e.Eval([]value.Tuple{at, bt}, mp)
 			if err != nil {
 				log.Fatal(err)
 			}
 			if value.MustBeBool(ok) {
-				fmt.Printf("%s < %s\n\t%s\n", a, b, ok)
+				fmt.Printf("a.%v < b.%v\n\t%s\n", i, j, ok)
 			}
 		}
 	}
 }
 
 func testTypeof() {
-	r := newTestRelation0()
+	ct := context.New()
+	r := newTestRelation0(ct)
 	{
 		fmt.Printf("r:\n%s\n", r)
 	}
-	a, err := NewAttribute("a", r)
-	if err != nil {
-		log.Fatal(err)
-	}
+	a := &Attribute{r.Placeholder(), "a"}
 	e := &UnaryExtend{
 		E:  a,
 		Op: overload.Typeof,
 	}
-	ts, err := util.GetTuples(r)
+	cnt, err := r.GetTupleCount()
 	if err != nil {
 		log.Fatal(err)
 	}
-	for i, t := range ts {
-		v, err := e.Eval([]value.Tuple{t})
+	mp, as, err := util.Getattribute(r.Placeholder(), e.Attributes(), ct)
+	if err != nil {
+		log.Fatal(err)
+	}
+	for i := 0; i < cnt; i++ {
+		var t value.Tuple
+
+		for _, attrs := range as {
+			t = append(t, attrs[i])
+		}
+		v, err := e.Eval([]value.Tuple{t, t}, mp)
 		if err != nil {
 			log.Fatal(err)
 		}
-		fmt.Printf("%v: %s.a.type\n\t%s\n", i, t, v)
+		fmt.Printf("%v: a.type\n\t%s\n", i, v)
 	}
-
 }
 
-func newTestRelation0() relation.Relation {
+func newTestRelation0(ct context.Context) relation.Relation {
 	var attrs []string
 
 	attrs = append(attrs, "a")
 	attrs = append(attrs, "b")
 	attrs = append(attrs, "c")
-	r := mem.New("A", attrs)
+	r := mem.New("A", attrs, ct)
 	{
 		var t value.Tuple
 
@@ -136,12 +151,12 @@ func newTestRelation0() relation.Relation {
 	return r
 }
 
-func newTestRelation1() relation.Relation {
+func newTestRelation1(ct context.Context) relation.Relation {
 	var attrs []string
 
 	attrs = append(attrs, "b")
 	attrs = append(attrs, "d")
-	r := mem.New("B", attrs)
+	r := mem.New("B", attrs, ct)
 	{
 		var t value.Tuple
 

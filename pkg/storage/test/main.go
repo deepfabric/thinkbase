@@ -8,10 +8,13 @@ import (
 
 	"github.com/deepfabric/thinkbase/pkg/algebra/extend"
 	"github.com/deepfabric/thinkbase/pkg/algebra/extend/overload"
+	aprojection "github.com/deepfabric/thinkbase/pkg/algebra/projection"
 	"github.com/deepfabric/thinkbase/pkg/algebra/relation/disk"
 	asummarize "github.com/deepfabric/thinkbase/pkg/algebra/summarize"
 	aoverload "github.com/deepfabric/thinkbase/pkg/algebra/summarize/overload"
 	"github.com/deepfabric/thinkbase/pkg/algebra/value"
+	"github.com/deepfabric/thinkbase/pkg/context"
+	"github.com/deepfabric/thinkbase/pkg/exec/projection"
 	"github.com/deepfabric/thinkbase/pkg/exec/restrict"
 	"github.com/deepfabric/thinkbase/pkg/exec/summarize"
 	"github.com/deepfabric/thinkbase/pkg/exec/testunit"
@@ -28,35 +31,35 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	if err := inject(tbl, 100); err != nil {
+	if err := inject(tbl, 1000000); err != nil {
 		log.Fatal(err)
 	}
 	{
 		fmt.Printf("++++++inject end++++++\n")
 	}
 	testSummarize("test", db)
+	//testRestrict("test", db)
+	//testProjection("test", db)
 }
 
 func testRestrict(id string, db storage.Database) {
-	r, err := disk.New(id, db)
+	ct := context.New()
+	r, err := disk.New(id, db, ct)
 	if err != nil {
 		log.Fatal(err)
 	}
-	a, err := extend.NewAttribute("amount", r)
-	if err != nil {
-		log.Fatal(err)
-	}
+	a := &extend.Attribute{r.Placeholder(), "amount"}
 	e := &extend.BinaryExtend{
 		Op:    overload.GT,
 		Left:  a,
-		Right: value.NewInt(1000),
+		Right: value.NewInt(5000),
 	}
 	t := time.Now()
-	us, err := testunit.NewRestrict(2, e, r)
+	us, err := testunit.NewRestrict(8, e, ct, r)
 	if err != nil {
 		log.Fatal(err)
 	}
-	_, err = restrict.New(us).Restrict()
+	_, err = restrict.New(us, ct).Restrict()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -64,7 +67,8 @@ func testRestrict(id string, db storage.Database) {
 }
 
 func testSummarize(id string, db storage.Database) {
-	r, err := disk.New(id, db)
+	ct := context.New()
+	r, err := disk.New(id, db, ct)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -72,15 +76,47 @@ func testSummarize(id string, db storage.Database) {
 	gs := []string{}
 	attrs := []*asummarize.Attribute{}
 	{
-		ops = append(ops, aoverload.Avg)
+		ops = append(ops, aoverload.Count)
 		attrs = append(attrs, &asummarize.Attribute{Name: "amount", Alias: "A"})
 	}
 	t := time.Now()
-	us, err := testunit.NewSummarize(2, ops, gs, attrs, r)
+	us, err := testunit.NewSummarize(8, ops, gs, attrs, ct, r)
 	if err != nil {
 		log.Fatal(err)
 	}
-	_, err = summarize.New(ops, gs, attrs, r, us).Summarize()
+	_, err = summarize.New(ops, gs, attrs, ct, r, us).Summarize()
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("process: %v\n", time.Now().Sub(t))
+}
+
+func testProjection(id string, db storage.Database) {
+	ct := context.New()
+	r, err := disk.New(id, db, ct)
+	if err != nil {
+		log.Fatal(err)
+	}
+	attrs := []*aprojection.Attribute{}
+	{
+		a := &extend.Attribute{r.Placeholder(), "amount"}
+		e := &extend.BinaryExtend{
+			Op:    overload.Mult,
+			Left:  a,
+			Right: value.NewInt(5),
+		}
+		attrs = append(attrs, &aprojection.Attribute{Alias: "A", E: e})
+	}
+	{
+		a := &extend.Attribute{r.Placeholder(), "name"}
+		attrs = append(attrs, &aprojection.Attribute{Alias: "B", E: a})
+	}
+	t := time.Now()
+	us, err := testunit.NewProjection(4, attrs, ct, r)
+	if err != nil {
+		log.Fatal(err)
+	}
+	_, err = projection.New(us, ct).Projection()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -98,11 +134,16 @@ func inject(tbl storage.Table, n int) error {
 		mp := make(map[string]interface{})
 		mp["name"] = randString(5)
 		mp["amount"] = r.Int63n(10000)
-		/*
-			mp["count0"] = r.Int63n(10000)
-			mp["count1"] = r.Int63n(10000)
-			mp["count2"] = r.Int63n(10000)
-		*/
+		mp["count0"] = r.Int63n(10000)
+		mp["count1"] = r.Int63n(10000)
+		mp["count2"] = r.Int63n(10000)
+		mp["count3"] = r.Int63n(10000)
+		mp["count4"] = r.Int63n(10000)
+		mp["count5"] = r.Int63n(10000)
+		mp["count6"] = r.Int63n(10000)
+		mp["count7"] = r.Int63n(10000)
+		mp["count8"] = r.Int63n(10000)
+		mp["count9"] = r.Int63n(10000)
 		mp["date"] = time.Unix(r.Int63n(100000000), 0)
 		if err := tbl.AddTuple(mp); err != nil {
 			return err

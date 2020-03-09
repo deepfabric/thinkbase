@@ -4,14 +4,15 @@ import (
 	"github.com/deepfabric/thinkbase/pkg/algebra/relation"
 	"github.com/deepfabric/thinkbase/pkg/algebra/relation/mem"
 	"github.com/deepfabric/thinkbase/pkg/algebra/value"
+	"github.com/deepfabric/thinkbase/pkg/context"
 )
 
-func Dup(r relation.Relation) (relation.Relation, error) {
+func Dup(r relation.Relation, ct context.Context) (relation.Relation, error) {
 	ts, err := GetTuples(r)
 	if err != nil {
 		return nil, err
 	}
-	rr := mem.New(r.Name(), r.Metadata())
+	rr := mem.New(r.Name(), r.Metadata(), ct)
 	rr.AddTuples(ts)
 	return rr, nil
 }
@@ -37,4 +38,52 @@ func GetMetadata(a, b relation.Relation) []string {
 		bs[i] = b.Name() + "." + bs[i]
 	}
 	return append(as, bs...)
+}
+
+func Getattribute(plh int, attrs map[int][]string, ct context.Context) (map[int]map[string]int, []value.Attribute, error) {
+	var as []value.Attribute
+
+	mp := make(map[int]map[string]int)
+	r := ct.Relation(plh)
+	mp[plh] = make(map[string]int)
+	for i, attr := range attrs[plh] {
+		mp[plh][attr] = i
+		a, err := r.GetAttribute(attr)
+		if err != nil {
+			return nil, nil, err
+		}
+		as = append(as, a)
+	}
+	return mp, as, nil
+}
+
+func GetattributeByJoin(aplh, bplh int, attrs map[int][]string, ct context.Context) (map[int]map[string]int, []value.Attribute, []value.Attribute, error) {
+	var as, bs []value.Attribute
+
+	mp := make(map[int]map[string]int)
+	{
+		r := ct.Relation(aplh)
+		mp[aplh] = make(map[string]int)
+		for i, attr := range attrs[aplh] {
+			mp[aplh][attr] = i
+			a, err := r.GetAttribute(attr)
+			if err != nil {
+				return nil, nil, nil, err
+			}
+			as = append(as, a)
+		}
+	}
+	{
+		r := ct.Relation(bplh)
+		mp[bplh] = make(map[string]int)
+		for i, attr := range attrs[bplh] {
+			mp[bplh][attr] = i
+			a, err := r.GetAttribute(attr)
+			if err != nil {
+				return nil, nil, nil, err
+			}
+			bs = append(bs, a)
+		}
+	}
+	return mp, as, bs, nil
 }

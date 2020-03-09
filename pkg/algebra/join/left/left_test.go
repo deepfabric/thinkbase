@@ -10,11 +10,13 @@ import (
 	"github.com/deepfabric/thinkbase/pkg/algebra/relation"
 	"github.com/deepfabric/thinkbase/pkg/algebra/relation/mem"
 	"github.com/deepfabric/thinkbase/pkg/algebra/value"
+	"github.com/deepfabric/thinkbase/pkg/context"
 )
 
 func TestLeft(t *testing.T) {
-	a := newTestRelation0()
-	b := newTestRelation1()
+	ct := context.New()
+	a := newTestRelation0(ct)
+	b := newTestRelation1(ct)
 	{
 		fmt.Printf("a:\n%s\n", a)
 	}
@@ -22,21 +24,14 @@ func TestLeft(t *testing.T) {
 		fmt.Printf("b:\n%s\n", b)
 	}
 	{
-		ea, err := extend.NewAttribute("b", a)
-		if err != nil {
-			log.Fatal(err)
-		}
-		eb, err := extend.NewAttribute("b", b)
-		if err != nil {
-			log.Fatal(err)
-		}
+		ea := &extend.Attribute{a.Placeholder(), "b"}
+		eb := &extend.Attribute{b.Placeholder(), "b"}
 		e := &extend.BinaryExtend{
 			Op:    overload.LT,
 			Left:  ea,
 			Right: eb,
 		}
-
-		r, err := New(e, a, b).Join()
+		r, err := New(e, ct, a, b).Join()
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -44,13 +39,13 @@ func TestLeft(t *testing.T) {
 	}
 }
 
-func newTestRelation0() relation.Relation {
+func newTestRelation0(c context.Context) relation.Relation {
 	var attrs []string
 
 	attrs = append(attrs, "a")
 	attrs = append(attrs, "b")
 	attrs = append(attrs, "c")
-	r := mem.New("A", attrs)
+	r := mem.New("A", attrs, c)
 	{
 		var t value.Tuple
 
@@ -94,12 +89,12 @@ func newTestRelation0() relation.Relation {
 	return r
 }
 
-func newTestRelation1() relation.Relation {
+func newTestRelation1(c context.Context) relation.Relation {
 	var attrs []string
 
 	attrs = append(attrs, "b")
 	attrs = append(attrs, "d")
-	r := mem.New("B", attrs)
+	r := mem.New("B", attrs, c)
 	{
 		var t value.Tuple
 

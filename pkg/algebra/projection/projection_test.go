@@ -10,19 +10,18 @@ import (
 	"github.com/deepfabric/thinkbase/pkg/algebra/relation"
 	"github.com/deepfabric/thinkbase/pkg/algebra/relation/mem"
 	"github.com/deepfabric/thinkbase/pkg/algebra/value"
+	"github.com/deepfabric/thinkbase/pkg/context"
 )
 
 func TestProjection(t *testing.T) {
-	r := newTestRelation()
+	ct := context.New()
+	r := newTestRelation(ct)
 	{
 		fmt.Printf("r:\n%s\n", r)
 	}
 	attrs := []*Attribute{}
 	{
-		a, err := extend.NewAttribute("a", r)
-		if err != nil {
-			log.Fatal(err)
-		}
+		a := &extend.Attribute{r.Placeholder(), "a"}
 		e := &extend.BinaryExtend{
 			Op:    overload.Mult,
 			Left:  a,
@@ -31,13 +30,10 @@ func TestProjection(t *testing.T) {
 		attrs = append(attrs, &Attribute{Alias: "A", E: e})
 	}
 	{
-		a, err := extend.NewAttribute("b", r)
-		if err != nil {
-			log.Fatal(err)
-		}
+		a := &extend.Attribute{r.Placeholder(), "b"}
 		attrs = append(attrs, &Attribute{Alias: "B", E: a})
 	}
-	p := New(r, attrs)
+	p := New(r, ct, attrs)
 	pr, err := p.Projection()
 	if err != nil {
 		log.Fatal(err)
@@ -47,12 +43,12 @@ func TestProjection(t *testing.T) {
 	}
 }
 
-func newTestRelation() relation.Relation {
+func newTestRelation(ct context.Context) relation.Relation {
 	var attrs []string
 
 	attrs = append(attrs, "a")
 	attrs = append(attrs, "b")
-	r := mem.New("A", attrs)
+	r := mem.New("A", attrs, ct)
 	{
 		var t value.Tuple
 

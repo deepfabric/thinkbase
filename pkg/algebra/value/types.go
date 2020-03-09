@@ -12,7 +12,8 @@ type Value interface {
 	ResolvedType() *types.T
 
 	IsLogical() bool
-	Eval([]Tuple) (Value, error)
+	Attributes() map[int][]string
+	Eval([]Tuple, map[int]map[string]int) (Value, error)
 }
 
 type Bool bool

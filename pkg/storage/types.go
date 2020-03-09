@@ -6,7 +6,7 @@ import (
 	"github.com/deepfabric/thinkbase/pkg/algebra/value"
 )
 
-const System = "system"
+const System = "_system"
 
 // system -> table list
 type Database interface {
@@ -17,7 +17,7 @@ type Database interface {
 
 // id -> count
 // id.A -> attribute list
-// row store: id.R.row number.attr's name -> value
+// row store: id.R.row number -> value
 // column store: id.C.attr's name.row number -> value
 // inverted index: id.S.attr's name.value.row number
 type Table interface {
@@ -29,6 +29,7 @@ type Table interface {
 	GetTupleCount() (int, error)
 	GetTuple(int, []string) (value.Tuple, error)
 	GetTuples(int, int, []string) ([]value.Tuple, error)
+	GetTuplesByIndex([]int, []string) ([]value.Tuple, error)
 
 	GetAttributeByLimit(string, int, int) (value.Attribute, error)
 }
@@ -54,6 +55,7 @@ type Iterator interface {
 	Next() error
 	Valid() bool
 	Close() error
+	Seek([]byte) error
 	Key() []byte
 	Value() ([]byte, error)
 }

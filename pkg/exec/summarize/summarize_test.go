@@ -10,11 +10,13 @@ import (
 	asummarize "github.com/deepfabric/thinkbase/pkg/algebra/summarize"
 	"github.com/deepfabric/thinkbase/pkg/algebra/summarize/overload"
 	"github.com/deepfabric/thinkbase/pkg/algebra/value"
+	"github.com/deepfabric/thinkbase/pkg/context"
 	"github.com/deepfabric/thinkbase/pkg/exec/testunit"
 )
 
 func TestSummarize(t *testing.T) {
-	r := newTestRelation()
+	ct := context.New()
+	r := newTestRelation(ct)
 	{
 		fmt.Printf("r:\n%s\n", r)
 	}
@@ -40,12 +42,12 @@ func TestSummarize(t *testing.T) {
 		ops = append(ops, overload.Count)
 		attrs = append(attrs, &asummarize.Attribute{Name: "b", Alias: "D"})
 	}
-	us, err := testunit.NewSummarize(4, ops, gs, attrs, r)
+	us, err := testunit.NewSummarize(4, ops, gs, attrs, ct, r)
 	if err != nil {
 		log.Fatal(err)
 	}
 	{
-		sr, err := New(ops, gs, attrs, r, us).Summarize()
+		sr, err := New(ops, gs, attrs, ct, r, us).Summarize()
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -53,13 +55,13 @@ func TestSummarize(t *testing.T) {
 	}
 }
 
-func newTestRelation() relation.Relation {
+func newTestRelation(c context.Context) relation.Relation {
 	var attrs []string
 
 	attrs = append(attrs, "a")
 	attrs = append(attrs, "b")
 	attrs = append(attrs, "c")
-	r := mem.New("A", attrs)
+	r := mem.New("A", attrs, c)
 	{
 		var t value.Tuple
 

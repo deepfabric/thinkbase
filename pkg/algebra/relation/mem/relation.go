@@ -7,18 +7,49 @@ import (
 
 	arelation "github.com/deepfabric/thinkbase/pkg/algebra/relation"
 	"github.com/deepfabric/thinkbase/pkg/algebra/value"
+	"github.com/deepfabric/thinkbase/pkg/context"
 )
 
-func New(name string, attrs []string) *relation {
+func New(name string, attrs []string, ct context.Context) *relation {
 	mp := make(map[string]int)
 	for i, attr := range attrs {
 		mp[attr] = i
 	}
-	return &relation{
+	r := &relation{
+		ct:    ct,
 		mp:    mp,
 		name:  name,
 		attrs: attrs,
+		plh:   ct.Placeholder(),
 	}
+	ct.AddRelation(r)
+	return r
+}
+
+func (r *relation) Placeholder() int {
+	return r.plh
+}
+
+func (r *relation) Limit(start, count int) (arelation.Relation, error) {
+	if start < 0 || count <= 0 || start+count > len(r.tuple) {
+		return nil, errors.New("out of size")
+	}
+	attrs := make([]string, len(r.attrs))
+	copy(attrs, r.attrs)
+	mp := make(map[string]int)
+	for i, attr := range attrs {
+		mp[attr] = i
+	}
+	rr := &relation{
+		mp:    mp,
+		attrs: attrs,
+		name:  r.name,
+		ct:    r.ct,
+		plh:   r.ct.Placeholder(),
+		tuple: r.tuple[start : start+count],
+	}
+	rr.ct.AddRelation(rr)
+	return rr, nil
 }
 
 func (r *relation) Split(n int) ([]arelation.Relation, error) {
@@ -43,8 +74,11 @@ func (r *relation) Split(n int) ([]arelation.Relation, error) {
 			mp:    mp,
 			attrs: attrs,
 			name:  r.name,
+			ct:    r.ct,
+			plh:   r.ct.Placeholder(),
 			tuple: r.tuple[i : i+cnt],
 		})
+		r.ct.AddRelation(rs[len(rs)-1])
 	}
 	return rs, nil
 }
@@ -116,6 +150,15 @@ func (r *relation) GetTuples(start, end int) ([]value.Tuple, error) {
 		end = len(r.tuple)
 	}
 	return r.tuple[start:end], nil
+}
+
+func (r *relation) GetTuplesByIndex(is []int) ([]value.Tuple, error) {
+	var ts []value.Tuple
+
+	for _, i := range is {
+		ts = append(ts, r.tuple[i])
+	}
+	return ts, nil
 }
 
 func (r *relation) GetAttributeIndex(name string) (int, error) {

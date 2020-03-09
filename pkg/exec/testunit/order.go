@@ -1,12 +1,6 @@
 package testunit
 
-import (
-	"github.com/deepfabric/thinkbase/pkg/algebra/order"
-	"github.com/deepfabric/thinkbase/pkg/algebra/relation"
-	"github.com/deepfabric/thinkbase/pkg/algebra/relation/mem"
-	"github.com/deepfabric/thinkbase/pkg/exec/unit"
-)
-
+/*
 func NewOrder(n int, isNub bool, descs []bool, attrs []string, r relation.Relation) ([]unit.Unit, error) {
 	rn, err := r.GetTupleCount()
 	if err != nil {
@@ -36,3 +30,4 @@ func NewOrder(n int, isNub bool, descs []bool, attrs []string, r relation.Relati
 func (u *orderUnit) Result() (relation.Relation, error) {
 	return order.New(u.isNub, u.descs, u.attrs, u.r).Order()
 }
+*/

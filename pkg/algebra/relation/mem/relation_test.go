@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/deepfabric/thinkbase/pkg/algebra/value"
+	"github.com/deepfabric/thinkbase/pkg/context"
 )
 
 func TestRelation(t *testing.T) {
@@ -12,7 +13,7 @@ func TestRelation(t *testing.T) {
 
 	attrs = append(attrs, "a")
 	attrs = append(attrs, "b")
-	r := New("A", attrs)
+	r := New("A", attrs, context.New())
 	{
 		var t value.Tuple
 

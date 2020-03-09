@@ -13,9 +13,10 @@ import (
 	"github.com/deepfabric/thinkbase/pkg/algebra/summarize/overload/sum"
 	"github.com/deepfabric/thinkbase/pkg/algebra/util"
 	"github.com/deepfabric/thinkbase/pkg/algebra/value"
+	"github.com/deepfabric/thinkbase/pkg/context"
 )
 
-func New(ops []int, gs []string, as []*Attribute, r relation.Relation) *summarize {
+func New(ops []int, gs []string, as []*Attribute, c context.Context, r relation.Relation) *summarize {
 	var is []int
 	var aggs []overload.Aggregation
 
@@ -27,13 +28,22 @@ func New(ops []int, gs []string, as []*Attribute, r relation.Relation) *summariz
 		is = append(is, idx)
 	}
 	for _, op := range ops {
-		if agg, ok := Aggs[op]; !ok {
+		switch op {
+		case overload.Avg:
+			aggs = append(aggs, avg.New())
+		case overload.Max:
+			aggs = append(aggs, max.New())
+		case overload.Min:
+			aggs = append(aggs, min.New())
+		case overload.Sum:
+			aggs = append(aggs, sum.New())
+		case overload.Count:
+			aggs = append(aggs, count.New())
+		default:
 			return nil
-		} else {
-			aggs = append(aggs, agg)
 		}
 	}
-	return &summarize{r: r, is: is, gs: gs, as: as, aggs: aggs}
+	return &summarize{r: r, c: c, is: is, gs: gs, as: as, aggs: aggs}
 }
 
 func (s *summarize) Summarize(n int) (relation.Relation, error) {
@@ -88,7 +98,7 @@ func (s *summarize) summarizeByGroup(n int) (relation.Relation, error) {
 			return nil, err
 		}
 	default:
-		r = mem.New("", s.r.Metadata())
+		r = mem.New("", s.r.Metadata(), s.c)
 	}
 	gs, err := s.group()
 	if err != nil {
@@ -127,7 +137,7 @@ func (s *summarize) newRelation() (relation.Relation, error) {
 		}
 		attrs = append(attrs, attr)
 	}
-	return mem.New("", attrs), nil
+	return mem.New("", attrs, s.c), nil
 }
 
 func (s *summarize) newRelationByGroup(n int) (relation.Relation, error) {
@@ -139,7 +149,7 @@ func (s *summarize) newRelationByGroup(n int) (relation.Relation, error) {
 		}
 		attrs = append(attrs, attr)
 	}
-	return mem.New("", attrs), nil
+	return mem.New("", attrs, s.c), nil
 }
 
 type group struct {
@@ -188,12 +198,4 @@ func getAttributeName(a *Attribute) (string, error) {
 		return "", errors.New("need alias")
 	}
 	return a.Alias, nil
-}
-
-var Aggs = map[int]overload.Aggregation{
-	overload.Avg:   avg.New(),
-	overload.Max:   max.New(),
-	overload.Min:   min.New(),
-	overload.Sum:   sum.New(),
-	overload.Count: count.New(),
 }

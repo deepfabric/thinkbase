@@ -8,22 +8,24 @@ import (
 	"github.com/deepfabric/thinkbase/pkg/algebra/relation"
 	"github.com/deepfabric/thinkbase/pkg/algebra/relation/mem"
 	"github.com/deepfabric/thinkbase/pkg/algebra/value"
+	"github.com/deepfabric/thinkbase/pkg/context"
 )
 
 func TestOrder(t *testing.T) {
-	r := newTestRelation()
+	ct := context.New()
+	r := newTestRelation(ct)
 	{
 		fmt.Printf("%s\n", r)
 	}
 	{
-		rr, err := New(true, []bool{false}, []string{"a"}, r).Order()
+		rr, err := New(true, []bool{false}, []string{"a"}, ct, r).Order()
 		if err != nil {
 			log.Fatal(err)
 		}
 		fmt.Printf("%s\n", rr)
 	}
 	{
-		rr, err := New(false, []bool{true}, []string{"a"}, r).Order()
+		rr, err := New(false, []bool{true}, []string{"a"}, ct, r).Order()
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -31,12 +33,12 @@ func TestOrder(t *testing.T) {
 	}
 }
 
-func newTestRelation() relation.Relation {
+func newTestRelation(c context.Context) relation.Relation {
 	var attrs []string
 
 	attrs = append(attrs, "a")
 	attrs = append(attrs, "b")
-	r := mem.New("A", attrs)
+	r := mem.New("A", attrs, c)
 	{
 		var t value.Tuple
 

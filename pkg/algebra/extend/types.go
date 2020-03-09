@@ -4,7 +4,8 @@ import "github.com/deepfabric/thinkbase/pkg/algebra/value"
 
 type Extend interface {
 	IsLogical() bool
-	Eval([]value.Tuple) (value.Value, error)
+	Attributes() map[int][]string // placeholder -> attribute list
+	Eval([]value.Tuple, map[int]map[string]int) (value.Value, error)
 }
 
 type UnaryExtend struct {
@@ -23,6 +24,6 @@ type FuncExtend struct {
 }
 
 type Attribute struct {
-	idx  int
-	Name string
+	Placeholder int
+	Name        string
 }

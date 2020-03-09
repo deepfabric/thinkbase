@@ -125,7 +125,8 @@ func CompareBool(d, v bool) int {
 	return 0
 }
 
-func (_ *Bool) IsLogical() bool { return true }
+func (_ *Bool) IsLogical() bool              { return true }
+func (_ *Bool) Attributes() map[int][]string { return make(map[int][]string) }
 
 func NewInt(v int64) *Int {
 	r := Int(v)
@@ -202,7 +203,8 @@ func (a *Int) Compare(v Value) int {
 	}
 }
 
-func (_ *Int) IsLogical() bool { return false }
+func (_ *Int) IsLogical() bool              { return false }
+func (_ *Int) Attributes() map[int][]string { return make(map[int][]string) }
 
 func NewFloat(v float64) *Float {
 	r := Float(v)
@@ -290,7 +292,8 @@ func (a *Float) Compare(v Value) int {
 	return 1
 }
 
-func (_ *Float) IsLogical() bool { return false }
+func (_ *Float) IsLogical() bool              { return false }
+func (_ *Float) Attributes() map[int][]string { return make(map[int][]string) }
 
 func NewString(v string) *String {
 	r := String(v)
@@ -346,7 +349,8 @@ func (a *String) Compare(v Value) int {
 	return 0
 }
 
-func (_ *String) IsLogical() bool { return false }
+func (_ *String) IsLogical() bool              { return false }
+func (_ *String) Attributes() map[int][]string { return make(map[int][]string) }
 
 func NewTime(t time.Time) *Time {
 	return &Time{Time: t.Round(time.Second)}
@@ -416,7 +420,8 @@ func compareTime(a, b Value) int {
 	return 0
 }
 
-func (_ *Time) IsLogical() bool { return false }
+func (_ *Time) IsLogical() bool              { return false }
+func (_ *Time) Attributes() map[int][]string { return make(map[int][]string) }
 
 func NewTable(id string) *Table {
 	return &Table{id}
@@ -470,11 +475,13 @@ func compareTable(a, b Value) int {
 	return strings.Compare(aTable.Id, bTable.Id)
 }
 
-func (_ *Table) IsLogical() bool { return false }
+func (_ *Table) IsLogical() bool              { return false }
+func (_ *Table) Attributes() map[int][]string { return make(map[int][]string) }
 
-func (_ Null) String() string         { return "null" }
-func (_ Null) ResolvedType() *types.T { return types.Null }
-func (_ Null) IsLogical() bool        { return false }
+func (_ Null) String() string               { return "null" }
+func (_ Null) ResolvedType() *types.T       { return types.Null }
+func (_ Null) IsLogical() bool              { return false }
+func (_ Null) Attributes() map[int][]string { return make(map[int][]string) }
 
 func (a Null) Compare(v Value) int {
 	if v == ConstNull {
@@ -483,8 +490,9 @@ func (a Null) Compare(v Value) int {
 	return 1 // NULL is less than any non-NULL value
 }
 
-func (_ Array) ResolvedType() *types.T { return types.Array }
-func (_ Array) IsLogical() bool        { return false }
+func (_ Array) ResolvedType() *types.T       { return types.Array }
+func (_ Array) IsLogical() bool              { return false }
+func (_ Array) Attributes() map[int][]string { return make(map[int][]string) }
 
 func (a Array) String() string {
 	s := "["
@@ -526,14 +534,14 @@ func (a Array) Compare(v Value) int {
 	return 0
 }
 
-func (a *Int) Eval(_ []Tuple) (Value, error)    { return a, nil }
-func (a *Bool) Eval(_ []Tuple) (Value, error)   { return a, nil }
-func (a *Time) Eval(_ []Tuple) (Value, error)   { return a, nil }
-func (a *Float) Eval(_ []Tuple) (Value, error)  { return a, nil }
-func (a Null) Eval(_ []Tuple) (Value, error)    { return a, nil }
-func (a *Table) Eval(_ []Tuple) (Value, error)  { return a, nil }
-func (a Array) Eval(_ []Tuple) (Value, error)   { return a, nil }
-func (a *String) Eval(_ []Tuple) (Value, error) { return a, nil }
+func (a *Int) Eval(_ []Tuple, _ map[int]map[string]int) (Value, error)    { return a, nil }
+func (a *Bool) Eval(_ []Tuple, _ map[int]map[string]int) (Value, error)   { return a, nil }
+func (a *Time) Eval(_ []Tuple, _ map[int]map[string]int) (Value, error)   { return a, nil }
+func (a *Float) Eval(_ []Tuple, _ map[int]map[string]int) (Value, error)  { return a, nil }
+func (a Null) Eval(_ []Tuple, _ map[int]map[string]int) (Value, error)    { return a, nil }
+func (a *Table) Eval(_ []Tuple, _ map[int]map[string]int) (Value, error)  { return a, nil }
+func (a Array) Eval(_ []Tuple, _ map[int]map[string]int) (Value, error)   { return a, nil }
+func (a *String) Eval(_ []Tuple, _ map[int]map[string]int) (Value, error) { return a, nil }
 
 func (a Tuple) Len() int { return len(a) }
 func (a Tuple) Compare(b Tuple) int {
@@ -616,5 +624,7 @@ func init() {
 	gob.Register(Float(0))
 	gob.Register(Bool(true))
 	gob.Register(String(""))
+
+	gob.Register(time.Time{})
 	gob.Register([]interface{}{})
 }

@@ -4,10 +4,11 @@ import (
 	"github.com/deepfabric/thinkbase/pkg/algebra/relation"
 	"github.com/deepfabric/thinkbase/pkg/algebra/relation/mem"
 	"github.com/deepfabric/thinkbase/pkg/algebra/util"
+	"github.com/deepfabric/thinkbase/pkg/context"
 )
 
-func New(a, b relation.Relation) *product {
-	return &product{a, b}
+func New(c context.Context, a, b relation.Relation) *product {
+	return &product{c, a, b}
 }
 
 func (j *product) Join() (relation.Relation, error) {
@@ -19,7 +20,7 @@ func (j *product) Join() (relation.Relation, error) {
 	if err != nil {
 		return nil, err
 	}
-	r := mem.New("", util.GetMetadata(j.a, j.b))
+	r := mem.New("", util.GetMetadata(j.a, j.b), j.c)
 	for _, a := range as {
 		for _, b := range bs {
 			r.AddTuple(append(a, b...))

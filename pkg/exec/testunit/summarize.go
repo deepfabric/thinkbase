@@ -4,10 +4,11 @@ import (
 	"github.com/deepfabric/thinkbase/pkg/algebra/relation"
 	"github.com/deepfabric/thinkbase/pkg/algebra/summarize"
 	"github.com/deepfabric/thinkbase/pkg/algebra/summarize/overload"
+	"github.com/deepfabric/thinkbase/pkg/context"
 	"github.com/deepfabric/thinkbase/pkg/exec/unit"
 )
 
-func NewSummarize(n int, ops []int, gs []string, attrs []*summarize.Attribute, r relation.Relation) ([]unit.Unit, error) {
+func NewSummarize(n int, ops []int, gs []string, attrs []*summarize.Attribute, c context.Context, r relation.Relation) ([]unit.Unit, error) {
 	{
 		var tops []int
 		var tattrs []*summarize.Attribute
@@ -26,7 +27,7 @@ func NewSummarize(n int, ops []int, gs []string, attrs []*summarize.Attribute, r
 		attrs = tattrs
 		if flg { // need row count
 			ops = append(ops, overload.Count)
-			attrs = append(attrs, &summarize.Attribute{Name: r.Metadata()[0], Alias: "_"})
+			attrs = append(attrs, &summarize.Attribute{Name: attrs[0].Name, Alias: "_"})
 		}
 	}
 	rs, err := r.Split(n)
@@ -35,11 +36,11 @@ func NewSummarize(n int, ops []int, gs []string, attrs []*summarize.Attribute, r
 	}
 	var us []unit.Unit
 	for i, j := 0, len(rs); i < j; i++ {
-		us = append(us, &summarizeUnit{ops, gs, rs[i], attrs})
+		us = append(us, &summarizeUnit{ops, gs, c, rs[i], attrs})
 	}
 	return us, nil
 }
 
 func (u *summarizeUnit) Result() (relation.Relation, error) {
-	return summarize.New(u.ops, u.gs, u.attrs, u.r).Summarize(len(u.r.Metadata()))
+	return summarize.New(u.ops, u.gs, u.attrs, u.c, u.r).Summarize(len(u.r.Metadata()))
 }

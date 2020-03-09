@@ -1,4 +1,5 @@
 #!/bin/bash
 
-rm -r test.db
-go run main.go
+rm -r test test.db
+go build
+./test

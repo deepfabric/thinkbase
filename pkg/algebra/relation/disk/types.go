@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/deepfabric/thinkbase/pkg/algebra/value"
+	"github.com/deepfabric/thinkbase/pkg/context"
 	"github.com/deepfabric/thinkbase/pkg/storage"
 )
 
@@ -15,12 +16,15 @@ type metadata struct {
 }
 
 type relation struct {
+	plh   int // placeholder
 	name  string
 	attrs []string
 	md    *metadata
 	tbl   storage.Table
 	tuple []value.Tuple
 	mp    map[string]int
+	ct    context.Context
+	amp   map[string]value.Attribute
 }
 
 type tuples struct {

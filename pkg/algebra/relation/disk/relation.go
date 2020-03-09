@@ -7,10 +7,11 @@ import (
 
 	arelation "github.com/deepfabric/thinkbase/pkg/algebra/relation"
 	"github.com/deepfabric/thinkbase/pkg/algebra/value"
+	"github.com/deepfabric/thinkbase/pkg/context"
 	"github.com/deepfabric/thinkbase/pkg/storage"
 )
 
-func New(id string, db storage.Database) (*relation, error) {
+func New(id string, db storage.Database, ct context.Context) (*relation, error) {
 	tbl, err := db.Table(id)
 	if err != nil {
 		return nil, err
@@ -24,13 +25,46 @@ func New(id string, db storage.Database) (*relation, error) {
 	for i, attr := range attrs {
 		mp[attr] = i
 	}
-	return &relation{
+	r := &relation{
+		ct:    ct,
 		mp:    mp,
 		name:  id,
 		tbl:   tbl,
 		attrs: attrs,
+		plh:   ct.Placeholder(),
 		md:    newMetadata(cnt, 0, id, attrs),
-	}, nil
+		amp:   make(map[string]value.Attribute),
+	}
+	ct.AddRelation(r)
+	return r, nil
+}
+
+func (r *relation) Placeholder() int {
+	return r.plh
+}
+
+func (r *relation) Limit(start, count int) (arelation.Relation, error) {
+	if start < 0 || count <= 0 || start+count > r.md.cnt {
+		return nil, errors.New("out of size")
+	}
+	attrs := make([]string, len(r.attrs))
+	copy(attrs, r.attrs)
+	mp := make(map[string]int)
+	for i, attr := range attrs {
+		mp[attr] = i
+	}
+	rr := &relation{
+		mp:    mp,
+		tbl:   r.tbl,
+		attrs: attrs,
+		name:  r.name,
+		ct:    r.ct,
+		plh:   r.ct.Placeholder(),
+		amp:   make(map[string]value.Attribute),
+		md:    newMetadata(count, start, r.md.id, r.md.attrs),
+	}
+	r.ct.AddRelation(rr)
+	return rr, nil
 }
 
 func (r *relation) Split(n int) ([]arelation.Relation, error) {
@@ -56,8 +90,12 @@ func (r *relation) Split(n int) ([]arelation.Relation, error) {
 			tbl:   r.tbl,
 			attrs: attrs,
 			name:  r.name,
+			ct:    r.ct,
+			plh:   r.ct.Placeholder(),
+			amp:   make(map[string]value.Attribute),
 			md:    newMetadata(cnt, i, r.md.id, r.md.attrs),
 		})
+		r.ct.AddRelation(rs[len(rs)-1])
 	}
 	return rs, nil
 }
@@ -123,6 +161,10 @@ func (r *relation) GetTuples(start, end int) ([]value.Tuple, error) {
 	return r.tbl.GetTuples(r.md.start+start, r.md.start+end, r.md.attrs)
 }
 
+func (r *relation) GetTuplesByIndex(is []int) ([]value.Tuple, error) {
+	return r.tbl.GetTuplesByIndex(is, r.md.attrs)
+}
+
 func (r *relation) GetAttributeIndex(name string) (int, error) {
 	if idx, ok := r.mp[name]; ok {
 		return idx, nil
@@ -131,10 +173,27 @@ func (r *relation) GetAttributeIndex(name string) (int, error) {
 }
 
 func (r *relation) GetAttribute(name string) (value.Attribute, error) {
-	return r.tbl.GetAttributeByLimit(name, r.md.start, r.md.start+r.md.cnt)
+	if a, ok := r.amp[name]; ok {
+		return a, nil
+	}
+	a, err := r.tbl.GetAttributeByLimit(name, r.md.start, r.md.start+r.md.cnt)
+	if err != nil {
+		return nil, err
+	}
+	r.amp[name] = a
+	return a, nil
 }
 
 func (r *relation) GetAttributeByLimit(name string, start, end int) (value.Attribute, error) {
+	if a, ok := r.amp[name]; ok {
+		if start < 0 {
+			start = 0
+		}
+		if end < 0 || end > r.md.cnt {
+			end = r.md.cnt
+		}
+		return a[start:end], nil
+	}
 	return r.tbl.GetAttributeByLimit(name, r.md.start+start, r.md.start+end)
 }
 

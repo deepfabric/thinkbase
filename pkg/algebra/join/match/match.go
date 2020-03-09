@@ -5,14 +5,15 @@ import (
 	"github.com/deepfabric/thinkbase/pkg/algebra/join/natural"
 	"github.com/deepfabric/thinkbase/pkg/algebra/projection"
 	"github.com/deepfabric/thinkbase/pkg/algebra/relation"
+	"github.com/deepfabric/thinkbase/pkg/context"
 )
 
-func New(a, b relation.Relation) *match {
-	return &match{a, b}
+func New(c context.Context, a, b relation.Relation) *match {
+	return &match{c, a, b}
 }
 
 func (j *match) Join() (relation.Relation, error) {
-	r, err := natural.New(j.a, j.b).Join()
+	r, err := natural.New(j.c, j.a, j.b).Join()
 	if err != nil {
 		return nil, err
 	}
@@ -23,12 +24,8 @@ func (j *match) Join() (relation.Relation, error) {
 	{
 		as := j.a.Metadata()
 		for _, a := range as {
-			e, err := extend.NewAttribute(a, r)
-			if err != nil {
-				return nil, err
-			}
-			attrs = append(attrs, &projection.Attribute{E: e})
+			attrs = append(attrs, &projection.Attribute{E: &extend.Attribute{r.Placeholder(), a}})
 		}
 	}
-	return projection.New(r, attrs).Projection()
+	return projection.New(r, j.c, attrs).Projection()
 }

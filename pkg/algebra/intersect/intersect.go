@@ -6,10 +6,11 @@ import (
 	"github.com/deepfabric/thinkbase/pkg/algebra/relation"
 	"github.com/deepfabric/thinkbase/pkg/algebra/relation/mem"
 	"github.com/deepfabric/thinkbase/pkg/algebra/util"
+	"github.com/deepfabric/thinkbase/pkg/context"
 )
 
-func New(a, b relation.Relation) *intersect {
-	return &intersect{a, b}
+func New(c context.Context, a, b relation.Relation) *intersect {
+	return &intersect{c, a, b}
 }
 
 func (i *intersect) Intersect() (relation.Relation, error) {
@@ -24,7 +25,7 @@ func (i *intersect) Intersect() (relation.Relation, error) {
 	if err != nil {
 		return nil, err
 	}
-	r := mem.New("", i.a.Metadata())
+	r := mem.New("", i.a.Metadata(), i.c)
 	for _, a := range as {
 		ok := false
 		for _, b := range bs {

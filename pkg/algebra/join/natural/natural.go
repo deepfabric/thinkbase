@@ -5,10 +5,11 @@ import (
 	"github.com/deepfabric/thinkbase/pkg/algebra/relation/mem"
 	"github.com/deepfabric/thinkbase/pkg/algebra/util"
 	"github.com/deepfabric/thinkbase/pkg/algebra/value"
+	"github.com/deepfabric/thinkbase/pkg/context"
 )
 
-func New(a, b relation.Relation) *natural {
-	return &natural{a, b}
+func New(c context.Context, a, b relation.Relation) *natural {
+	return &natural{c, a, b}
 }
 
 func (j *natural) Join() (relation.Relation, error) {
@@ -21,7 +22,7 @@ func (j *natural) Join() (relation.Relation, error) {
 		return nil, err
 	}
 	mp, is, attrs := getMetadata(j.a, j.b)
-	r := mem.New("", attrs)
+	r := mem.New("", attrs, j.c)
 	for _, a := range as {
 		for _, b := range bs {
 			ok := true

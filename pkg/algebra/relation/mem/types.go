@@ -4,13 +4,16 @@ import (
 	"fmt"
 
 	"github.com/deepfabric/thinkbase/pkg/algebra/value"
+	"github.com/deepfabric/thinkbase/pkg/context"
 )
 
 type relation struct {
+	plh   int // placeholder
 	name  string
 	attrs []string
 	tuple []value.Tuple
 	mp    map[string]int
+	ct    context.Context
 }
 
 type tuples struct {

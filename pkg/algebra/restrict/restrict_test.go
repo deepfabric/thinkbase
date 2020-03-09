@@ -10,17 +10,16 @@ import (
 	"github.com/deepfabric/thinkbase/pkg/algebra/relation"
 	"github.com/deepfabric/thinkbase/pkg/algebra/relation/mem"
 	"github.com/deepfabric/thinkbase/pkg/algebra/value"
+	"github.com/deepfabric/thinkbase/pkg/context"
 )
 
 func TestRestrict(t *testing.T) {
-	r := newTestRelation()
+	ct := context.New()
+	r := newTestRelation(ct)
 	{
 		fmt.Printf("r:\n%s\n", r)
 	}
-	a, err := extend.NewAttribute("a", r)
-	if err != nil {
-		log.Fatal(err)
-	}
+	a := &extend.Attribute{r.Placeholder(), "a"}
 	e1 := &extend.UnaryExtend{
 		E:  a,
 		Op: overload.Typeof,
@@ -30,10 +29,7 @@ func TestRestrict(t *testing.T) {
 		Left:  e1,
 		Right: value.NewString("float"),
 	}
-	rs := New(e, r)
-	if err != nil {
-		log.Fatal(err)
-	}
+	rs := New(e, ct, r)
 	rr, err := rs.Restrict()
 	if err != nil {
 		log.Fatal(err)
@@ -43,12 +39,12 @@ func TestRestrict(t *testing.T) {
 	}
 }
 
-func newTestRelation() relation.Relation {
+func newTestRelation(ct context.Context) relation.Relation {
 	var attrs []string
 
 	attrs = append(attrs, "a")
 	attrs = append(attrs, "b")
-	r := mem.New("A", attrs)
+	r := mem.New("A", attrs, ct)
 	{
 		var t value.Tuple
 

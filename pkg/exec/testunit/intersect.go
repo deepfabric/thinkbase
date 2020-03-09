@@ -1,14 +1,6 @@
 package testunit
 
-import (
-	"errors"
-
-	"github.com/deepfabric/thinkbase/pkg/algebra/intersect"
-	"github.com/deepfabric/thinkbase/pkg/algebra/relation"
-	"github.com/deepfabric/thinkbase/pkg/algebra/relation/mem"
-	"github.com/deepfabric/thinkbase/pkg/exec/unit"
-)
-
+/*
 func newIntersect(n int, a, b relation.Relation) ([]unit.Unit, error) {
 	if len(a.Metadata()) != len(b.Metadata()) {
 		return nil, errors.New("size is different")
@@ -65,3 +57,4 @@ func newIntersect(n int, a, b relation.Relation) ([]unit.Unit, error) {
 func (u *intersectUnit) Result() (relation.Relation, error) {
 	return intersect.New(u.a, u.b).Intersect()
 }
+*/

@@ -3,6 +3,7 @@ package restrict
 import (
 	"github.com/deepfabric/thinkbase/pkg/algebra/extend"
 	"github.com/deepfabric/thinkbase/pkg/algebra/relation"
+	"github.com/deepfabric/thinkbase/pkg/context"
 )
 
 type Restrict interface {
@@ -11,5 +12,6 @@ type Restrict interface {
 
 type restrict struct {
 	e extend.Extend
+	c context.Context
 	r relation.Relation
 }

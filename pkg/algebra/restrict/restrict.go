@@ -8,29 +8,44 @@ import (
 	"github.com/deepfabric/thinkbase/pkg/algebra/relation/mem"
 	"github.com/deepfabric/thinkbase/pkg/algebra/util"
 	"github.com/deepfabric/thinkbase/pkg/algebra/value"
+	"github.com/deepfabric/thinkbase/pkg/context"
 )
 
-func New(e extend.Extend, r relation.Relation) *restrict {
-	return &restrict{e, r}
+func New(e extend.Extend, c context.Context, r relation.Relation) *restrict {
+	return &restrict{e, c, r}
 }
 
 func (r *restrict) Restrict() (relation.Relation, error) {
 	if !r.e.IsLogical() {
 		return nil, errors.New("extend must be a boolean expression")
 	}
-	ts, err := util.GetTuples(r.r)
+	cnt, err := r.r.GetTupleCount()
 	if err != nil {
 		return nil, err
 	}
-	rr := mem.New("", r.r.Metadata())
-	for _, t := range ts {
-		ok, err := r.e.Eval([]value.Tuple{t, t})
+	mp, as, err := util.Getattribute(r.r.Placeholder(), r.e.Attributes(), r.c)
+	if err != nil {
+		return nil, err
+	}
+	is := []int{}
+	rr := mem.New("", r.r.Metadata(), r.c)
+	for i := 0; i < cnt; i++ {
+		var et value.Tuple
+		for _, attrs := range as {
+			et = append(et, attrs[i])
+		}
+		ok, err := r.e.Eval([]value.Tuple{et, et}, mp)
 		if err != nil {
 			return nil, err
 		}
 		if value.MustBeBool(ok) {
-			rr.AddTuple(t)
+			is = append(is, i)
 		}
 	}
+	ts, err := r.r.GetTuplesByIndex(is)
+	if err != nil {
+		return nil, err
+	}
+	rr.AddTuples(ts)
 	return rr, nil
 }

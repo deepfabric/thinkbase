@@ -1,13 +1,6 @@
 package testunit
 
-import (
-	"errors"
-
-	"github.com/deepfabric/thinkbase/pkg/algebra/relation"
-	"github.com/deepfabric/thinkbase/pkg/algebra/relation/mem"
-	"github.com/deepfabric/thinkbase/pkg/exec/unit"
-)
-
+/*
 func newUnion(n int, a, b relation.Relation) ([]unit.Unit, error) {
 	if len(a.Metadata()) != len(b.Metadata()) {
 		return nil, errors.New("size is different")
@@ -57,3 +50,4 @@ func newUnion(n int, a, b relation.Relation) ([]unit.Unit, error) {
 func (u *unionUnit) Result() (relation.Relation, error) {
 	return u.a, nil
 }
+*/

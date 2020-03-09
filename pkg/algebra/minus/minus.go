@@ -6,10 +6,11 @@ import (
 	"github.com/deepfabric/thinkbase/pkg/algebra/relation"
 	"github.com/deepfabric/thinkbase/pkg/algebra/relation/mem"
 	"github.com/deepfabric/thinkbase/pkg/algebra/util"
+	"github.com/deepfabric/thinkbase/pkg/context"
 )
 
-func New(a, b relation.Relation) *minus {
-	return &minus{a, b}
+func New(c context.Context, a, b relation.Relation) *minus {
+	return &minus{c, a, b}
 }
 
 func (m *minus) Minus() (relation.Relation, error) {
@@ -24,7 +25,7 @@ func (m *minus) Minus() (relation.Relation, error) {
 	if err != nil {
 		return nil, err
 	}
-	r := mem.New("", m.a.Metadata())
+	r := mem.New("", m.a.Metadata(), m.c)
 	for _, a := range as {
 		ok := true
 		for _, b := range bs {

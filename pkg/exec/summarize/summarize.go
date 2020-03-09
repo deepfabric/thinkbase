@@ -9,10 +9,11 @@ import (
 	"github.com/deepfabric/thinkbase/pkg/algebra/summarize/overload"
 	"github.com/deepfabric/thinkbase/pkg/algebra/util"
 	"github.com/deepfabric/thinkbase/pkg/algebra/value"
+	"github.com/deepfabric/thinkbase/pkg/context"
 	"github.com/deepfabric/thinkbase/pkg/exec/unit"
 )
 
-func New(ops []int, gs []string, attrs []*asummarize.Attribute, r relation.Relation, us []unit.Unit) *summarize {
+func New(ops []int, gs []string, attrs []*asummarize.Attribute, c context.Context, r relation.Relation, us []unit.Unit) *summarize {
 	var avgs []string
 
 	{
@@ -31,7 +32,7 @@ func New(ops []int, gs []string, attrs []*asummarize.Attribute, r relation.Relat
 			attrs = append(attrs, &asummarize.Attribute{Name: "_", Alias: "_"})
 		}
 	}
-	return &summarize{ops, gs, avgs, us, r, attrs}
+	return &summarize{ops, gs, avgs, us, c, r, attrs}
 }
 
 func (e *summarize) Summarize() (relation.Relation, error) {
@@ -75,7 +76,7 @@ func (e *summarize) avg(sr relation.Relation) (relation.Relation, error) {
 	}
 	attrs := sr.Metadata()
 	last := len(attrs) - 1
-	r := mem.New("", attrs[:last])
+	r := mem.New("", attrs[:last], e.c)
 	for i, j := 0, len(ts); i < j; i++ {
 		for _, idx := range is {
 			v := ts[i][idx]
@@ -137,5 +138,5 @@ func (e *summarize) merge(lr, rr relation.Relation) (relation.Relation, error) {
 		return nil, err
 	}
 	lr.AddTuples(ts)
-	return asummarize.New(e.ops, e.gs, e.attrs, lr).Summarize(len(e.r.Metadata()))
+	return asummarize.New(e.ops, e.gs, e.attrs, e.c, lr).Summarize(len(e.r.Metadata()))
 }
