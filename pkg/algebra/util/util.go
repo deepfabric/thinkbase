@@ -87,3 +87,40 @@ func GetattributeByJoin(aplh, bplh int, attrs map[int][]string, ct context.Conte
 	}
 	return mp, as, bs, nil
 }
+
+func NewCompare(isNub bool, descs []bool, attrs []string, md []string) func(value.Tuple, value.Tuple) bool {
+	var is []int
+
+	for _, attr := range attrs {
+		is = append(is, getAttributeIndex(attr, md))
+	}
+	return func(x, y value.Tuple) bool {
+		for idx, i := range is {
+			if i >= 0 {
+				if r := int(x[i].ResolvedType().Oid - y[i].ResolvedType().Oid); r != 0 {
+					return less(descs[idx], r)
+				}
+				if r := x[i].Compare(y[i]); r != 0 {
+					return less(descs[idx], r)
+				}
+			}
+		}
+		return false
+	}
+}
+
+func getAttributeIndex(attr string, md []string) int {
+	for i, a := range md {
+		if a == attr {
+			return i
+		}
+	}
+	return -1
+}
+
+func less(desc bool, r int) bool {
+	if desc {
+		return r > 0
+	}
+	return r < 0
+}

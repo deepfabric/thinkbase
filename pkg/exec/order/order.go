@@ -7,11 +7,12 @@ import (
 	"github.com/deepfabric/thinkbase/pkg/algebra/relation/mem"
 	"github.com/deepfabric/thinkbase/pkg/algebra/util"
 	"github.com/deepfabric/thinkbase/pkg/algebra/value"
+	"github.com/deepfabric/thinkbase/pkg/context"
 	"github.com/deepfabric/thinkbase/pkg/exec/unit"
 )
 
-func New(us []unit.Unit, cmp func(value.Tuple, value.Tuple) bool) *order {
-	return &order{us, cmp}
+func New(us []unit.Unit, c context.Context, cmp func(value.Tuple, value.Tuple) bool) *order {
+	return &order{us, c, cmp}
 }
 
 func (e *order) Order() (relation.Relation, error) {
@@ -38,7 +39,7 @@ func (e *order) Order() (relation.Relation, error) {
 	if err != nil {
 		return nil, err
 	}
-	r := mem.New("", rs[0].Metadata())
+	r := mem.New("", rs[0].Metadata(), e.c)
 	r.AddTuples(ts)
 	return r, nil
 }

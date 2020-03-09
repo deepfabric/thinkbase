@@ -16,7 +16,6 @@ type Summarize interface {
 }
 
 type summarize struct {
-	is   []int // array of group by attribute's index
 	gs   []string
 	as   []*Attribute // array of aggregation function attribute
 	c    context.Context

@@ -12,8 +12,10 @@ import (
 	"github.com/deepfabric/thinkbase/pkg/algebra/relation/disk"
 	asummarize "github.com/deepfabric/thinkbase/pkg/algebra/summarize"
 	aoverload "github.com/deepfabric/thinkbase/pkg/algebra/summarize/overload"
+	"github.com/deepfabric/thinkbase/pkg/algebra/util"
 	"github.com/deepfabric/thinkbase/pkg/algebra/value"
 	"github.com/deepfabric/thinkbase/pkg/context"
+	"github.com/deepfabric/thinkbase/pkg/exec/order"
 	"github.com/deepfabric/thinkbase/pkg/exec/projection"
 	"github.com/deepfabric/thinkbase/pkg/exec/restrict"
 	"github.com/deepfabric/thinkbase/pkg/exec/summarize"
@@ -27,19 +29,43 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	tbl, err := db.Table("test")
+	/*
+		tbl, err := db.Table("test")
+		if err != nil {
+			log.Fatal(err)
+		}
+		if err := inject(tbl, 1000000); err != nil {
+			log.Fatal(err)
+		}
+		{
+			fmt.Printf("++++++inject end++++++\n")
+		}
+	*/
+	testOrder("test", db)
+	//testSummarize("test", db)
+	//testRestrict("test", db)
+	//testProjection("test", db)
+}
+
+func testOrder(id string, db storage.Database) {
+	ct := context.New()
+	r, err := disk.New(id, db, ct)
 	if err != nil {
 		log.Fatal(err)
 	}
-	if err := inject(tbl, 1000000); err != nil {
-		log.Fatal(err)
-	}
 	{
-		fmt.Printf("++++++inject end++++++\n")
+		cmp := util.NewCompare(false, []bool{false}, []string{"name"}, r.Metadata())
+		t := time.Now()
+		us, err := testunit.NewOrder(4, false, []bool{false}, []string{"a"}, ct, r)
+		if err != nil {
+			log.Fatal(err)
+		}
+		_, err = order.New(us, ct, cmp).Order()
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Printf("process: %v\n", time.Now().Sub(t))
 	}
-	testSummarize("test", db)
-	//testRestrict("test", db)
-	//testProjection("test", db)
 }
 
 func testRestrict(id string, db storage.Database) {
@@ -76,11 +102,14 @@ func testSummarize(id string, db storage.Database) {
 	gs := []string{}
 	attrs := []*asummarize.Attribute{}
 	{
-		ops = append(ops, aoverload.Count)
+		gs = append(gs, "name")
+	}
+	{
+		ops = append(ops, aoverload.Sum)
 		attrs = append(attrs, &asummarize.Attribute{Name: "amount", Alias: "A"})
 	}
 	t := time.Now()
-	us, err := testunit.NewSummarize(8, ops, gs, attrs, ct, r)
+	us, err := testunit.NewSummarize(4, ops, gs, attrs, ct, r)
 	if err != nil {
 		log.Fatal(err)
 	}

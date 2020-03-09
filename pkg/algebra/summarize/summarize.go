@@ -11,22 +11,13 @@ import (
 	"github.com/deepfabric/thinkbase/pkg/algebra/summarize/overload/max"
 	"github.com/deepfabric/thinkbase/pkg/algebra/summarize/overload/min"
 	"github.com/deepfabric/thinkbase/pkg/algebra/summarize/overload/sum"
-	"github.com/deepfabric/thinkbase/pkg/algebra/util"
 	"github.com/deepfabric/thinkbase/pkg/algebra/value"
 	"github.com/deepfabric/thinkbase/pkg/context"
 )
 
 func New(ops []int, gs []string, as []*Attribute, c context.Context, r relation.Relation) *summarize {
-	var is []int
 	var aggs []overload.Aggregation
 
-	for _, a := range gs {
-		idx, err := r.GetAttributeIndex(a)
-		if err != nil {
-			return nil
-		}
-		is = append(is, idx)
-	}
 	for _, op := range ops {
 		switch op {
 		case overload.Avg:
@@ -43,11 +34,11 @@ func New(ops []int, gs []string, as []*Attribute, c context.Context, r relation.
 			return nil
 		}
 	}
-	return &summarize{r: r, c: c, is: is, gs: gs, as: as, aggs: aggs}
+	return &summarize{r: r, c: c, gs: gs, as: as, aggs: aggs}
 }
 
 func (s *summarize) Summarize(n int) (relation.Relation, error) {
-	if len(s.is) > 0 {
+	if len(s.gs) > 0 {
 		return s.summarizeByGroup(n)
 	}
 	return s.summarize(n)
@@ -86,12 +77,8 @@ func (s *summarize) summarizeByGroup(n int) (relation.Relation, error) {
 	case len(s.as) > 0:
 		var err error
 
-		for _, a := range s.as {
-			idx, err := s.r.GetAttributeIndex(a.Name)
-			if err != nil {
-				return nil, err
-			}
-			mp[a.Name] = idx
+		for i, a := range s.as {
+			mp[a.Name] = i
 		}
 		r, err = s.newRelationByGroup(n)
 		if err != nil {
@@ -118,7 +105,7 @@ func (s *summarize) summarizeByGroup(n int) (relation.Relation, error) {
 					t = append(t, v)
 				}
 			}
-			g.r = append(g.r[:n], t...)
+			g.r = append(g.r[:len(s.gs)], t...)
 		}
 	}
 	for _, g := range gs {
@@ -141,7 +128,7 @@ func (s *summarize) newRelation() (relation.Relation, error) {
 }
 
 func (s *summarize) newRelationByGroup(n int) (relation.Relation, error) {
-	attrs := s.r.Metadata()[:n]
+	attrs := s.gs
 	for _, a := range s.as {
 		attr, err := getAttributeName(a)
 		if err != nil {
@@ -158,25 +145,31 @@ type group struct {
 }
 
 func (s *summarize) group() ([]*group, error) {
-	ts, err := util.GetTuples(s.r)
+	cnt, err := s.r.GetTupleCount()
+	if err != nil {
+		return nil, err
+	}
+	xs, ys, err := s.getAttributes()
 	if err != nil {
 		return nil, err
 	}
 	gs := []*group{}
 	mp := make(map[string]*group)
-	for i, j := 0, len(ts); i < j; i++ {
-		t := getTuple(ts[i], s.is)
-		k := t.String()
+	for i := 0; i < cnt; i++ {
+		kt := getTuple(i, xs)
+		k := kt.String()
 		if _, ok := mp[k]; !ok {
-			g := &group{r: ts[i]}
-			for _, v := range ts[i] {
+			g := &group{r: kt}
+			t := getTuple(i, ys)
+			for _, v := range t {
 				g.as = append(g.as, value.Attribute{v})
 			}
 			mp[k] = g
 			gs = append(gs, g)
 		} else {
 			g := mp[k]
-			for i, v := range ts[i] {
+			t := getTuple(i, ys)
+			for i, v := range t {
 				g.as[i] = append(g.as[i], v)
 			}
 		}
@@ -184,11 +177,42 @@ func (s *summarize) group() ([]*group, error) {
 	return gs, nil
 }
 
-func getTuple(t value.Tuple, is []int) value.Tuple {
+func (s *summarize) getAttributes() ([]value.Attribute, []value.Attribute, error) {
+	var xs, ys []value.Attribute
+
+	mp := make(map[string]value.Attribute)
+	for _, g := range s.gs {
+		if x, ok := mp[g]; ok {
+			xs = append(xs, x)
+		} else {
+			x, err := s.r.GetAttribute(g)
+			if err != nil {
+				return nil, nil, err
+			}
+			mp[g] = x
+			xs = append(xs, x)
+		}
+	}
+	for _, a := range s.as {
+		if y, ok := mp[a.Name]; ok {
+			ys = append(ys, y)
+		} else {
+			y, err := s.r.GetAttribute(a.Name)
+			if err != nil {
+				return nil, nil, err
+			}
+			mp[a.Name] = y
+			ys = append(ys, y)
+		}
+	}
+	return xs, ys, nil
+}
+
+func getTuple(i int, as []value.Attribute) value.Tuple {
 	var r value.Tuple
 
-	for _, i := range is {
-		r = append(r, t[i])
+	for _, a := range as {
+		r = append(r, a[i])
 	}
 	return r
 }

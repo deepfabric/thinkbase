@@ -25,7 +25,7 @@ func TestSummarize(t *testing.T) {
 		attrs = append(attrs, &projection.Attribute{E: &extend.Attribute{r.Placeholder(), "A"}})
 	}
 	{
-		attrs = append(attrs, &projection.Attribute{E: &extend.Attribute{r.Placeholder(), "a"}})
+		attrs = append(attrs, &projection.Attribute{E: &extend.Attribute{r.Placeholder(), "b"}})
 	}
 	{
 		attrs = append(attrs, &projection.Attribute{E: &extend.Attribute{r.Placeholder(), "B"}})

@@ -51,25 +51,6 @@ func (p *projection) Projection() (relation.Relation, error) {
 		r.AddTuple(t)
 	}
 	return r, nil
-	/*
-		ts, err := util.GetTuples(p.r)
-		if err != nil {
-			return nil, err
-		}
-		r := mem.New("", attrs)
-		for _, t := range ts {
-			var rt value.Tuple
-			for _, a := range p.as {
-				if v, err := a.E.Eval([]value.Tuple{t, t}); err != nil {
-					return nil, err
-				} else {
-					rt = append(rt, v)
-				}
-			}
-			r.AddTuple(rt)
-		}
-		return r, nil
-	*/
 }
 
 func getAttributeName(a *Attribute) (string, error) {
