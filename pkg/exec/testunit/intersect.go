@@ -1,7 +1,17 @@
 package testunit
 
-/*
-func newIntersect(n int, a, b relation.Relation) ([]unit.Unit, error) {
+import (
+	"errors"
+	"sync"
+
+	"github.com/deepfabric/thinkbase/pkg/algebra/relation"
+	"github.com/deepfabric/thinkbase/pkg/algebra/relation/mem"
+	"github.com/deepfabric/thinkbase/pkg/algebra/util"
+	"github.com/deepfabric/thinkbase/pkg/context"
+	"github.com/deepfabric/thinkbase/pkg/exec/unit"
+)
+
+func newIntersect(n int, c context.Context, a, b relation.Relation) ([]unit.Unit, error) {
 	if len(a.Metadata()) != len(b.Metadata()) {
 		return nil, errors.New("size is different")
 	}
@@ -13,48 +23,56 @@ func newIntersect(n int, a, b relation.Relation) ([]unit.Unit, error) {
 	if err != nil {
 		return nil, err
 	}
-	var us []unit.Unit
-	if an < bn {
-		step := bn / n
-		if step < 1 {
-			step = 1
-		}
-		for i := 0; i < bn; i += step {
-			r := mem.New("", b.Metadata())
-			cnt := step
-			if cnt > bn-i {
-				cnt = bn - i
-			}
-			ts, err := b.GetTuples(i, i+cnt)
-			if err != nil {
-				return nil, err
-			}
-			r.AddTuples(ts)
-			us = append(us, &intersectUnit{a, r})
-		}
-		return us, nil
-	}
-	step := an / n
-	if step < 1 {
-		step = 1
-	}
-	for i := 0; i < an; i += step {
-		r := mem.New("", a.Metadata())
-		cnt := step
-		if cnt > an-i {
-			cnt = an - i
-		}
-		ts, err := a.GetTuples(i, i+cnt)
+	switch {
+	case an*len(a.Metadata()) < bn*len(b.Metadata()):
+		rs, err := b.Split(n)
 		if err != nil {
 			return nil, err
 		}
-		r.AddTuples(ts)
-		us = append(us, &intersectUnit{r, b})
+		ts, err := util.GetTuples(a)
+		if err != nil {
+			return nil, err
+		}
+		mp := new(sync.Map)
+		for _, t := range ts {
+			mp.Store(t.String(), nil)
+		}
+		var us []unit.Unit
+		for i, j := 0, len(rs); i < j; i++ {
+			us = append(us, &intersectUnit{mp, c, rs[i], a})
+		}
+		return us, nil
+	default:
+		rs, err := a.Split(n)
+		if err != nil {
+			return nil, err
+		}
+		ts, err := util.GetTuples(b)
+		if err != nil {
+			return nil, err
+		}
+		mp := new(sync.Map)
+		for _, t := range ts {
+			mp.Store(t.String(), nil)
+		}
+		var us []unit.Unit
+		for i, j := 0, len(rs); i < j; i++ {
+			us = append(us, &intersectUnit{mp, c, rs[i], b})
+		}
+		return us, nil
 	}
-	return us, nil
 }
 
 func (u *intersectUnit) Result() (relation.Relation, error) {
-	return intersect.New(u.a, u.b).Intersect()
+	ts, err := util.GetTuples(u.a)
+	if err != nil {
+		return nil, err
+	}
+	r := mem.New("", u.a.Metadata(), u.c)
+	for _, t := range ts {
+		if _, ok := u.mp.Load(t.String()); ok {
+			r.AddTuple(t)
+		}
+	}
+	return r, nil
 }
-*/

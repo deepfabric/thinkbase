@@ -16,7 +16,6 @@ import (
 	aoverload "github.com/deepfabric/thinkbase/pkg/algebra/summarize/overload"
 	"github.com/deepfabric/thinkbase/pkg/algebra/value"
 	"github.com/deepfabric/thinkbase/pkg/context"
-	"github.com/deepfabric/thinkbase/pkg/exec/intersect"
 	"github.com/deepfabric/thinkbase/pkg/exec/minus"
 	"github.com/deepfabric/thinkbase/pkg/exec/nub"
 	"github.com/deepfabric/thinkbase/pkg/exec/order"
@@ -30,53 +29,64 @@ import (
 )
 
 func main() {
-	db, err := storage.New(bg.New("test.db"))
+	db0, err := storage.New(bg.New("test0.db"))
 	if err != nil {
 		log.Fatal(err)
 	}
-	/*
-		tbl0, err := db.Table("test0")
-		if err != nil {
+	db1, err := storage.New(bg.New("test1.db"))
+	if err != nil {
+		log.Fatal(err)
+	}
+	db2, err := storage.New(bg.New("test2.db"))
+	if err != nil {
+		log.Fatal(err)
+	}
+	tbl0, err := db0.Table("test")
+	if err != nil {
+		log.Fatal(err)
+	}
+	tbl1, err := db1.Table("test")
+	if err != nil {
+		log.Fatal(err)
+	}
+	tbl2, err := db2.Table("test")
+	if err != nil {
+		log.Fatal(err)
+	}
+	{
+		if err := inject(tbl0, 1000000); err != nil {
 			log.Fatal(err)
 		}
-		tbl1, err := db.Table("test1")
-		if err != nil {
+		if err := inject(tbl1, 1000000); err != nil {
 			log.Fatal(err)
 		}
-		{
-			if err := inject(tbl0, 1000000); err != nil {
-				log.Fatal(err)
-			}
-			if err := inject(tbl1, 1000000); err != nil {
-				log.Fatal(err)
-			}
+		if err := inject(tbl2, 1000000); err != nil {
+			log.Fatal(err)
 		}
-	*/
+	}
 	{
 		fmt.Printf("++++++inject end++++++\n")
 	}
 	/*
-		testMinus("test0", "test1", db)
-		testNub("test0", db)
-		testOrder("test0", db)
-		testSummarize("test0", db)
-		testRestrict("test0", db)
-		testProjection("test0", db)
-		testIntersect("test0", "test1", db)
+		testNub("test0", db0)
+		testOrder("test0", db0)
+		testSummarize("test0", db0)
+		testRestrict("test0", db0)
+		testProjection("test0", db0)
+		testMinus("test0", db0, db1)
 	*/
-	testIntersect("test0", "test1", db)
 }
 
-func testMinus(id0, id1 string, db storage.Database) {
+func testMinus(id string, db0, db1 storage.Database) {
 	var err error
 	var r0, r1 relation.Relation
 
 	ct := context.New()
-	r0, err = disk.New(id0, db, ct)
+	r0, err = disk.New(id, db0, ct)
 	if err != nil {
 		log.Fatal(err)
 	}
-	r1, err = disk.New(id1, db, ct)
+	r1, err = disk.New(id, db1, ct)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -110,51 +120,6 @@ func testMinus(id0, id1 string, db storage.Database) {
 		log.Fatal(err)
 	}
 	fmt.Printf("minus process: %v\n", time.Now().Sub(t))
-}
-
-func testIntersect(id0, id1 string, db storage.Database) {
-	var err error
-	var r0, r1 relation.Relation
-
-	ct := context.New()
-	r0, err = disk.New(id0, db, ct)
-	if err != nil {
-		log.Fatal(err)
-	}
-	r1, err = disk.New(id1, db, ct)
-	if err != nil {
-		log.Fatal(err)
-	}
-	t := time.Now()
-	{
-		us, err := testunit.NewNub(8, ct, r0)
-		if err != nil {
-			log.Fatal(err)
-		}
-		r0, err = nub.New(us, ct).Nub()
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
-	{
-		us, err := testunit.NewNub(8, ct, r1)
-		if err != nil {
-			log.Fatal(err)
-		}
-		r1, err = nub.New(us, ct).Nub()
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
-	us, err := testunit.New(8, unit.Intersect, ct, r0, r1)
-	if err != nil {
-		log.Fatal(err)
-	}
-	_, err = intersect.New(us, ct).Intersect()
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Printf("intersect process: %v\n", time.Now().Sub(t))
 }
 
 func testNub(id string, db storage.Database) {

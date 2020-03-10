@@ -12,12 +12,10 @@ func New(n, op int, c context.Context, a, b relation.Relation) ([]unit.Unit, err
 		return newMinus(n, c, a, b)
 	case unit.Union:
 		return newUnion(n, c, a, b)
-		/*
-			case unit.Product:
-				return newProduct(n, a, b)
-			case unit.Intersect:
-				return newIntersect(n, a, b)
-		*/
+	case unit.Intersect:
+		return newIntersect(n, c, a, b)
+	case unit.Product:
+		return newProduct(n, c, a, b)
 	}
 	return nil, nil
 }

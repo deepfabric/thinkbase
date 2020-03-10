@@ -48,6 +48,7 @@ type summarizeUnit struct {
 }
 
 type intersectUnit struct {
+	mp   *sync.Map
 	c    context.Context
 	a, b relation.Relation
 }

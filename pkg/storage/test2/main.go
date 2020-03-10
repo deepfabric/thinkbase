@@ -30,16 +30,20 @@ import (
 )
 
 func main() {
-	db, err := storage.New(bg.New("test.db"))
+	db0, err := storage.New(bg.New("test0.db"))
+	if err != nil {
+		log.Fatal(err)
+	}
+	db1, err := storage.New(bg.New("test1.db"))
 	if err != nil {
 		log.Fatal(err)
 	}
 	/*
-		tbl0, err := db.Table("test0")
+		tbl0, err := db0.Table("test")
 		if err != nil {
 			log.Fatal(err)
 		}
-		tbl1, err := db.Table("test1")
+		tbl1, err := db1.Table("test")
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -56,27 +60,27 @@ func main() {
 		fmt.Printf("++++++inject end++++++\n")
 	}
 	/*
-		testMinus("test0", "test1", db)
-		testNub("test0", db)
-		testOrder("test0", db)
-		testSummarize("test0", db)
-		testRestrict("test0", db)
-		testProjection("test0", db)
-		testIntersect("test0", "test1", db)
+		testNub("test", db0)
+		testOrder("test", db0)
+		testSummarize("test", db0)
+		testRestrict("test", db0)
+		testProjection("test", db0)
+		testMinus("test", db0, db1)
+		testIntersect("test", db0, db1)
 	*/
-	testIntersect("test0", "test1", db)
+	testIntersect("test", db0, db1)
 }
 
-func testMinus(id0, id1 string, db storage.Database) {
+func testMinus(id string, db0, db1 storage.Database) {
 	var err error
 	var r0, r1 relation.Relation
 
 	ct := context.New()
-	r0, err = disk.New(id0, db, ct)
+	r0, err = disk.New(id, db0, ct)
 	if err != nil {
 		log.Fatal(err)
 	}
-	r1, err = disk.New(id1, db, ct)
+	r1, err = disk.New(id, db1, ct)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -112,22 +116,22 @@ func testMinus(id0, id1 string, db storage.Database) {
 	fmt.Printf("minus process: %v\n", time.Now().Sub(t))
 }
 
-func testIntersect(id0, id1 string, db storage.Database) {
+func testIntersect(id string, db0, db1 storage.Database) {
 	var err error
 	var r0, r1 relation.Relation
 
 	ct := context.New()
-	r0, err = disk.New(id0, db, ct)
+	r0, err = disk.New(id, db0, ct)
 	if err != nil {
 		log.Fatal(err)
 	}
-	r1, err = disk.New(id1, db, ct)
+	r1, err = disk.New(id, db1, ct)
 	if err != nil {
 		log.Fatal(err)
 	}
 	t := time.Now()
 	{
-		us, err := testunit.NewNub(8, ct, r0)
+		us, err := testunit.NewNub(4, ct, r0)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -137,7 +141,7 @@ func testIntersect(id0, id1 string, db storage.Database) {
 		}
 	}
 	{
-		us, err := testunit.NewNub(8, ct, r1)
+		us, err := testunit.NewNub(4, ct, r1)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -146,7 +150,7 @@ func testIntersect(id0, id1 string, db storage.Database) {
 			log.Fatal(err)
 		}
 	}
-	us, err := testunit.New(8, unit.Intersect, ct, r0, r1)
+	us, err := testunit.New(4, unit.Intersect, ct, r0, r1)
 	if err != nil {
 		log.Fatal(err)
 	}

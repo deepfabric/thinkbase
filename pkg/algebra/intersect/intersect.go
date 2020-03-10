@@ -26,15 +26,12 @@ func (i *intersect) Intersect() (relation.Relation, error) {
 		return nil, err
 	}
 	r := mem.New("", i.a.Metadata(), i.c)
+	mp := make(map[string]struct{})
+	for _, b := range bs {
+		mp[b.String()] = struct{}{}
+	}
 	for _, a := range as {
-		ok := false
-		for _, b := range bs {
-			if a.Compare(b) == 0 {
-				ok = true
-				break
-			}
-		}
-		if ok {
+		if _, ok := mp[a.String()]; ok {
 			r.AddTuple(a)
 		}
 	}

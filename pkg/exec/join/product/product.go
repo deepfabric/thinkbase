@@ -4,12 +4,15 @@ import (
 	"sync"
 
 	"github.com/deepfabric/thinkbase/pkg/algebra/relation"
+	"github.com/deepfabric/thinkbase/pkg/algebra/relation/mem"
 	"github.com/deepfabric/thinkbase/pkg/algebra/union"
+	"github.com/deepfabric/thinkbase/pkg/algebra/util"
+	"github.com/deepfabric/thinkbase/pkg/context"
 	"github.com/deepfabric/thinkbase/pkg/exec/unit"
 )
 
-func New(us []unit.Unit) *product {
-	return &product{us}
+func New(attrs []string, us []unit.Unit, c context.Context) *product {
+	return &product{attrs, us, c}
 }
 
 // A ⨯ B = (A ⨯ B1) ∪  (A ⨯ B2) ...
@@ -33,9 +36,17 @@ func (e *product) Join() (relation.Relation, error) {
 	if err != nil {
 		return nil, err
 	}
-	r := rs[0]
+	var r relation.Relation
+	{
+		ts, err := util.GetTuples(rs[0])
+		if err != nil {
+			return nil, err
+		}
+		r = mem.New("", e.attrs, e.c)
+		r.AddTuples(ts)
+	}
 	for i, j := 1, len(rs); i < j; i++ {
-		r, err = union.New(true, r, rs[i]).Union()
+		r, err = union.New(e.c, r, rs[i]).Union()
 		if err != nil {
 			return nil, err
 		}

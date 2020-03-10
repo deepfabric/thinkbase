@@ -1,7 +1,12 @@
 package product
 
-import "github.com/deepfabric/thinkbase/pkg/exec/unit"
+import (
+	"github.com/deepfabric/thinkbase/pkg/context"
+	"github.com/deepfabric/thinkbase/pkg/exec/unit"
+)
 
 type product struct {
-	us []unit.Unit
+	attrs []string
+	us    []unit.Unit
+	c     context.Context
 }

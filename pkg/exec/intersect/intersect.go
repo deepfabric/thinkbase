@@ -5,11 +5,12 @@ import (
 
 	"github.com/deepfabric/thinkbase/pkg/algebra/relation"
 	"github.com/deepfabric/thinkbase/pkg/algebra/union"
+	"github.com/deepfabric/thinkbase/pkg/context"
 	"github.com/deepfabric/thinkbase/pkg/exec/unit"
 )
 
-func New(us []unit.Unit) *intersect {
-	return &intersect{us}
+func New(us []unit.Unit, c context.Context) *intersect {
+	return &intersect{us, c}
 }
 
 // A ∩  B = (A1 ∩  B) ∪  (A2 ∩  B) ...
@@ -35,7 +36,7 @@ func (e *intersect) Intersect() (relation.Relation, error) {
 	}
 	r := rs[0]
 	for i, j := 1, len(rs); i < j; i++ {
-		r, err = union.New(true, r, rs[i]).Union()
+		r, err = union.New(e.c, r, rs[i]).Union()
 		if err != nil {
 			return nil, err
 		}
