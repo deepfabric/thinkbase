@@ -138,5 +138,5 @@ func (e *summarize) merge(lr, rr relation.Relation) (relation.Relation, error) {
 		return nil, err
 	}
 	lr.AddTuples(ts)
-	return asummarize.New(e.ops, e.gs, e.attrs, e.c, lr).Summarize(len(e.r.Metadata()))
+	return asummarize.New(e.ops, e.gs, e.attrs, e.c, lr).Summarize()
 }

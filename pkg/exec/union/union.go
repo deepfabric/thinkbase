@@ -5,11 +5,12 @@ import (
 
 	"github.com/deepfabric/thinkbase/pkg/algebra/relation"
 	aunion "github.com/deepfabric/thinkbase/pkg/algebra/union"
+	"github.com/deepfabric/thinkbase/pkg/context"
 	"github.com/deepfabric/thinkbase/pkg/exec/unit"
 )
 
-func New(isNub bool, us []unit.Unit) *union {
-	return &union{isNub, us}
+func New(us []unit.Unit, c context.Context) *union {
+	return &union{us, c}
 }
 
 // A ∪  B = (A1 ∪  A2 ...) ∪  (B1 ∪  B2 ...)
@@ -35,7 +36,7 @@ func (e *union) Union() (relation.Relation, error) {
 	}
 	r := rs[0]
 	for i, j := 1, len(rs); i < j; i++ {
-		r, err = aunion.New(e.isNub, r, rs[i]).Union()
+		r, err = aunion.New(e.c, r, rs[i]).Union()
 		if err != nil {
 			return nil, err
 		}

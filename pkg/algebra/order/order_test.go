@@ -18,14 +18,16 @@ func TestOrder(t *testing.T) {
 		fmt.Printf("%s\n", r)
 	}
 	{
-		rr, err := New(true, []bool{false}, []string{"a"}, ct, r).Order()
+		lt := NewLT([]bool{false}, []string{"a"}, r.Metadata())
+		rr, err := New(ct, r, lt).Order()
 		if err != nil {
 			log.Fatal(err)
 		}
 		fmt.Printf("%s\n", rr)
 	}
 	{
-		rr, err := New(false, []bool{true}, []string{"a"}, ct, r).Order()
+		lt := NewLT([]bool{true}, []string{"a"}, r.Metadata())
+		rr, err := New(ct, r, lt).Order()
 		if err != nil {
 			log.Fatal(err)
 		}

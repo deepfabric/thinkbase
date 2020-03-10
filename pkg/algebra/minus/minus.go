@@ -26,20 +26,14 @@ func (m *minus) Minus() (relation.Relation, error) {
 		return nil, err
 	}
 	r := mem.New("", m.a.Metadata(), m.c)
+	mp := make(map[string]struct{})
+	for _, b := range bs {
+		mp[b.String()] = struct{}{}
+	}
 	for _, a := range as {
-		ok := true
-		for _, b := range bs {
-			if a.Compare(b) == 0 {
-				ok = false
-				break
-			}
-		}
-		if ok {
+		if _, ok := mp[a.String()]; !ok {
 			r.AddTuple(a)
 		}
-	}
-	if err := r.Nub(); err != nil {
-		return nil, err
 	}
 	return r, nil
 }

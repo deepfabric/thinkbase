@@ -36,7 +36,7 @@ func (e *restrict) Restrict() (relation.Relation, error) {
 	}
 	r := rs[0]
 	for i, j := 1, len(rs); i < j; i++ {
-		r, err = union.New(false, e.c, r, rs[i]).Union()
+		r, err = union.New(e.c, r, rs[i]).Union()
 		if err != nil {
 			return nil, err
 		}

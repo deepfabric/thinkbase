@@ -71,7 +71,7 @@ func newSummarize(c context.Context) relation.Relation {
 		attrs = append(attrs, &Attribute{Name: "b", Alias: "D"})
 	}
 	s := New(ops, gs, attrs, c, r)
-	sr, err := s.Summarize(len(r.Metadata()))
+	sr, err := s.Summarize()
 	if err != nil {
 		log.Fatal(err)
 	}

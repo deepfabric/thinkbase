@@ -9,8 +9,6 @@ type Relation interface {
 	Placeholder() int
 	Metadata() []string
 
-	Nub() error
-
 	Split(int) ([]Relation, error)
 	Limit(int, int) (Relation, error)
 
@@ -28,6 +26,4 @@ type Relation interface {
 	GetAttributeIndex(string) (int, error)
 	GetAttribute(string) (value.Attribute, error)
 	GetAttributeByLimit(string, int, int) (value.Attribute, error)
-
-	Sort([]string, []bool) error
 }

@@ -1,19 +1,26 @@
 package testunit
 
 import (
+	"sync"
+
 	"github.com/deepfabric/thinkbase/pkg/algebra/extend"
 	"github.com/deepfabric/thinkbase/pkg/algebra/projection"
 	"github.com/deepfabric/thinkbase/pkg/algebra/relation"
 	"github.com/deepfabric/thinkbase/pkg/algebra/summarize"
+	"github.com/deepfabric/thinkbase/pkg/algebra/value"
 	"github.com/deepfabric/thinkbase/pkg/context"
 )
 
+type nubUnit struct {
+	mp *sync.Map
+	c  context.Context
+	r  relation.Relation
+}
+
 type orderUnit struct {
-	isNub bool
-	descs []bool
-	attrs []string
-	c     context.Context
-	r     relation.Relation
+	c  context.Context
+	r  relation.Relation
+	lt func(value.Tuple, value.Tuple) bool
 }
 
 type unionUnit struct {
@@ -22,6 +29,7 @@ type unionUnit struct {
 }
 
 type minusUnit struct {
+	mp   *sync.Map
 	c    context.Context
 	a, b relation.Relation
 }

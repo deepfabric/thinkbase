@@ -38,8 +38,5 @@ func (i *intersect) Intersect() (relation.Relation, error) {
 			r.AddTuple(a)
 		}
 	}
-	if err := r.Nub(); err != nil {
-		return nil, err
-	}
 	return r, nil
 }

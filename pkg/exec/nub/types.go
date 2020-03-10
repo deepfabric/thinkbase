@@ -1,18 +1,16 @@
-package order
+package nub
 
 import (
 	"github.com/deepfabric/thinkbase/pkg/algebra/relation"
-	"github.com/deepfabric/thinkbase/pkg/algebra/value"
 	"github.com/deepfabric/thinkbase/pkg/context"
 	"github.com/deepfabric/thinkbase/pkg/exec/unit"
 )
 
-type Order interface {
-	Order() (relation.Relation, error)
+type Nub interface {
+	Nub() (relation.Relation, error)
 }
 
-type order struct {
+type nub struct {
 	us []unit.Unit
 	c  context.Context
-	lt func(value.Tuple, value.Tuple) bool
 }

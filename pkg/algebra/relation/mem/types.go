@@ -16,23 +16,6 @@ type relation struct {
 	ct    context.Context
 }
 
-type tuples struct {
-	descs []bool
-	attrs []string
-	r     *relation
-	tuple []value.Tuple
-}
-
-func (t tuples) Len() int { return len(t.tuple) }
-
-func (t tuples) Swap(i, j int) {
-	t.tuple[i], t.tuple[j] = t.tuple[j], t.tuple[i]
-}
-
-func (t tuples) Less(i, j int) bool {
-	return t.r.less(t.tuple[i], t.tuple[j], t.attrs, t.descs)
-}
-
 func (r *relation) String() string {
 	s := r.name + "\n"
 	for i, as := range r.attrs {

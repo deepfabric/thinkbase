@@ -5,9 +5,9 @@ import (
 	"log"
 	"testing"
 
+	aorder "github.com/deepfabric/thinkbase/pkg/algebra/order"
 	"github.com/deepfabric/thinkbase/pkg/algebra/relation"
 	"github.com/deepfabric/thinkbase/pkg/algebra/relation/mem"
-	"github.com/deepfabric/thinkbase/pkg/algebra/util"
 	"github.com/deepfabric/thinkbase/pkg/algebra/value"
 	"github.com/deepfabric/thinkbase/pkg/context"
 	"github.com/deepfabric/thinkbase/pkg/exec/testunit"
@@ -20,28 +20,28 @@ func TestOrder(t *testing.T) {
 		fmt.Printf("%s\n", r)
 	}
 	{
-		cmp := util.NewCompare(false, []bool{false}, []string{"a"}, r.Metadata())
-		us, err := testunit.NewOrder(2, false, []bool{false}, []string{"a"}, ct, r)
+		lt := aorder.NewLT([]bool{false}, []string{"a"}, r.Metadata())
+		us, err := testunit.NewOrder(2, ct, r, lt)
 		if err != nil {
 			log.Fatal(err)
 		}
-		rr, err := New(us, ct, cmp).Order()
+		rr, err := New(us, ct, lt).Order()
 		if err != nil {
 			log.Fatal(err)
 		}
-		fmt.Printf("%s\n", rr)
+		fmt.Printf("%v\n", rr)
 	}
 	{
-		cmp := util.NewCompare(false, []bool{true}, []string{"a"}, r.Metadata())
-		us, err := testunit.NewOrder(2, false, []bool{true}, []string{"a"}, ct, r)
+		lt := aorder.NewLT([]bool{true}, []string{"a"}, r.Metadata())
+		us, err := testunit.NewOrder(2, ct, r, lt)
 		if err != nil {
 			log.Fatal(err)
 		}
-		rr, err := New(us, ct, cmp).Order()
+		rr, err := New(us, ct, lt).Order()
 		if err != nil {
 			log.Fatal(err)
 		}
-		fmt.Printf("%s\n", rr)
+		fmt.Printf("%v\n", rr)
 	}
 }
 

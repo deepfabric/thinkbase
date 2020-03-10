@@ -11,8 +11,8 @@ import (
 	"github.com/deepfabric/thinkbase/pkg/exec/unit"
 )
 
-func New(us []unit.Unit, c context.Context, cmp func(value.Tuple, value.Tuple) bool) *order {
-	return &order{us, c, cmp}
+func New(us []unit.Unit, c context.Context, lt func(value.Tuple, value.Tuple) bool) *order {
+	return &order{us, c, lt}
 }
 
 func (e *order) Order() (relation.Relation, error) {
@@ -83,7 +83,7 @@ func (e *order) merge(xs, ys []value.Tuple) []value.Tuple {
 	var rs []value.Tuple
 
 	for len(xs) > 0 && len(ys) > 0 {
-		if e.cmp(xs[0], ys[0]) {
+		if e.lt(xs[0], ys[0]) {
 			rs = append(rs, xs[0])
 			xs = xs[1:]
 		} else {

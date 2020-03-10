@@ -1,5 +1,5 @@
 #!/bin/bash
 
-rm -r test test.db
+rm -r test*
 go build
 ./test

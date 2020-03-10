@@ -11,7 +11,6 @@ type Union interface {
 }
 
 type union struct {
-	IsNub bool
-	c     context.Context
-	a, b  relation.Relation
+	c    context.Context
+	a, b relation.Relation
 }

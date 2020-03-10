@@ -9,8 +9,8 @@ import (
 	"github.com/deepfabric/thinkbase/pkg/context"
 )
 
-func New(isNub bool, c context.Context, a, b relation.Relation) *union {
-	return &union{isNub, c, a, b}
+func New(c context.Context, a, b relation.Relation) *union {
+	return &union{c, a, b}
 }
 
 func (u *union) Union() (relation.Relation, error) {
@@ -28,10 +28,5 @@ func (u *union) Union() (relation.Relation, error) {
 	r := mem.New("", u.a.Metadata(), u.c)
 	r.AddTuples(as)
 	r.AddTuples(bs)
-	if u.IsNub {
-		if err := r.Nub(); err != nil {
-			return nil, err
-		}
-	}
 	return r, nil
 }

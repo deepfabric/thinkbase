@@ -8,13 +8,15 @@ import (
 	"github.com/deepfabric/thinkbase/pkg/algebra/relation"
 	"github.com/deepfabric/thinkbase/pkg/algebra/relation/mem"
 	"github.com/deepfabric/thinkbase/pkg/algebra/value"
+	"github.com/deepfabric/thinkbase/pkg/context"
 	"github.com/deepfabric/thinkbase/pkg/exec/testunit"
 	"github.com/deepfabric/thinkbase/pkg/exec/unit"
 )
 
 func TestUnion(t *testing.T) {
-	a := newTestRelation0()
-	b := newTestRelation1()
+	ct := context.New()
+	a := newTestRelation0(ct)
+	b := newTestRelation1(ct)
 	{
 		fmt.Printf("a:\n%s\n", a)
 	}
@@ -22,22 +24,11 @@ func TestUnion(t *testing.T) {
 		fmt.Printf("b:\n%s\n", b)
 	}
 	{
-		us, err := testunit.New(3, unit.Union, a, b)
+		us, err := testunit.New(4, unit.Union, ct, a, b)
 		if err != nil {
 			log.Fatal(err)
 		}
-		r, err := New(true, us).Union()
-		if err != nil {
-			log.Fatal(err)
-		}
-		fmt.Printf("r:\n%s\n", r)
-	}
-	{
-		us, err := testunit.New(3, unit.Union, a, b)
-		if err != nil {
-			log.Fatal(err)
-		}
-		r, err := New(false, us).Union()
+		r, err := New(us, ct).Union()
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -45,12 +36,12 @@ func TestUnion(t *testing.T) {
 	}
 }
 
-func newTestRelation0() relation.Relation {
+func newTestRelation0(c context.Context) relation.Relation {
 	var attrs []string
 
 	attrs = append(attrs, "a")
 	attrs = append(attrs, "b")
-	r := mem.New("A", attrs)
+	r := mem.New("A", attrs, c)
 	{
 		var t value.Tuple
 
@@ -83,12 +74,12 @@ func newTestRelation0() relation.Relation {
 	return r
 }
 
-func newTestRelation1() relation.Relation {
+func newTestRelation1(c context.Context) relation.Relation {
 	var attrs []string
 
 	attrs = append(attrs, "a")
 	attrs = append(attrs, "b")
-	r := mem.New("B", attrs)
+	r := mem.New("B", attrs, c)
 	{
 		var t value.Tuple
 

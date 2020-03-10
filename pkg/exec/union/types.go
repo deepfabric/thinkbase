@@ -2,6 +2,7 @@ package union
 
 import (
 	"github.com/deepfabric/thinkbase/pkg/algebra/relation"
+	"github.com/deepfabric/thinkbase/pkg/context"
 	"github.com/deepfabric/thinkbase/pkg/exec/unit"
 )
 
@@ -10,6 +11,6 @@ type Union interface {
 }
 
 type union struct {
-	isNub bool
-	us    []unit.Unit
+	us []unit.Unit
+	c  context.Context
 }

@@ -1,48 +1,37 @@
 package testunit
 
-/*
-func newUnion(n int, a, b relation.Relation) ([]unit.Unit, error) {
+import (
+	"errors"
+
+	"github.com/deepfabric/thinkbase/pkg/algebra/relation"
+	"github.com/deepfabric/thinkbase/pkg/context"
+	"github.com/deepfabric/thinkbase/pkg/exec/unit"
+)
+
+func newUnion(n int, c context.Context, a, b relation.Relation) ([]unit.Unit, error) {
 	if len(a.Metadata()) != len(b.Metadata()) {
 		return nil, errors.New("size is different")
 	}
-	an, err := a.GetTupleCount()
+	if n < 4 {
+		us := []unit.Unit{}
+		us = append(us, &unionUnit{c, a})
+		us = append(us, &unionUnit{c, b})
+		return us, nil
+	}
+	as, err := a.Split(n / 2)
 	if err != nil {
 		return nil, err
 	}
-	bn, err := b.GetTupleCount()
+	bs, err := b.Split(n / 2)
 	if err != nil {
 		return nil, err
 	}
 	var us []unit.Unit
-	step := (an + bn) / n
-	if step < 1 {
-		step = 1
+	for i, j := 0, len(as); i < j; i++ {
+		us = append(us, &unionUnit{c, as[i]})
 	}
-	for i := 0; i < an; i += step {
-		r := mem.New("", a.Metadata())
-		cnt := step
-		if cnt > an-i {
-			cnt = an - i
-		}
-		ts, err := a.GetTuples(i, i+cnt)
-		if err != nil {
-			return nil, err
-		}
-		r.AddTuples(ts)
-		us = append(us, &unionUnit{r})
-	}
-	for i := 0; i < bn; i += step {
-		r := mem.New("", a.Metadata())
-		cnt := step
-		if cnt > bn-i {
-			cnt = bn - i
-		}
-		ts, err := b.GetTuples(i, i+cnt)
-		if err != nil {
-			return nil, err
-		}
-		r.AddTuples(ts)
-		us = append(us, &unionUnit{r})
+	for i, j := 0, len(bs); i < j; i++ {
+		us = append(us, &unionUnit{c, bs[i]})
 	}
 	return us, nil
 }
@@ -50,4 +39,3 @@ func newUnion(n int, a, b relation.Relation) ([]unit.Unit, error) {
 func (u *unionUnit) Result() (relation.Relation, error) {
 	return u.a, nil
 }
-*/

@@ -3,7 +3,6 @@ package mem
 import (
 	"errors"
 	"fmt"
-	"sort"
 
 	arelation "github.com/deepfabric/thinkbase/pkg/algebra/relation"
 	"github.com/deepfabric/thinkbase/pkg/algebra/value"
@@ -89,16 +88,6 @@ func (r *relation) Name() string {
 
 func (r *relation) Metadata() []string {
 	return r.attrs
-}
-
-func (r *relation) Nub() error {
-	if len(r.tuple) > 1 {
-		for i, j := 0, len(r.tuple); i < j; i++ {
-			remove(i+1, r.tuple[i], &r.tuple)
-			j = len(r.tuple)
-		}
-	}
-	return nil
 }
 
 func (r *relation) Rename(name string) error {
@@ -198,42 +187,4 @@ func (r *relation) GetAttributeByLimit(name string, start, end int) (value.Attri
 		attr = append(attr, r.tuple[i][idx])
 	}
 	return attr, nil
-}
-
-func (r *relation) Sort(attrs []string, descs []bool) error {
-	ts := &tuples{descs, attrs, r, r.tuple}
-	sort.Sort(ts)
-	r.tuple = ts.tuple
-	return nil
-}
-
-func (r *relation) less(tx, ty value.Tuple, attrs []string, descs []bool) bool {
-	for idx, attr := range attrs {
-		if i, ok := r.mp[attr]; ok {
-			if r := int(tx[i].ResolvedType().Oid - ty[i].ResolvedType().Oid); r != 0 {
-				return less(descs[idx], r)
-			}
-			if r := tx[i].Compare(ty[i]); r != 0 {
-				return less(descs[idx], r)
-			}
-		}
-	}
-	return false
-}
-
-func remove(start int, x value.Tuple, xs *[]value.Tuple) {
-	for i, j := start, len(*xs); i < j; i++ {
-		if x.Compare(((*xs)[i])) == 0 {
-			*xs = append((*xs)[:i], (*xs)[i+1:]...)
-			i--
-			j = len(*xs)
-		}
-	}
-}
-
-func less(desc bool, r int) bool {
-	if desc {
-		return r > 0
-	}
-	return r < 0
 }

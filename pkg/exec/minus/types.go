@@ -2,6 +2,7 @@ package minus
 
 import (
 	"github.com/deepfabric/thinkbase/pkg/algebra/relation"
+	"github.com/deepfabric/thinkbase/pkg/context"
 	"github.com/deepfabric/thinkbase/pkg/exec/unit"
 )
 
@@ -11,4 +12,5 @@ type Minus interface {
 
 type minus struct {
 	us []unit.Unit
+	c  context.Context
 }

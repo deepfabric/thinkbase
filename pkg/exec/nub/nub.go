@@ -1,4 +1,4 @@
-package projection
+package nub
 
 import (
 	"sync"
@@ -9,12 +9,11 @@ import (
 	"github.com/deepfabric/thinkbase/pkg/exec/unit"
 )
 
-func New(us []unit.Unit, c context.Context) *projection {
-	return &projection{us, c}
+func New(us []unit.Unit, c context.Context) *nub {
+	return &nub{us, c}
 }
 
-// ρ(A) = ρ(A1) ∪  ρ(A2) ...
-func (e *projection) Projection() (relation.Relation, error) {
+func (e *nub) Nub() (relation.Relation, error) {
 	var err error
 	var wg sync.WaitGroup
 
@@ -42,4 +41,5 @@ func (e *projection) Projection() (relation.Relation, error) {
 		}
 	}
 	return r, nil
+
 }

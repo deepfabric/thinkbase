@@ -60,19 +60,4 @@ func TestRelation(t *testing.T) {
 	{
 		fmt.Printf("%s\n", r)
 	}
-
-	r.Nub()
-
-	{
-		fmt.Printf("%s after nub:\n%s\n", r.Name(), r)
-	}
-
-	r.Sort([]string{"a"}, []bool{false})
-	{
-		fmt.Printf("%s after sort:\n%s\n", r.Name(), r)
-	}
-	r.Sort([]string{"a"}, []bool{true})
-	{
-		fmt.Printf("%s after desc sort:\n%s\n", r.Name(), r)
-	}
 }

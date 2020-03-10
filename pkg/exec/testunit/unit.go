@@ -10,9 +10,9 @@ func New(n, op int, c context.Context, a, b relation.Relation) ([]unit.Unit, err
 	switch op {
 	case unit.Minus:
 		return newMinus(n, c, a, b)
+	case unit.Union:
+		return newUnion(n, c, a, b)
 		/*
-			case unit.Union:
-				return newUnion(n, a, b)
 			case unit.Product:
 				return newProduct(n, a, b)
 			case unit.Intersect:

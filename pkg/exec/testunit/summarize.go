@@ -42,5 +42,5 @@ func NewSummarize(n int, ops []int, gs []string, attrs []*summarize.Attribute, c
 }
 
 func (u *summarizeUnit) Result() (relation.Relation, error) {
-	return summarize.New(u.ops, u.gs, u.attrs, u.c, u.r).Summarize(len(u.r.Metadata()))
+	return summarize.New(u.ops, u.gs, u.attrs, u.c, u.r).Summarize()
 }
