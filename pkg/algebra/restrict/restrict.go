@@ -42,10 +42,12 @@ func (r *restrict) Restrict() (relation.Relation, error) {
 			is = append(is, i)
 		}
 	}
-	ts, err := r.r.GetTuplesByIndex(is)
-	if err != nil {
-		return nil, err
+	if len(is) > 0 {
+		ts, err := r.r.GetTuplesByIndex(is)
+		if err != nil {
+			return nil, err
+		}
+		rr.AddTuples(ts)
 	}
-	rr.AddTuples(ts)
 	return rr, nil
 }

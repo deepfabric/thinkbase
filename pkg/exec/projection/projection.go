@@ -24,7 +24,7 @@ func (e *projection) Projection() (relation.Relation, error) {
 		go func(idx int) {
 			defer wg.Done()
 			r, privErr := e.us[idx].Result()
-			if err != nil {
+			if privErr != nil {
 				err = privErr
 			}
 			rs[idx] = r

@@ -6,6 +6,7 @@ import (
 	"math/rand"
 	"time"
 
+	"github.com/cockroachdb/pebble/vfs"
 	"github.com/deepfabric/thinkbase/pkg/algebra/extend"
 	"github.com/deepfabric/thinkbase/pkg/algebra/extend/overload"
 	aorder "github.com/deepfabric/thinkbase/pkg/algebra/order"
@@ -14,6 +15,7 @@ import (
 	"github.com/deepfabric/thinkbase/pkg/algebra/relation/disk"
 	asummarize "github.com/deepfabric/thinkbase/pkg/algebra/summarize"
 	aoverload "github.com/deepfabric/thinkbase/pkg/algebra/summarize/overload"
+	"github.com/deepfabric/thinkbase/pkg/algebra/util"
 	"github.com/deepfabric/thinkbase/pkg/algebra/value"
 	"github.com/deepfabric/thinkbase/pkg/context"
 	"github.com/deepfabric/thinkbase/pkg/exec/intersect"
@@ -26,45 +28,59 @@ import (
 	"github.com/deepfabric/thinkbase/pkg/exec/testunit"
 	"github.com/deepfabric/thinkbase/pkg/exec/unit"
 	"github.com/deepfabric/thinkbase/pkg/storage"
-	"github.com/deepfabric/thinkbase/pkg/storage/engine/bg"
+	"github.com/deepfabric/thinkbasekv/pkg/engine"
+	"github.com/deepfabric/thinkbasekv/pkg/engine/pb"
+	"github.com/deepfabric/thinkbasekv/pkg/engine/pb/s3"
 )
 
 func main() {
-	db, err := storage.New(bg.New("test.db"))
+	db, err := storage.New(newEngine("test-infinivision"))
 	if err != nil {
 		log.Fatal(err)
 	}
-	/*
-		tbl0, err := db.Table("test0")
-		if err != nil {
+	tbl0, err := db.Table("test0")
+	if err != nil {
+		log.Fatal(err)
+	}
+	tbl1, err := db.Table("test1")
+	if err != nil {
+		log.Fatal(err)
+	}
+	{
+		if err := inject(tbl0, 10); err != nil {
 			log.Fatal(err)
 		}
-		tbl1, err := db.Table("test1")
-		if err != nil {
+		if err := inject(tbl1, 10); err != nil {
 			log.Fatal(err)
 		}
-		{
-			if err := inject(tbl0, 1000000); err != nil {
-				log.Fatal(err)
-			}
-			if err := inject(tbl1, 1000000); err != nil {
-				log.Fatal(err)
-			}
-		}
-	*/
+	}
+	{
+		printTable("test0", db)
+		printTable("test1", db)
+	}
 	{
 		fmt.Printf("++++++inject end++++++\n")
 	}
-	/*
-		testMinus("test0", "test1", db)
-		testNub("test0", db)
-		testOrder("test0", db)
-		testSummarize("test0", db)
-		testRestrict("test0", db)
-		testProjection("test0", db)
-		testIntersect("test0", "test1", db)
-	*/
+	testNub("test0", db)
+	testOrder("test0", db)
+	testSummarize("test0", db)
+	testRestrict("test0", db)
+	testProjection("test0", db)
+	testMinus("test0", "test1", db)
 	testIntersect("test0", "test1", db)
+}
+
+func printTable(id string, db storage.Database) {
+	ct := context.New()
+	r, err := disk.New(id, db, ct)
+	if err != nil {
+		log.Fatal(err)
+	}
+	rr, err := util.Dup(r, ct)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("%v\n", rr)
 }
 
 func testMinus(id0, id1 string, db storage.Database) {
@@ -105,11 +121,12 @@ func testMinus(id0, id1 string, db storage.Database) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	_, err = minus.New(us, ct).Minus()
+	rr, err := minus.New(us, ct).Minus()
 	if err != nil {
 		log.Fatal(err)
 	}
 	fmt.Printf("minus process: %v\n", time.Now().Sub(t))
+	fmt.Printf("\t%v\n", rr)
 }
 
 func testIntersect(id0, id1 string, db storage.Database) {
@@ -150,11 +167,12 @@ func testIntersect(id0, id1 string, db storage.Database) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	_, err = intersect.New(us, ct).Intersect()
+	rr, err := intersect.New(us, ct).Intersect()
 	if err != nil {
 		log.Fatal(err)
 	}
 	fmt.Printf("intersect process: %v\n", time.Now().Sub(t))
+	fmt.Printf("\t%v\n", rr)
 }
 
 func testNub(id string, db storage.Database) {
@@ -168,11 +186,12 @@ func testNub(id string, db storage.Database) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	_, err = nub.New(us, ct).Nub()
+	rr, err := nub.New(us, ct).Nub()
 	if err != nil {
 		log.Fatal(err)
 	}
 	fmt.Printf("nub process: %v\n", time.Now().Sub(t))
+	fmt.Printf("\t%v\n", rr)
 }
 
 func testOrder(id string, db storage.Database) {
@@ -188,11 +207,12 @@ func testOrder(id string, db storage.Database) {
 		if err != nil {
 			log.Fatal(err)
 		}
-		_, err = order.New(us, ct, lt).Order()
+		rr, err := order.New(us, ct, lt).Order()
 		if err != nil {
 			log.Fatal(err)
 		}
 		fmt.Printf("order process: %v\n", time.Now().Sub(t))
+		fmt.Printf("\t%v\n", rr)
 	}
 }
 
@@ -213,11 +233,12 @@ func testRestrict(id string, db storage.Database) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	_, err = restrict.New(us, ct).Restrict()
+	rr, err := restrict.New(us, ct).Restrict()
 	if err != nil {
 		log.Fatal(err)
 	}
 	fmt.Printf("restrict process: %v\n", time.Now().Sub(t))
+	fmt.Printf("\t%v\n", rr)
 }
 
 func testSummarize(id string, db storage.Database) {
@@ -241,11 +262,12 @@ func testSummarize(id string, db storage.Database) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	_, err = summarize.New(ops, gs, attrs, ct, r, us).Summarize()
+	rr, err := summarize.New(ops, gs, attrs, ct, r, us).Summarize()
 	if err != nil {
 		log.Fatal(err)
 	}
 	fmt.Printf("summarize process: %v\n", time.Now().Sub(t))
+	fmt.Printf("\t%v\n", rr)
 }
 
 func testProjection(id string, db storage.Database) {
@@ -273,11 +295,12 @@ func testProjection(id string, db storage.Database) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	_, err = projection.New(us, ct).Projection()
+	rr, err := projection.New(us, ct).Projection()
 	if err != nil {
 		log.Fatal(err)
 	}
 	fmt.Printf("projection process: %v\n", time.Now().Sub(t))
+	fmt.Printf("\t%v\n", rr)
 }
 
 var r *rand.Rand
@@ -316,4 +339,20 @@ func randString(len int) string {
 		bytes[i] = byte(b)
 	}
 	return string(bytes)
+}
+
+func newEngine(name string) engine.DB {
+	return pb.New(name, nil)
+}
+
+func newfs() vfs.FS {
+	endpoint := "http://oss-cn-hangzhou.aliyuncs.com"
+	accessKeyID := ""
+	accessKeySecret := ""
+	acl := s3.PublicReadWrite
+	fs, err := s3.New(endpoint, accessKeyID, accessKeySecret, acl)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return fs
 }

@@ -10,11 +10,11 @@ import (
 
 	"github.com/deepfabric/thinkbase/pkg/algebra/types"
 	"github.com/deepfabric/thinkbase/pkg/algebra/value"
-	"github.com/deepfabric/thinkbase/pkg/storage/storerror"
 	"github.com/deepfabric/thinkbase/pkg/util/encoding"
+	"github.com/deepfabric/thinkbasekv/pkg/engine"
 )
 
-func New(db DB) (*database, error) {
+func New(db engine.DB) (*database, error) {
 	r := new(database)
 	v, err := db.Get(sysKey())
 	switch {
@@ -32,7 +32,7 @@ func New(db DB) (*database, error) {
 			}
 		}
 		return r, nil
-	case err == storerror.NotExist:
+	case err == engine.NotExist:
 		r.db = db
 		r.tables = make(map[string]*table)
 		return r, nil
@@ -51,7 +51,7 @@ func (db *database) Tables() ([]string, error) {
 
 func (db *database) Table(id string) (Table, error) {
 	if id == System {
-		return nil, storerror.CannotOpenSystemTable
+		return nil, errors.New("cannot open system table")
 	}
 	db.Lock()
 	defer db.Unlock()
@@ -243,10 +243,12 @@ func (tbl *table) GetAttributeByLimit(attr string, start, end int) (value.Attrib
 			if err != nil {
 				return nil, err
 			}
-			if e, err := getElement(int(v[0]), v[1:]); err != nil {
+			if e, _, err := encoding.DecodeValue(v); err != nil {
 				return nil, err
 			} else {
-				a = append(a, e)
+				if t, ok := e.(value.Value); ok {
+					a = append(a, t)
+				}
 			}
 			curr++
 		}
@@ -256,15 +258,18 @@ func (tbl *table) GetAttributeByLimit(attr string, start, end int) (value.Attrib
 }
 
 func (tbl *table) getTuple(data []byte, attrs []string) (value.Tuple, error) {
-	v, err := getElement(int(data[0]), data[1:])
-	if err != nil {
+	if xs, _, err := encoding.DecodeValue(data); err != nil {
 		return nil, err
+	} else {
+		if as, ok := xs.(value.Array); ok {
+			t := value.Tuple(as)
+			for i, j := len(t), len(attrs); i < j; i++ {
+				t = append(t, value.ConstNull)
+			}
+			return t, nil
+		}
+		return nil, errors.New("Not Tuple")
 	}
-	t := value.Tuple(v.(value.Array))
-	for i, j := len(t), len(attrs); i < j; i++ {
-		t = append(t, value.ConstNull)
-	}
-	return t, nil
 }
 
 func (tbl *table) updateAttributes(tuples []map[string]interface{}) []string {
@@ -279,8 +284,8 @@ func (tbl *table) updateAttributes(tuples []map[string]interface{}) []string {
 	return attrs
 }
 
-func (tbl *table) addTuple(row uint64, attrs []string, tuple map[string]interface{}, bat Batch) error {
-	var xs []interface{}
+func (tbl *table) addTuple(row uint64, attrs []string, tuple map[string]interface{}, bat engine.Batch) error {
+	var xs value.Array
 
 	for _, attr := range attrs {
 		if e, ok := tuple[attr]; ok {
@@ -288,42 +293,35 @@ func (tbl *table) addTuple(row uint64, attrs []string, tuple map[string]interfac
 			switch t := e.(type) {
 			case nil:
 				xs = append(xs, value.ConstNull)
-				v, _ = encoding.Encode(value.ConstNull)
-				v = append([]byte{byte(types.T_null)}, v...)
+				v, _ = encoding.EncodeValue(value.ConstNull)
 			case bool:
 				xs = append(xs, value.NewBool(t))
-				v, _ = encoding.Encode(*value.NewBool(t))
-				v = append([]byte{byte(types.T_bool)}, v...)
+				v, _ = encoding.EncodeValue(value.NewBool(t))
 			case int64:
 				xs = append(xs, value.NewInt(t))
-				v, _ = encoding.Encode(*value.NewInt(t))
-				v = append([]byte{byte(types.T_int)}, v...)
+				v, _ = encoding.EncodeValue(value.NewInt(t))
 			case string:
 				xs = append(xs, value.NewString(t))
-				v, _ = encoding.Encode(*value.NewString(t))
-				v = append([]byte{byte(types.T_string)}, v...)
+				v, _ = encoding.EncodeValue(value.NewString(t))
 			case float64:
 				xs = append(xs, value.NewFloat(t))
-				v, _ = encoding.Encode(*value.NewFloat(t))
-				v = append([]byte{byte(types.T_float)}, v...)
+				v, _ = encoding.EncodeValue(value.NewFloat(t))
 			case time.Time:
 				xs = append(xs, value.NewTime(t))
-				v, _ = encoding.Encode(*value.NewTime(t))
-				v = append([]byte{byte(types.T_time)}, v...)
+				v, _ = encoding.EncodeValue(value.NewTime(t))
 			case []interface{}:
-				if err := tbl.database.addTupleByArray(tbl.id+"."+attr, t, bat); err != nil {
+				if s, err := tbl.database.addTupleByArray(tbl.id+"."+attr, t, bat); err != nil {
 					return err
+				} else {
+					xs = append(xs, s)
+					v, _ = encoding.EncodeValue(s)
 				}
-				xs = append(xs, getArray(t))
-				v, _ = encoding.Encode(t)
-				v = append([]byte{byte(types.T_array)}, v...)
 			case map[string]interface{}:
 				if err := tbl.database.addTupleBysubTable(tbl.id+"."+attr, t, bat); err != nil {
 					return err
 				}
 				xs = append(xs, value.NewTable(tbl.id+"."+attr))
-				v, _ = encoding.Encode(*value.NewTable(tbl.id + "." + attr))
-				v = append([]byte{byte(types.T_table)}, v...)
+				v, _ = encoding.EncodeValue(value.NewTable(tbl.id + "." + attr))
 			}
 			if err := bat.Set(colKey(tbl.id, attr, row), v); err != nil {
 				return err
@@ -336,8 +334,8 @@ func (tbl *table) addTuple(row uint64, attrs []string, tuple map[string]interfac
 		}
 	}
 	{
-		v, _ := encoding.Encode(xs)
-		if err := bat.Set(rowKey(tbl.id, row), append([]byte{byte(types.T_array)}, v...)); err != nil {
+		v, _ := encoding.EncodeValue(xs)
+		if err := bat.Set(rowKey(tbl.id, row), v); err != nil {
 			return err
 		}
 	}
@@ -367,37 +365,41 @@ func (tbl *table) addTuple(row uint64, attrs []string, tuple map[string]interfac
 	return nil
 }
 
-func (db *database) addTupleByArray(id string, xs []interface{}, bat Batch) error {
+func (db *database) addTupleByArray(id string, xs []interface{}, bat engine.Batch) (value.Array, error) {
+	var as value.Array
+
 	for i, j := 0, len(xs); i < j; i++ {
 		switch t := xs[i].(type) {
 		case nil:
-			xs[i] = value.ConstNull
+			as = append(as, value.ConstNull)
 		case bool:
-			xs[i] = *value.NewBool(t)
+			as = append(as, value.NewBool(t))
 		case int64:
-			xs[i] = *value.NewInt(t)
+			as = append(as, value.NewInt(t))
 		case string:
-			xs[i] = *value.NewString(t)
+			as = append(as, value.NewString(t))
 		case float64:
-			xs[i] = *value.NewFloat(t)
+			as = append(as, value.NewFloat(t))
 		case time.Time:
-			xs[i] = *value.NewTime(t)
+			as = append(as, value.NewTime(t))
 		case []interface{}:
-			if err := db.addTupleByArray(id+"."+strconv.Itoa(i), t, bat); err != nil {
-				return err
+			if s, err := db.addTupleByArray(id+"."+strconv.Itoa(i), t, bat); err != nil {
+				return nil, err
+			} else {
+				as = append(as, s)
 			}
 		case map[string]interface{}:
 			idx := strconv.Itoa(i)
 			if err := db.addTupleBysubTable(id+"."+idx, t, bat); err != nil {
-				return err
+				return nil, err
 			}
-			xs[i] = *value.NewTable(id + "." + idx)
+			as = append(as, value.NewTable(id+"."+idx))
 		}
 	}
-	return nil
+	return as, nil
 }
 
-func (db *database) addTupleBysubTable(id string, tuple map[string]interface{}, bat Batch) error {
+func (db *database) addTupleBysubTable(id string, tuple map[string]interface{}, bat engine.Batch) error {
 	t, err := db.Table(id)
 	if err != nil {
 		return err
@@ -418,7 +420,7 @@ func (db *database) openTable(id string) (*table, error) {
 		switch {
 		case err == nil:
 			tbl.cnt = int64(binary.BigEndian.Uint64(v))
-		case err == storerror.NotExist:
+		case err == engine.NotExist:
 		default:
 			return nil, err
 		}
@@ -433,7 +435,7 @@ func (db *database) openTable(id string) (*table, error) {
 			for _, attr := range tbl.attrs {
 				tbl.mp[attr] = struct{}{}
 			}
-		case err == storerror.NotExist:
+		case err == engine.NotExist:
 		default:
 			return nil, err
 		}
