@@ -11,10 +11,20 @@ import (
 	hmem "github.com/deepfabric/thinkbase/pkg/vm/container/hash/mem"
 	"github.com/deepfabric/thinkbase/pkg/vm/container/vector"
 	vmem "github.com/deepfabric/thinkbase/pkg/vm/container/vector/mem"
+	"github.com/deepfabric/thinkbase/pkg/vm/estimator/testEstimator"
+	"github.com/deepfabric/thinkbase/pkg/vm/op"
 )
 
 func New(mcpu, rcpu, memSize, diskSize int) *testContext {
-	return &testContext{mcpu, rcpu, memSize, diskSize}
+	return &testContext{mcpu, rcpu, memSize, diskSize, testEstimator.New()}
+}
+
+func (c *testContext) Min(left, right op.OP) op.OP {
+	return c.est.Min(left, right)
+}
+
+func (c *testContext) Less(left, right op.OP) bool {
+	return c.est.Less(left, right)
 }
 
 func (c *testContext) NumMcpu() int {

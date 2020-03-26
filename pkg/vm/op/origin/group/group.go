@@ -34,10 +34,12 @@ func (n *group) GetTuples(limit int) (value.Array, error) {
 			return nil, err
 		}
 		if err := n.newByAttributes(attrs); err != nil {
+			n.dv.Destroy()
 			return nil, err
 		}
 		ks, err := n.dv.Keys()
 		if err != nil {
+			n.dv.Destroy()
 			return nil, err
 		}
 		n.ks = ks
@@ -59,6 +61,7 @@ func (n *group) GetTuples(limit int) (value.Array, error) {
 			{
 				v, _, err := encoding.DecodeValue([]byte(n.ks[0]))
 				if err != nil {
+					n.dv.Destroy()
 					return nil, err
 				}
 				size += v.(value.Array).Size()
@@ -66,6 +69,7 @@ func (n *group) GetTuples(limit int) (value.Array, error) {
 			}
 			for _, e := range n.es {
 				if v, err := e.Agg.Eval(); err != nil {
+					n.dv.Destroy()
 					return nil, err
 				} else {
 					size += v.Size()
@@ -79,11 +83,13 @@ func (n *group) GetTuples(limit int) (value.Array, error) {
 			}
 			continue
 		case err != nil:
+			n.dv.Destroy()
 			return nil, err
 		}
 		mp := util.Tuples2Map(ts, attrs)
 		for _, e := range n.es {
 			if err := e.Agg.Fill(mp[e.Name]); err != nil {
+				n.dv.Destroy()
 				return nil, err
 			}
 		}
@@ -104,10 +110,12 @@ func (n *group) GetAttributes(attrs []string, limit int) (map[string]value.Array
 			return nil, err
 		}
 		if err := n.newByAttributes(as[0]); err != nil {
+			n.dv.Destroy()
 			return nil, err
 		}
 		ks, err := n.dv.Keys()
 		if err != nil {
+			n.dv.Destroy()
 			return nil, err
 		}
 		n.ks = ks
@@ -128,6 +136,7 @@ func (n *group) GetAttributes(attrs []string, limit int) (map[string]value.Array
 			{
 				v, _, err := encoding.DecodeValue([]byte(n.ks[0]))
 				if err != nil {
+					n.dv.Destroy()
 					return nil, err
 				}
 				size += v.(value.Array).Size()
@@ -137,6 +146,7 @@ func (n *group) GetAttributes(attrs []string, limit int) (map[string]value.Array
 			}
 			for _, e := range es {
 				if v, err := e.Agg.Eval(); err != nil {
+					n.dv.Destroy()
 					return nil, err
 				} else {
 					size += v.Size()
@@ -149,11 +159,13 @@ func (n *group) GetAttributes(attrs []string, limit int) (map[string]value.Array
 			}
 			continue
 		case err != nil:
+			n.dv.Destroy()
 			return nil, err
 		}
 		mp := util.Tuples2Map(ts, as[0])
 		for _, e := range es {
 			if err := e.Agg.Fill(mp[e.Name]); err != nil {
+				n.dv.Destroy()
 				return nil, err
 			}
 		}

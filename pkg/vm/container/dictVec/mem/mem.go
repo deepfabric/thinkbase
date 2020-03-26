@@ -35,6 +35,7 @@ func (m *mem) Pop(k string) (value.Value, error) {
 		return nil, dictVec.NotExist
 	}
 	r := a[0]
+	a[0] = nil
 	m.mp[k] = a[1:]
 	return r, nil
 }
@@ -74,6 +75,7 @@ func (m *mem) Pops(k string, n, limit int) (value.Array, error) {
 		for size < limit && len(a) > 0 {
 			size += a[0].Size()
 			r = append(r, a[0])
+			a[0] = nil
 			a = a[1:]
 		}
 		m.mp[k] = a
@@ -82,7 +84,10 @@ func (m *mem) Pops(k string, n, limit int) (value.Array, error) {
 	if len(a) < n {
 		n = len(a)
 	}
-	r = a[:n]
+	for i := 0; i < n; i++ {
+		r = append(r, a[i])
+		a[i] = nil
+	}
 	m.mp[k] = a[n:]
 	return r, nil
 }

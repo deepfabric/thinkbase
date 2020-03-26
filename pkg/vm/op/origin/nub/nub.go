@@ -33,10 +33,12 @@ func (n *nub) GetTuples(limit int) (value.Array, error) {
 	}
 	attrs, err := n.prev.AttributeList()
 	if err != nil {
+		n.dict.Destroy()
 		return nil, err
 	}
 	ts, err := n.prev.GetTuples(limit)
 	if err != nil {
+		n.dict.Destroy()
 		return nil, err
 	}
 	if len(ts) == 0 {
@@ -46,6 +48,7 @@ func (n *nub) GetTuples(limit int) (value.Array, error) {
 	is := util.Indexs(n.attrs, attrs)
 	for i, j := 0, len(ts); i < j; i++ {
 		if ok, _, err := n.dict.GetOrSet(util.SubTuple(ts[i].(value.Array), is), nil); err != nil {
+			n.dict.Destroy()
 			return nil, err
 		} else if !ok {
 			a = append(a, ts[i])
@@ -71,6 +74,7 @@ func (n *nub) GetAttributes(attrs []string, limit int) (map[string]value.Array, 
 	}
 	mp, err := n.prev.GetAttributes(as[0], limit)
 	if err != nil {
+		n.dict.Destroy()
 		return nil, err
 	}
 	if len(mp) == 0 || len(mp[attrs[0]]) == 0 {
@@ -80,6 +84,7 @@ func (n *nub) GetAttributes(attrs []string, limit int) (map[string]value.Array, 
 	rq := make(map[string]value.Array)
 	for i, j := 0, len(mp[attrs[0]]); i < j; i++ {
 		if ok, _, err := n.dict.GetOrSet(util.Map2Tuple(mp, attrs, i), nil); err != nil {
+			n.dict.Destroy()
 			return nil, err
 		} else if !ok {
 			for _, attr := range attrs {

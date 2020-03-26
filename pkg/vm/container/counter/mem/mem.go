@@ -13,6 +13,38 @@ func (m *mem) Destroy() error {
 	return nil
 }
 
+func (m *mem) Set(v value.Value) error {
+	m.Lock()
+	defer m.Unlock()
+	k, err := encoding.EncodeValue(v)
+	if err != nil {
+		return err
+	}
+	m.mp[string(k)] = 1
+	return nil
+}
+
+func (m *mem) Del(v value.Value) error {
+	m.Lock()
+	defer m.Unlock()
+	k, err := encoding.EncodeValue(v)
+	if err != nil {
+		return err
+	}
+	delete(m.mp, string(k))
+	return nil
+}
+
+func (m *mem) Get(v value.Value) (int, error) {
+	m.Lock()
+	defer m.Unlock()
+	k, err := encoding.EncodeValue(v)
+	if err != nil {
+		return -1, err
+	}
+	return m.mp[string(k)], nil
+}
+
 func (m *mem) Inc(v value.Value) error {
 	m.Lock()
 	defer m.Unlock()
@@ -43,4 +75,38 @@ func (m *mem) Dec(v value.Value) (bool, error) {
 		m.mp[string(k)] = cnt - 1
 	}
 	return true, nil
+}
+
+func (m *mem) IncAndGet(v value.Value) (int, error) {
+	m.Lock()
+	defer m.Unlock()
+	k, err := encoding.EncodeValue(v)
+	if err != nil {
+		return -1, err
+	}
+	if cnt, ok := m.mp[string(k)]; !ok {
+		m.mp[string(k)] = 1
+		return 0, nil
+	} else {
+		m.mp[string(k)] = cnt + 1
+		return cnt, nil
+	}
+}
+
+func (m *mem) DecAndGet(v value.Value) (int, error) {
+	m.Lock()
+	defer m.Unlock()
+	k, err := encoding.EncodeValue(v)
+	if err != nil {
+		return -1, err
+	}
+	if cnt, ok := m.mp[string(k)]; !ok {
+		return 0, nil
+	} else if cnt-1 == 0 {
+		delete(m.mp, string(k))
+		return cnt, nil
+	} else {
+		m.mp[string(k)] = cnt - 1
+		return cnt, nil
+	}
 }

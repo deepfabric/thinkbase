@@ -25,6 +25,7 @@ func (m *mem) Pop() (value.Value, error) {
 		return nil, nil
 	}
 	r := m.a[0]
+	m.a[0] = nil
 	m.a = m.a[1:]
 	return r, nil
 }
@@ -48,6 +49,7 @@ func (m *mem) Pops(n, limit int) (value.Array, error) {
 		for size < limit && len(m.a) > 0 {
 			size += m.a[0].Size()
 			r = append(r, m.a[0])
+			m.a[0] = nil
 			m.a = m.a[1:]
 		}
 		return r, nil
@@ -55,7 +57,10 @@ func (m *mem) Pops(n, limit int) (value.Array, error) {
 	if len(m.a) < n {
 		n = len(m.a)
 	}
-	r = m.a[:n]
+	for i := 0; i < n; i++ {
+		r = append(r, m.a[i])
+		m.a[i] = nil
+	}
 	m.a = m.a[n:]
 	return r, nil
 }

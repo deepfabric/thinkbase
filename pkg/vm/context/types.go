@@ -6,9 +6,11 @@ import (
 	"github.com/deepfabric/thinkbase/pkg/vm/container/dictionary"
 	"github.com/deepfabric/thinkbase/pkg/vm/container/hash"
 	"github.com/deepfabric/thinkbase/pkg/vm/container/vector"
+	"github.com/deepfabric/thinkbase/pkg/vm/estimator"
 )
 
 type Context interface {
+	estimator.Estimator
 	NumMcpu() int  // 逻辑执行单元限制
 	NumRcpu() int  // 执行单元的最佳并行读数目
 	MemSize() int  // 可用内存限制
