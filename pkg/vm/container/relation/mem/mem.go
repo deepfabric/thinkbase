@@ -22,7 +22,7 @@ func (r *mem) Destroy() error {
 }
 
 func (r *mem) Size() (int, error) {
-	return -1, nil
+	return 0, nil
 }
 
 func (r *mem) Split(n int) ([]relation.Relation, error) {
