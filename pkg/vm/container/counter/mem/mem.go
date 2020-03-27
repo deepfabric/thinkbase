@@ -13,6 +13,31 @@ func (m *mem) Destroy() error {
 	return nil
 }
 
+func (m *mem) Pops(limit int) (value.Array, error) {
+	var a value.Array
+
+	m.Lock()
+	defer m.Unlock()
+	size := 0
+	for k, cnt := range m.mp {
+		if size >= limit {
+			return a, nil
+		}
+		v, _, err := encoding.DecodeValue([]byte(k))
+		if err != nil {
+			return nil, err
+		}
+		t := v.(value.Value)
+		for cnt > 0 && size < limit {
+			cnt--
+			m.mp[k] = cnt
+			a = append(a, t)
+			size += t.Size()
+		}
+	}
+	return a, nil
+}
+
 func (m *mem) Set(v value.Value) error {
 	m.Lock()
 	defer m.Unlock()

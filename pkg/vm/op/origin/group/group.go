@@ -37,29 +37,32 @@ func (n *group) GetTuples(limit int) (value.Array, error) {
 			n.dv.Destroy()
 			return nil, err
 		}
-		ks, err := n.dv.Keys()
-		if err != nil {
-			n.dv.Destroy()
-			return nil, err
-		}
-		n.ks = ks
 		n.isCheck = true
-	}
-	if len(n.ks) == 0 {
-		return nil, nil
 	}
 	size := 0
 	var a value.Array
 	for {
-		if size >= limit || len(n.ks) == 0 {
+		if size >= limit {
 			break
 		}
-		ts, err := n.dv.Pops(n.ks[0], -1, n.c.MemSize())
+		if len(n.k) == 0 {
+			k, err := n.dv.PopKey()
+			if err != nil {
+				n.dv.Destroy()
+				return nil, err
+			}
+			if len(k) == 0 {
+				n.dv.Destroy()
+				return a, nil
+			}
+			n.k = k
+		}
+		ts, err := n.dv.Pops(n.k, -1, n.c.MemSize())
 		switch {
-		case err == dictVec.NotExist || len(ts) == 0:
+		case err == dictVec.NotExist || (err == nil && len(ts) == 0):
 			var t value.Array
 			{
-				v, _, err := encoding.DecodeValue([]byte(n.ks[0]))
+				v, _, err := encoding.DecodeValue([]byte(n.k))
 				if err != nil {
 					n.dv.Destroy()
 					return nil, err
@@ -78,9 +81,7 @@ func (n *group) GetTuples(limit int) (value.Array, error) {
 				e.Agg.Reset()
 			}
 			a = append(a, t)
-			if n.ks = n.ks[1:]; len(n.ks) == 0 {
-				n.dv.Destroy()
-			}
+			n.k = ""
 			continue
 		case err != nil:
 			n.dv.Destroy()
@@ -113,28 +114,31 @@ func (n *group) GetAttributes(attrs []string, limit int) (map[string]value.Array
 			n.dv.Destroy()
 			return nil, err
 		}
-		ks, err := n.dv.Keys()
-		if err != nil {
-			n.dv.Destroy()
-			return nil, err
-		}
-		n.ks = ks
 		n.isCheck = true
-	}
-	if len(n.ks) == 0 {
-		return nil, nil
 	}
 	size := 0
 	rq := make(map[string]value.Array)
 	for {
-		if size >= limit || len(n.ks) == 0 {
+		if size >= limit {
 			break
 		}
-		ts, err := n.dv.Pops(n.ks[0], -1, n.c.MemSize())
+		if len(n.k) == 0 {
+			k, err := n.dv.PopKey()
+			if err != nil {
+				n.dv.Destroy()
+				return nil, err
+			}
+			if len(k) == 0 {
+				n.dv.Destroy()
+				return rq, nil
+			}
+			n.k = k
+		}
+		ts, err := n.dv.Pops(n.k, -1, n.c.MemSize())
 		switch {
-		case err == dictVec.NotExist || len(ts) == 0:
+		case err == dictVec.NotExist || (err == nil && len(ts) == 0):
 			{
-				v, _, err := encoding.DecodeValue([]byte(n.ks[0]))
+				v, _, err := encoding.DecodeValue([]byte(n.k))
 				if err != nil {
 					n.dv.Destroy()
 					return nil, err
@@ -154,9 +158,7 @@ func (n *group) GetAttributes(attrs []string, limit int) (map[string]value.Array
 				}
 				e.Agg.Reset()
 			}
-			if n.ks = n.ks[1:]; len(n.ks) == 0 {
-				n.dv.Destroy()
-			}
+			n.k = ""
 			continue
 		case err != nil:
 			n.dv.Destroy()

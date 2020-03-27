@@ -5,6 +5,8 @@ import "github.com/deepfabric/thinkbase/pkg/vm/value"
 type Counter interface {
 	Destroy() error
 
+	Pops(int) (value.Array, error) // 根据计数弹出值
+
 	Set(value.Value) error // 如果不存在则设为1, 存在则什么也不错
 	Del(value.Value) error
 	Get(value.Value) (int, error)
