@@ -23,12 +23,27 @@ func New(left, right op.OP, c context.Context) *union {
 	}
 }
 
+func (n *union) Name() (string, error) {
+	ln, err := n.left.Name()
+	if err != nil {
+		return "", err
+	}
+	rn, err := n.right.Name()
+	if err != nil {
+		return "", err
+	}
+	return ln + "." + rn, nil
+}
+
 func (n *union) AttributeList() ([]string, error) {
 	return n.left.AttributeList()
 }
 
 func (n *union) GetTuples(limit int) (value.Array, error) {
 	if !n.isCheck {
+		if err := n.check(nil); err != nil {
+			return nil, err
+		}
 		if dict, err := n.c.NewDictionary(); err != nil {
 			return nil, err
 		} else {
@@ -165,6 +180,9 @@ func (n *union) check(attrs []string) error {
 				return errors.New("attribute not equal")
 			}
 		}
+	}
+	if len(attrs) == 0 {
+		return nil
 	}
 	as, err := n.left.AttributeList()
 	if err != nil {

@@ -23,6 +23,10 @@ func New(prev op.OP, gs []string, es []*summarize.Extend, c context.Context) *gr
 	return &group{isCheck: false, prev: prev, gs: gs, c: c, es: es}
 }
 
+func (n *group) Name() (string, error) {
+	return n.prev.Name()
+}
+
 func (n *group) AttributeList() ([]string, error) {
 	return aliasList(n.es, n.gs), nil
 }
@@ -187,7 +191,7 @@ func (n *group) newByAttributes(attrs []string) error {
 		if err != nil {
 			return err
 		}
-		if len(mp[attrs[0]]) == 0 {
+		if len(mp) == 0 || len(mp[attrs[0]]) == 0 {
 			return nil
 		}
 		for i, j := 0, len(mp[attrs[0]]); i < j; i++ {

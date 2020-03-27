@@ -9,6 +9,7 @@ type Relation interface {
 
 	Split(int) ([]Relation, error)
 
+	Name() (string, error)
 	AttributeList() ([]string, error)
 	GetTuples(int) (value.Array, error)
 	GetAttributes([]string, int) (map[string]value.Array, error)

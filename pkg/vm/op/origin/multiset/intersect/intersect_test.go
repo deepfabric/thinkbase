@@ -27,6 +27,10 @@ func TestIntersect(t *testing.T) {
 	{
 		n := New(newRestrict0(), newRelation1(), testContext.New(1, 1, 1024*1024*1024, 1024*1024*1024*1024))
 		{
+			name, err := n.Name()
+			fmt.Printf("%v, %v\n", name, err)
+		}
+		{
 			attrs, err := n.AttributeList()
 			fmt.Printf("%v, %v\n", attrs, err)
 		}
@@ -45,6 +49,10 @@ func TestIntersect(t *testing.T) {
 	}
 	{
 		n := New(newRestrict0(), newRelation1(), testContext.New(1, 1, 1024*1024*1024, 1024*1024*1024*1024))
+		{
+			name, err := n.Name()
+			fmt.Printf("%v, %v\n", name, err)
+		}
 		{
 			attrs, err := n.AttributeList()
 			fmt.Printf("%v, %v\n", attrs, err)
@@ -173,7 +181,7 @@ func newRelation1() relation.Relation {
 	attrs = append(attrs, "a")
 	attrs = append(attrs, "b")
 	attrs = append(attrs, "c")
-	r := mem.New("A", attrs)
+	r := mem.New("B", attrs)
 	{
 		var t value.Array
 

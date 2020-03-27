@@ -20,6 +20,18 @@ func New(left, right op.OP, c context.Context) *difference {
 	}
 }
 
+func (n *difference) Name() (string, error) {
+	ln, err := n.left.Name()
+	if err != nil {
+		return "", err
+	}
+	rn, err := n.right.Name()
+	if err != nil {
+		return "", err
+	}
+	return ln + "." + rn, nil
+}
+
 func (n *difference) AttributeList() ([]string, error) {
 	return n.left.AttributeList()
 }
@@ -40,6 +52,9 @@ func (n *difference) GetAttributes(attrs []string, limit int) (map[string]value.
 
 func (n *difference) getTuplesByLeft(limit int) (value.Array, error) {
 	if !n.isCheck {
+		if err := n.check(nil); err != nil {
+			return nil, err
+		}
 		if ctr, err := n.c.NewCounter(); err != nil {
 			return nil, err
 		} else {
@@ -65,6 +80,9 @@ func (n *difference) getTuplesByLeft(limit int) (value.Array, error) {
 
 func (n *difference) getTuplesByRight(limit int) (value.Array, error) {
 	if !n.isCheck {
+		if err := n.check(nil); err != nil {
+			return nil, err
+		}
 		if ctr, err := n.c.NewCounter(); err != nil {
 			return nil, err
 		} else {
@@ -251,6 +269,9 @@ func (n *difference) check(attrs []string) error {
 				return errors.New("attribute not equal")
 			}
 		}
+	}
+	if len(attrs) == 0 {
+		return nil
 	}
 	as, err := n.left.AttributeList()
 	if err != nil {

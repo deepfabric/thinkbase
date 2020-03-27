@@ -21,6 +21,10 @@ func New(prev op.OP, descs []bool, attrs []string, c context.Context) *order {
 	}
 }
 
+func (n *order) Name() (string, error) {
+	return n.prev.Name()
+}
+
 func (n *order) AttributeList() ([]string, error) {
 	return n.prev.AttributeList()
 }
@@ -118,7 +122,9 @@ func (n *order) newByTuple(lt func(value.Value, value.Value) bool) error {
 		if err != nil {
 			return err
 		}
-		v.Append(ts)
+		if err := v.Append(ts); err != nil {
+			return err
+		}
 		n.vs = append(n.vs, v)
 	}
 	return nil
@@ -131,7 +137,7 @@ func (n *order) newByAttributes(attrs []string, lt func(value.Value, value.Value
 		if err != nil {
 			return err
 		}
-		if len(mp[attrs[0]]) == 0 {
+		if len(mp) == 0 || len(mp[attrs[0]]) == 0 {
 			return nil
 		}
 		ts := util.Map2Tuples(mp, attrs)
