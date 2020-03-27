@@ -1,8 +1,6 @@
 package mem
 
 import (
-	"sort"
-
 	"github.com/deepfabric/thinkbase/pkg/vm/container/dictVec"
 	"github.com/deepfabric/thinkbase/pkg/vm/value"
 )
@@ -15,16 +13,16 @@ func (m *mem) Destroy() error {
 	return nil
 }
 
-func (m *mem) Keys() ([]string, error) {
-	var ks []string
-
+func (m *mem) PopKey() (string, error) {
 	m.RLock()
 	defer m.RUnlock()
-	for k, _ := range m.mp {
-		ks = append(ks, k)
+	if len(m.mp) == 0 {
+		return "", nil
 	}
-	sort.Strings(ks)
-	return ks, nil
+	for k, _ := range m.mp {
+		return k, nil
+	}
+	return "", nil
 }
 
 func (m *mem) Pop(k string) (value.Value, error) {
@@ -36,7 +34,11 @@ func (m *mem) Pop(k string) (value.Value, error) {
 	}
 	r := a[0]
 	a[0] = nil
-	m.mp[k] = a[1:]
+	if len(a[1:]) > 0 {
+		m.mp[k] = a[1:]
+	} else {
+		delete(m.mp, k)
+	}
 	return r, nil
 }
 
@@ -78,7 +80,11 @@ func (m *mem) Pops(k string, n, limit int) (value.Array, error) {
 			a[0] = nil
 			a = a[1:]
 		}
-		m.mp[k] = a
+		if len(a) > 0 {
+			m.mp[k] = a
+		} else {
+			delete(m.mp, k)
+		}
 		return r, nil
 	}
 	if len(a) < n {
@@ -88,6 +94,10 @@ func (m *mem) Pops(k string, n, limit int) (value.Array, error) {
 		r = append(r, a[i])
 		a[i] = nil
 	}
-	m.mp[k] = a[n:]
+	if len(a[n:]) > 0 {
+		m.mp[k] = a[n:]
+	} else {
+		delete(m.mp, k)
+	}
 	return r, nil
 }

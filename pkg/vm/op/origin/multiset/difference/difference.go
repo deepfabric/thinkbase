@@ -87,7 +87,7 @@ func (n *difference) getTuplesByRight(limit int) (value.Array, error) {
 	}
 	var a value.Array
 	for i, j := 0, len(ts); i < j; i++ {
-		if cnt, err := n.ctr.IncAndGet(ts[i]); err != nil {
+		if cnt, err := n.ctr.DecAndGet(ts[i]); err != nil {
 			n.ctr.Destroy()
 			return nil, err
 		} else if cnt == 0 {
@@ -165,7 +165,7 @@ func (n *difference) getAttributesByRight(attrs []string, limit int) (map[string
 	}
 	rq := make(map[string]value.Array)
 	for i, j := 0, len(ts); i < j; i++ {
-		if cnt, err := n.ctr.IncAndGet(ts[i]); err != nil {
+		if cnt, err := n.ctr.DecAndGet(ts[i]); err != nil {
 			n.ctr.Destroy()
 			return nil, err
 		} else if cnt == 0 {
@@ -187,7 +187,7 @@ func (n *difference) newByLeft(limit int) error {
 			break
 		}
 		for _, t := range ts {
-			if err := n.ctr.Set(t); err != nil {
+			if err := n.ctr.Inc(t); err != nil {
 				return err
 			}
 		}
@@ -201,12 +201,8 @@ func (n *difference) newByLeft(limit int) error {
 			return nil
 		}
 		for _, t := range ts {
-			if cnt, err := n.ctr.Get(t); err != nil {
+			if _, err := n.ctr.Dec(t); err != nil {
 				return err
-			} else if cnt > 0 {
-				if err := n.ctr.Del(t); err != nil {
-					return err
-				}
 			}
 		}
 	}
@@ -222,7 +218,7 @@ func (n *difference) newByRight(limit int) error {
 			return nil
 		}
 		for _, t := range ts {
-			if err := n.ctr.Set(t); err != nil {
+			if err := n.ctr.Inc(t); err != nil {
 				return err
 			}
 		}

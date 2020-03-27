@@ -11,7 +11,7 @@ import (
 type group struct {
 	isCheck bool
 	prev    op.OP
-	ks      []string // key of groups
+	k       string
 	gs      []string // group attributes
 	c       context.Context
 	dv      dictVec.DictVector

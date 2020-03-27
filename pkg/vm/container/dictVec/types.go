@@ -13,7 +13,7 @@ var (
 type DictVector interface {
 	Destroy() error
 
-	Keys() ([]string, error) // sorted
+	PopKey() (string, error)
 
 	Pop(string) (value.Value, error)
 	Head(string) (value.Value, error)
