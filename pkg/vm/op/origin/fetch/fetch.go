@@ -18,6 +18,10 @@ func New(prev op.OP, limit, offset int, c context.Context) *fetch {
 	}
 }
 
+func (n *fetch) Name() (string, error) {
+	return n.prev.Name()
+}
+
 func (n *fetch) AttributeList() ([]string, error) {
 	return n.prev.AttributeList()
 }
@@ -55,7 +59,7 @@ func (n *fetch) GetAttributes(attrs []string, limit int) (map[string]value.Array
 	if err != nil {
 		return nil, err
 	}
-	if len(mp) == 0 {
+	if len(mp) == 0 || len(mp[attrs[0]]) == 0 {
 		return mp, nil
 	}
 	for len(mp[attrs[0]]) > 0 && n.off < n.offset {

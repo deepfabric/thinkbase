@@ -13,6 +13,10 @@ func New(prev op.OP, attrs []string, c context.Context) *nub {
 	return &nub{isCheck: false, prev: prev, attrs: attrs, c: c}
 }
 
+func (n *nub) Name() (string, error) {
+	return n.prev.Name()
+}
+
 func (n *nub) AttributeList() ([]string, error) {
 	return n.prev.AttributeList()
 }

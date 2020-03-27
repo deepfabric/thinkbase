@@ -1,4 +1,4 @@
-package union
+package product
 
 import (
 	"fmt"
@@ -15,7 +15,7 @@ import (
 	"github.com/deepfabric/thinkbase/pkg/vm/value"
 )
 
-func TestUnion(t *testing.T) {
+func TestProduct(t *testing.T) {
 	{
 		r := newRelation0()
 		fmt.Printf("%s\n", r)
@@ -30,6 +30,7 @@ func TestUnion(t *testing.T) {
 			name, err := n.Name()
 			fmt.Printf("%v, %v\n", name, err)
 		}
+
 		{
 			attrs, err := n.AttributeList()
 			fmt.Printf("%v, %v\n", attrs, err)
@@ -58,15 +59,15 @@ func TestUnion(t *testing.T) {
 			fmt.Printf("%v, %v\n", attrs, err)
 		}
 		for {
-			mp, err := n.GetAttributes([]string{"b", "c"}, 1024*1024)
+			mp, err := n.GetAttributes([]string{"A.b", "B.c"}, 1024*1024)
 			if err != nil {
 				log.Fatal(err)
 			}
-			if len(mp["b"]) == 0 {
+			if len(mp["B.c"]) == 0 {
 				break
 			}
-			fmt.Printf("b = %v\n", mp["b"])
-			fmt.Printf("c = %v\n", mp["c"])
+			fmt.Printf("A.b = %v\n", mp["A.b"])
+			fmt.Printf("B.c = %v\n", mp["B.c"])
 		}
 
 	}

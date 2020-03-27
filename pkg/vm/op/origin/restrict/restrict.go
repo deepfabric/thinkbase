@@ -15,6 +15,10 @@ func New(prev op.OP, e extend.Extend, c context.Context) *restrict {
 	return &restrict{false, prev, e, c}
 }
 
+func (n *restrict) Name() (string, error) {
+	return n.prev.Name()
+}
+
 func (n *restrict) AttributeList() ([]string, error) {
 	return n.prev.AttributeList()
 }
@@ -55,7 +59,7 @@ func (n *restrict) GetAttributes(attrs []string, limit int) (map[string]value.Ar
 	if err != nil {
 		return nil, err
 	}
-	if len(mp) == 0 {
+	if len(mp) == 0 || len(mp[attrs[0]]) == 0 {
 		return mp, nil
 	}
 	rq := make(map[string]value.Array)

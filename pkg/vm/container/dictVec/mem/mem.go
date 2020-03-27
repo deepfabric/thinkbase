@@ -25,6 +25,18 @@ func (m *mem) PopKey() (string, error) {
 	return "", nil
 }
 
+func (m *mem) Len(k string) (int, error) {
+	m.RLock()
+	defer m.RUnlock()
+	return len(m.mp[k]), nil
+}
+
+func (m *mem) Get(k string, idx int) (value.Value, error) {
+	m.RLock()
+	defer m.RUnlock()
+	return m.mp[k][idx], nil
+}
+
 func (m *mem) Pop(k string) (value.Value, error) {
 	m.Lock()
 	defer m.Unlock()

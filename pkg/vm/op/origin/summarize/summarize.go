@@ -20,6 +20,10 @@ func New(prev op.OP, es []*Extend, c context.Context) *summarize {
 	return &summarize{false, false, prev, es, c}
 }
 
+func (n *summarize) Name() (string, error) {
+	return n.prev.Name()
+}
+
 func (n *summarize) AttributeList() ([]string, error) {
 	return aliasList(n.es), nil
 }
@@ -89,7 +93,7 @@ func (n *summarize) newByAttributes(attrs []string) error {
 		if err != nil {
 			return err
 		}
-		if len(mp[attrs[0]]) == 0 {
+		if len(mp) == 0 || len(mp[attrs[0]]) == 0 {
 			return nil
 		}
 		for _, e := range n.es {

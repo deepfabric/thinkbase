@@ -29,6 +29,10 @@ func (r *mem) Split(n int) ([]relation.Relation, error) {
 	return []relation.Relation{r}, nil
 }
 
+func (r *mem) Name() (string, error) {
+	return r.name, nil
+}
+
 func (r *mem) AttributeList() ([]string, error) {
 	return r.attrs, nil
 }

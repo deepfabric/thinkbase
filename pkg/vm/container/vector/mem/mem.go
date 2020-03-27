@@ -12,10 +12,22 @@ func (m *mem) Destroy() error {
 	return nil
 }
 
+func (m *mem) Len() (int, error) {
+	m.RLock()
+	defer m.RUnlock()
+	return len(m.a), nil
+}
+
 func (m *mem) IsEmpty() (bool, error) {
 	m.RLock()
 	defer m.RUnlock()
 	return len(m.a) == 0, nil
+}
+
+func (m *mem) Get(idx int) (value.Value, error) {
+	m.RLock()
+	defer m.RUnlock()
+	return m.a[idx], nil
 }
 
 func (m *mem) Pop() (value.Value, error) {

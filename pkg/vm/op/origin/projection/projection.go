@@ -15,6 +15,10 @@ func New(prev op.OP, es []*Extend, c context.Context) *projection {
 	return &projection{false, prev, es, c}
 }
 
+func (n *projection) Name() (string, error) {
+	return n.prev.Name()
+}
+
 func (n *projection) AttributeList() ([]string, error) {
 	return aliasList(n.es), nil
 }
@@ -33,7 +37,7 @@ func (n *projection) GetTuples(limit int) (value.Array, error) {
 	if err != nil {
 		return nil, err
 	}
-	if len(mp) == 0 {
+	if len(mp) == 0 || len(mp[attrs[0]]) == 0 {
 		return nil, nil
 	}
 	for i, j := 0, len(mp[attrs[0]]); i < j; i++ {
@@ -69,7 +73,7 @@ func (n *projection) GetAttributes(attrs []string, limit int) (map[string]value.
 	if err != nil {
 		return nil, err
 	}
-	if len(mp) == 0 {
+	if len(mp) == 0 || len(mp[as[0][0]]) == 0 {
 		return mp, nil
 	}
 	rq := make(map[string]value.Array)
