@@ -5,8 +5,6 @@ import "github.com/deepfabric/thinkbase/pkg/vm/value"
 type Relation interface {
 	Destroy() error
 
-	Size() (int, error)
-
 	Split(int) ([]Relation, error)
 
 	Name() (string, error)

@@ -10,8 +10,7 @@ import (
 	"github.com/deepfabric/thinkbase/pkg/vm/context/testContext"
 	"github.com/deepfabric/thinkbase/pkg/vm/extend"
 	"github.com/deepfabric/thinkbase/pkg/vm/extend/overload"
-	"github.com/deepfabric/thinkbase/pkg/vm/op"
-	"github.com/deepfabric/thinkbase/pkg/vm/op/origin/restrict"
+	oprojection "github.com/deepfabric/thinkbase/pkg/vm/op/origin/projection"
 	"github.com/deepfabric/thinkbase/pkg/vm/value"
 )
 
@@ -21,21 +20,21 @@ func TestProjection(t *testing.T) {
 		fmt.Printf("%s\n", r)
 	}
 	{
-		var es []*Extend
+		var es []*oprojection.Extend
 
-		prev := newRestrict()
-		es = append(es, &Extend{
+		r := newRelation()
+		es = append(es, &oprojection.Extend{
 			Alias: "C",
 			E:     &extend.Attribute{"a"},
 		})
-		es = append(es, &Extend{
+		es = append(es, &oprojection.Extend{
 			Alias: "A",
 			E: &extend.UnaryExtend{
 				Op: overload.Typeof,
 				E:  &extend.Attribute{"b"},
 			},
 		})
-		n := New(prev, es, testContext.New(1, 1, 1024*1024*1024, 1024*1024*1024*1024))
+		n := New(testContext.New(1, 1, 1024*1024*1024, 1024*1024*1024*1024), r, es)
 		{
 			attrs, err := n.AttributeList()
 			fmt.Printf("%v, %v\n", attrs, err)
@@ -54,21 +53,21 @@ func TestProjection(t *testing.T) {
 		}
 	}
 	{
-		var es []*Extend
+		var es []*oprojection.Extend
 
-		prev := newRestrict()
-		es = append(es, &Extend{
+		r := newRelation()
+		es = append(es, &oprojection.Extend{
 			Alias: "C",
 			E:     &extend.Attribute{"a"},
 		})
-		es = append(es, &Extend{
+		es = append(es, &oprojection.Extend{
 			Alias: "A",
 			E: &extend.UnaryExtend{
 				Op: overload.Typeof,
 				E:  &extend.Attribute{"b"},
 			},
 		})
-		n := New(prev, es, testContext.New(1, 1, 1024*1024*1024, 1024*1024*1024*1024))
+		n := New(testContext.New(1, 1, 1024*1024*1024, 1024*1024*1024*1024), r, es)
 		{
 			attrs, err := n.AttributeList()
 			fmt.Printf("%v, %v\n", attrs, err)
@@ -85,16 +84,6 @@ func TestProjection(t *testing.T) {
 			fmt.Printf("A = %v\n", mp["A"])
 		}
 	}
-}
-
-func newRestrict() op.OP {
-	r := newRelation()
-	e := &extend.BinaryExtend{
-		Op:    overload.GT,
-		Left:  &extend.Attribute{"a"},
-		Right: value.NewInt(1),
-	}
-	return restrict.New(r, e, testContext.New(1, 1, 1024*1024*1024, 1024*1024*1024*1024))
 }
 
 func newRelation() relation.Relation {

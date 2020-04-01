@@ -1,4 +1,4 @@
-package projection
+package restrict
 
 import (
 	"fmt"
@@ -10,32 +10,22 @@ import (
 	"github.com/deepfabric/thinkbase/pkg/vm/context/testContext"
 	"github.com/deepfabric/thinkbase/pkg/vm/extend"
 	"github.com/deepfabric/thinkbase/pkg/vm/extend/overload"
-	"github.com/deepfabric/thinkbase/pkg/vm/op"
-	"github.com/deepfabric/thinkbase/pkg/vm/op/origin/restrict"
 	"github.com/deepfabric/thinkbase/pkg/vm/value"
 )
 
-func TestProjection(t *testing.T) {
+func TestRestrict(t *testing.T) {
 	{
 		r := newRelation()
 		fmt.Printf("%s\n", r)
 	}
 	{
-		var es []*Extend
-
-		prev := newRestrict()
-		es = append(es, &Extend{
-			Alias: "C",
-			E:     &extend.Attribute{"a"},
-		})
-		es = append(es, &Extend{
-			Alias: "A",
-			E: &extend.UnaryExtend{
-				Op: overload.Typeof,
-				E:  &extend.Attribute{"b"},
-			},
-		})
-		n := New(prev, es, testContext.New(1, 1, 1024*1024*1024, 1024*1024*1024*1024))
+		r := newRelation()
+		e := &extend.BinaryExtend{
+			Op:    overload.GT,
+			Left:  &extend.Attribute{"a"},
+			Right: value.NewInt(1),
+		}
+		n := New(e, testContext.New(1, 4, 1024*1024*1024, 1024*1024*1024*1024), r)
 		{
 			attrs, err := n.AttributeList()
 			fmt.Printf("%v, %v\n", attrs, err)
@@ -54,47 +44,29 @@ func TestProjection(t *testing.T) {
 		}
 	}
 	{
-		var es []*Extend
-
-		prev := newRestrict()
-		es = append(es, &Extend{
-			Alias: "C",
-			E:     &extend.Attribute{"a"},
-		})
-		es = append(es, &Extend{
-			Alias: "A",
-			E: &extend.UnaryExtend{
-				Op: overload.Typeof,
-				E:  &extend.Attribute{"b"},
-			},
-		})
-		n := New(prev, es, testContext.New(1, 1, 1024*1024*1024, 1024*1024*1024*1024))
+		r := newRelation()
+		e := &extend.BinaryExtend{
+			Op:    overload.GT,
+			Left:  &extend.Attribute{"a"},
+			Right: value.NewInt(1),
+		}
+		n := New(e, testContext.New(1, 2, 1024*1024*1024, 1024*1024*1024*1024), r)
 		{
 			attrs, err := n.AttributeList()
 			fmt.Printf("%v, %v\n", attrs, err)
 		}
 		for {
-			mp, err := n.GetAttributes([]string{"C", "A"}, 1024*1024)
+			mp, err := n.GetAttributes([]string{"a", "b"}, 1024*1024)
 			if err != nil {
 				log.Fatal(err)
 			}
-			if len(mp["C"]) == 0 {
+			if len(mp["a"]) == 0 {
 				break
 			}
-			fmt.Printf("C = %v\n", mp["C"])
-			fmt.Printf("A = %v\n", mp["A"])
+			fmt.Printf("a = %v\n", mp["a"])
+			fmt.Printf("b = %v\n", mp["b"])
 		}
 	}
-}
-
-func newRestrict() op.OP {
-	r := newRelation()
-	e := &extend.BinaryExtend{
-		Op:    overload.GT,
-		Left:  &extend.Attribute{"a"},
-		Right: value.NewInt(1),
-	}
-	return restrict.New(r, e, testContext.New(1, 1, 1024*1024*1024, 1024*1024*1024*1024))
 }
 
 func newRelation() relation.Relation {

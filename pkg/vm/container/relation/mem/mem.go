@@ -21,12 +21,37 @@ func (r *mem) Destroy() error {
 	return nil
 }
 
-func (r *mem) Size() (int, error) {
-	return 0, nil
-}
-
 func (r *mem) Split(n int) ([]relation.Relation, error) {
-	return []relation.Relation{r}, nil
+	var rs []relation.Relation
+
+	step := len(r.ts) / n
+	if step < 1 {
+		step = 1
+	}
+	for i, j := 0, len(r.ts); i < j; i += step {
+		switch {
+		case len(rs) == n-1:
+			rs = append(rs, &mem{
+				mp:    r.mp,
+				name:  r.name,
+				attrs: r.attrs,
+				ts:    r.ts[i:],
+			})
+			return rs, nil
+		default:
+			cnt := step
+			if cnt > j-i {
+				cnt = j - i
+			}
+			rs = append(rs, &mem{
+				mp:    r.mp,
+				name:  r.name,
+				attrs: r.attrs,
+				ts:    r.ts[i : i+cnt],
+			})
+		}
+	}
+	return rs, nil
 }
 
 func (r *mem) Name() (string, error) {
