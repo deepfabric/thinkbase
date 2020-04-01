@@ -44,7 +44,7 @@ func (c *testContext) DiskSize() int {
 }
 
 func (c *testContext) NewHash(n int) (hash.Hash, error) {
-	return hmem.New(n), nil
+	return hmem.New(n, c.NewVector), nil
 }
 
 func (c *testContext) NewVector() (vector.Vector, error) {

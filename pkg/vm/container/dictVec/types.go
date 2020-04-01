@@ -19,6 +19,8 @@ type DictVector interface {
 
 	Get(string, int) (value.Value, error)
 
+	PopsAll(int, int) (map[string]value.Array, error)
+
 	Pop(string) (value.Value, error)
 	Head(string) (value.Value, error)
 	Pops(string, int, int) (value.Array, error)

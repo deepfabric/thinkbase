@@ -113,3 +113,35 @@ func (m *mem) Pops(k string, n, limit int) (value.Array, error) {
 	}
 	return r, nil
 }
+
+func (m *mem) PopsAll(n, limit int) (map[string]value.Array, error) {
+	rq := make(map[string]value.Array)
+	m.Lock()
+	defer m.Unlock()
+	if n <= 0 {
+		if n = m.length(limit / len(m.mp)); n == 0 {
+			return nil, nil
+		}
+	}
+	for k, v := range m.mp {
+		rq[k] = v[:n]
+		m.mp[k] = v[n:]
+	}
+	return rq, nil
+}
+
+func (m *mem) length(limit int) int {
+	n := 0
+	for _, v := range m.mp {
+		size := 0
+		if n <= 0 {
+			for i, t := range v {
+				if size = size + t.Size(); size > limit {
+					return n
+				}
+				n = i + 1
+			}
+		}
+	}
+	return n
+}

@@ -83,10 +83,9 @@ func (n *projection) GetAttributes(attrs []string, limit int) (map[string]value.
 			if err != nil {
 				return nil, err
 			}
-			switch t := e.E.(type) {
-			case *extend.Attribute:
+			if t, ok := e.E.(*extend.Attribute); ok && len(e.Alias) == 0 {
 				rq[t.Name] = append(rq[t.Name], v)
-			default:
+			} else {
 				rq[e.Alias] = append(rq[e.Alias], v)
 			}
 		}
@@ -127,10 +126,9 @@ func aliasList(es []*Extend) []string {
 	var rs []string
 
 	for _, e := range es {
-		switch t := e.E.(type) {
-		case *extend.Attribute:
+		if t, ok := e.E.(*extend.Attribute); ok && len(e.Alias) == 0 {
 			rs = append(rs, t.Name)
-		default:
+		} else {
 			rs = append(rs, e.Alias)
 		}
 	}
