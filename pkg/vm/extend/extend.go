@@ -24,6 +24,34 @@ func (e *UnaryExtend) Eval(mp map[string]value.Value) (value.Value, error) {
 	return overload.UnaryEval(e.Op, v)
 }
 
+func (e *UnaryExtend) String() string {
+	switch e.Op {
+	case overload.Not:
+		return fmt.Sprintf("not %s", e.E.String())
+	case overload.Abs:
+		return fmt.Sprintf("abs(%s)", e.E.String())
+	case overload.Ceil:
+		return fmt.Sprintf("ceil(%s)", e.E.String())
+	case overload.Sign:
+		return fmt.Sprintf("sign(%s)", e.E.String())
+	case overload.Floor:
+		return fmt.Sprintf("floor(%s)", e.E.String())
+	case overload.Lower:
+		return fmt.Sprintf("lower(%s)", e.E.String())
+	case overload.Round:
+		return fmt.Sprintf("round(%s)", e.E.String())
+	case overload.Upper:
+		return fmt.Sprintf("upper(%s)", e.E.String())
+	case overload.Length:
+		return fmt.Sprintf("length(%s)", e.E.String())
+	case overload.Typeof:
+		return fmt.Sprintf("typeof(%s)", e.E.String())
+	case overload.UnaryMinus:
+		return fmt.Sprintf("-%s", e.E.String())
+	}
+	return ""
+}
+
 func (e *BinaryExtend) IsLogical() bool {
 	return overload.IsLogical(e.Op)
 }
@@ -42,6 +70,40 @@ func (e *BinaryExtend) Eval(mp map[string]value.Value) (value.Value, error) {
 		return nil, err
 	}
 	return overload.BinaryEval(e.Op, l, r)
+}
+
+func (e *BinaryExtend) String() string {
+	switch e.Op {
+	case overload.EQ:
+		return fmt.Sprintf("%s = %s", e.Left.String(), e.Right.String())
+	case overload.LT:
+		return fmt.Sprintf("%s < %s", e.Left.String(), e.Right.String())
+	case overload.GT:
+		return fmt.Sprintf("%s > %s", e.Left.String(), e.Right.String())
+	case overload.LE:
+		return fmt.Sprintf("%s <= %s", e.Left.String(), e.Right.String())
+	case overload.GE:
+		return fmt.Sprintf("%s >= %s", e.Left.String(), e.Right.String())
+	case overload.NE:
+		return fmt.Sprintf("%s <> %s", e.Left.String(), e.Right.String())
+	case overload.Or:
+		return fmt.Sprintf("%s or %s", e.Left.String(), e.Right.String())
+	case overload.And:
+		return fmt.Sprintf("%s and %s", e.Left.String(), e.Right.String())
+	case overload.Div:
+		return fmt.Sprintf("%s / %s", e.Left.String(), e.Right.String())
+	case overload.Mod:
+		return fmt.Sprintf("%s %% %s", e.Left.String(), e.Right.String())
+	case overload.Plus:
+		return fmt.Sprintf("%s + %s", e.Left.String(), e.Right.String())
+	case overload.Mult:
+		return fmt.Sprintf("%s * %s", e.Left.String(), e.Right.String())
+	case overload.Minus:
+		return fmt.Sprintf("%s - %s", e.Left.String(), e.Right.String())
+	case overload.Typecast:
+		return fmt.Sprintf("cast(%s as %s)", e.Left.String(), e.Right.String())
+	}
+	return ""
 }
 
 func (e *MultiExtend) IsLogical() bool {
@@ -77,6 +139,22 @@ func (e *MultiExtend) Eval(mp map[string]value.Value) (value.Value, error) {
 	return overload.MultiEval(e.Op, args)
 }
 
+func (e *MultiExtend) String() string {
+	switch e.Op {
+	case overload.Concat:
+		var r string
+		for i, arg := range e.Args {
+			if i == 0 {
+				r += fmt.Sprintf("%s", arg)
+			} else {
+				r += fmt.Sprintf(" ++ %s", arg)
+			}
+		}
+		return r
+	}
+	return ""
+}
+
 func (a *Attribute) IsLogical() bool {
 	return false
 }
@@ -90,4 +168,8 @@ func (a *Attribute) Eval(mp map[string]value.Value) (value.Value, error) {
 		return v, nil
 	}
 	return nil, fmt.Errorf("attribute '%s' not exist", a.Name)
+}
+
+func (a *Attribute) String() string {
+	return a.Name
 }

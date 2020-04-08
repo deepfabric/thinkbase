@@ -21,6 +21,48 @@ func New(r, s op.OP, c context.Context) *union {
 	}
 }
 
+func (n *union) Size() float64 {
+	return n.c.SetUnionSizeByHash(n.r, n.s)
+}
+
+func (n *union) Cost() float64 {
+	return n.c.SetUnionCostByHash(n.r, n.s)
+}
+
+func (n *union) Dup() op.OP {
+	return &union{
+		c:       n.c,
+		r:       n.r,
+		s:       n.s,
+		isCheck: n.isCheck,
+	}
+}
+
+func (n *union) Operate() int {
+	return op.SetUnion
+}
+
+func (n *union) Children() []op.OP {
+	return []op.OP{n.r, n.s}
+}
+
+func (n *union) SetChild(o op.OP, idx int) {
+	switch idx {
+	case 0:
+		n.r = o
+	default:
+		n.s = o
+	}
+}
+
+func (n *union) IsOrdered() bool {
+	return false
+}
+
+func (n *union) String() string {
+	return fmt.Sprintf("(%s ∪  %s, hash union)", n.r, n.s)
+}
+
 func (n *union) Name() (string, error) {
 	rn, err := n.r.Name()
 	if err != nil {

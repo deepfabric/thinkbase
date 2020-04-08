@@ -6,6 +6,8 @@ import (
 
 	"github.com/deepfabric/thinkbase/pkg/vm/context"
 	"github.com/deepfabric/thinkbase/pkg/vm/op"
+	hunion "github.com/deepfabric/thinkbase/pkg/vm/op/parallel/tail/local/set/hash/union"
+	ounion "github.com/deepfabric/thinkbase/pkg/vm/op/parallel/tail/local/set/order/union"
 	"github.com/deepfabric/thinkbase/pkg/vm/util"
 	"github.com/deepfabric/thinkbase/pkg/vm/value"
 )
@@ -21,6 +23,57 @@ func New(left, right op.OP, c context.Context) *union {
 		isCheck:     false,
 		isLeftEmpty: false,
 	}
+}
+
+func (n *union) NewHashUnion(left, right op.OP) op.OP {
+	return hunion.New(left, right, n.c)
+}
+
+func (n *union) NewOrderUnion(left, right op.OP) op.OP {
+	return ounion.New(left, right, n.c)
+}
+
+func (n *union) Size() float64 {
+	return n.c.SetUnionSize(n.left, n.right)
+}
+
+func (n *union) Cost() float64 {
+	return n.c.SetUnionCost(n.left, n.right)
+}
+
+func (n *union) Dup() op.OP {
+	return &union{
+		c:           n.c,
+		left:        n.left,
+		right:       n.right,
+		isCheck:     n.isCheck,
+		isLeftEmpty: n.isLeftEmpty,
+	}
+}
+
+func (n *union) Operate() int {
+	return op.SetUnion
+}
+
+func (n *union) Children() []op.OP {
+	return []op.OP{n.left, n.right}
+}
+
+func (n *union) SetChild(o op.OP, idx int) {
+	switch idx {
+	case 0:
+		n.left = o
+	default:
+		n.right = o
+	}
+}
+
+func (n *union) IsOrdered() bool {
+	return false
+}
+
+func (n *union) String() string {
+	return fmt.Sprintf("(%s ∪  %s)", n.left, n.right)
 }
 
 func (n *union) Name() (string, error) {

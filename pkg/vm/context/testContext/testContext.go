@@ -12,6 +12,7 @@ import (
 	"github.com/deepfabric/thinkbase/pkg/vm/container/vector"
 	vmem "github.com/deepfabric/thinkbase/pkg/vm/container/vector/mem"
 	"github.com/deepfabric/thinkbase/pkg/vm/estimator/testEstimator"
+	"github.com/deepfabric/thinkbase/pkg/vm/extend"
 	"github.com/deepfabric/thinkbase/pkg/vm/op"
 )
 
@@ -25,6 +26,142 @@ func (c *testContext) Min(left, right op.OP) op.OP {
 
 func (c *testContext) Less(left, right op.OP) bool {
 	return c.est.Less(left, right)
+}
+
+func (c *testContext) NubSize(o op.OP, attrs []string) float64 {
+	return c.est.NubSize(o, attrs)
+}
+
+func (c *testContext) FetchSize(o op.OP, limit, offset int) float64 {
+	return c.est.FetchSize(o, limit, offset)
+}
+
+func (c *testContext) OrderSize(o op.OP, attrs []string) float64 {
+	return c.est.OrderSize(o, attrs)
+}
+
+func (c *testContext) SummarizeSize(o op.OP, ops []int) float64 {
+	return c.est.SummarizeSize(o, ops)
+}
+
+func (c *testContext) GroupSize(o op.OP, gs []string, ops []int) float64 {
+	return c.est.GroupSize(o, gs, ops)
+}
+
+func (c *testContext) RestrictSize(o op.OP, e extend.Extend) float64 {
+	return c.est.RestrictSize(o, e)
+}
+
+func (c *testContext) ProjectionSize(o op.OP, as []string, es []extend.Extend) float64 {
+	return c.est.ProjectionSize(o, as, es)
+}
+
+func (c *testContext) ProductSize(r, s op.OP) float64 {
+	return c.est.ProductSize(r, s)
+}
+
+func (c *testContext) NaturalJoinSize(r, s op.OP) float64 {
+	return c.est.NaturalJoinSize(r, s)
+}
+
+func (c *testContext) SetUnionSize(r, s op.OP) float64 {
+	return c.est.SetUnionSize(r, s)
+}
+
+func (c *testContext) SetIntersectSize(r, s op.OP) float64 {
+	return c.est.SetIntersectSize(r, s)
+}
+
+func (c *testContext) SetDifferenceSize(r, s op.OP) float64 {
+	return c.est.SetDifferenceSize(r, s)
+}
+
+func (c *testContext) MultisetUnionSize(r, s op.OP) float64 {
+	return c.est.MultisetUnionSize(r, s)
+}
+
+func (c *testContext) MultisetIntersectSize(r, s op.OP) float64 {
+	return c.est.MultisetIntersectSize(r, s)
+}
+
+func (c *testContext) MultisetDifferenceSize(r, s op.OP) float64 {
+	return c.est.MultisetDifferenceSize(r, s)
+}
+
+func (c *testContext) SetUnionSizeByHash(r, s op.OP) float64 {
+	return c.est.SetUnionSizeByHash(r, s)
+}
+
+func (c *testContext) SetUnionSizeByOrder(r, s op.OP) float64 {
+	return c.est.SetUnionSizeByOrder(r, s)
+}
+
+func (c *testContext) NubCost(o op.OP, attrs []string) float64 {
+	return c.est.NubCost(o, attrs)
+}
+
+func (c *testContext) FetchCost(o op.OP, limit, offset int) float64 {
+	return c.est.FetchCost(o, limit, offset)
+}
+
+func (c *testContext) OrderCost(o op.OP, attrs []string) float64 {
+	return c.est.OrderCost(o, attrs)
+}
+
+func (c *testContext) SummarizeCost(o op.OP, ops []int) float64 {
+	return c.est.SummarizeCost(o, ops)
+}
+
+func (c *testContext) GroupCost(o op.OP, gs []string, ops []int) float64 {
+	return c.est.GroupCost(o, gs, ops)
+}
+
+func (c *testContext) RestrictCost(o op.OP, e extend.Extend) float64 {
+	return c.est.RestrictCost(o, e)
+}
+
+func (c *testContext) ProjectionCost(o op.OP, as []string, es []extend.Extend) float64 {
+	return c.est.ProjectionCost(o, as, es)
+}
+
+func (c *testContext) ProductCost(r, s op.OP) float64 {
+	return c.est.ProductCost(r, s)
+}
+
+func (c *testContext) NaturalJoinCost(r, s op.OP) float64 {
+	return c.est.NaturalJoinCost(r, s)
+}
+
+func (c *testContext) SetUnionCost(r, s op.OP) float64 {
+	return c.est.SetUnionCost(r, s)
+}
+
+func (c *testContext) SetIntersectCost(r, s op.OP) float64 {
+	return c.est.SetIntersectCost(r, s)
+}
+
+func (c *testContext) SetDifferenceCost(r, s op.OP) float64 {
+	return c.est.SetDifferenceCost(r, s)
+}
+
+func (c *testContext) MultisetUnionCost(r, s op.OP) float64 {
+	return c.est.MultisetUnionCost(r, s)
+}
+
+func (c *testContext) MultisetIntersectCost(r, s op.OP) float64 {
+	return c.est.MultisetIntersectSize(r, s)
+}
+
+func (c *testContext) MultisetDifferenceCost(r, s op.OP) float64 {
+	return c.est.MultisetDifferenceCost(r, s)
+}
+
+func (c *testContext) SetUnionCostByHash(r, s op.OP) float64 {
+	return c.est.SetUnionCostByHash(r, s)
+}
+
+func (c *testContext) SetUnionCostByOrder(r, s op.OP) float64 {
+	return c.est.SetUnionCostByOrder(r, s)
 }
 
 func (c *testContext) NumMcpu() int {

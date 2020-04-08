@@ -29,7 +29,7 @@ func testLT() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("v: %v\n", v)
+	fmt.Printf("%s: %v\n", e, v)
 }
 
 func testTypeof() {
@@ -44,5 +44,5 @@ func testTypeof() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("v: %v\n", v)
+	fmt.Printf("%s: %v\n", e, v)
 }

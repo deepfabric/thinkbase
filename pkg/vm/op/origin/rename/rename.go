@@ -22,6 +22,45 @@ func New(prev op.OP, name string, mp map[string]string, c context.Context) *rena
 	}
 }
 
+func (n *rename) Size() float64 {
+	return n.prev.Size()
+}
+
+func (n *rename) Cost() float64 {
+	return n.prev.Cost()
+}
+
+func (n *rename) Dup() op.OP {
+	return &rename{
+		c:    n.c,
+		mq:   n.mq,
+		mp:   n.mp,
+		prev: n.prev,
+		name: n.name,
+	}
+}
+
+func (n *rename) SetChild(o op.OP, _ int) { n.prev = o }
+func (n *rename) Operate() int            { return op.Rename }
+func (n *rename) Children() []op.OP       { return []op.OP{n.prev} }
+func (n *rename) IsOrdered() bool         { return n.prev.IsOrdered() }
+
+func (n *rename) String() string {
+	r := fmt.Sprintf("ρ([")
+	i := 0
+	for k, v := range n.mp {
+		if i == 0 {
+			r += fmt.Sprintf("%s -> %s", k, v)
+		} else {
+			r += fmt.Sprintf(", %s -> %s", k, v)
+		}
+		i++
+	}
+	name, _ := n.prev.Name()
+	r += fmt.Sprintf("], %s -> %s)", name, n.name)
+	return r
+}
+
 func (n *rename) Name() (string, error) {
 	return n.name, nil
 }

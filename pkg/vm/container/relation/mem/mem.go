@@ -2,6 +2,7 @@ package mem
 
 import (
 	"github.com/deepfabric/thinkbase/pkg/vm/container/relation"
+	"github.com/deepfabric/thinkbase/pkg/vm/op"
 	"github.com/deepfabric/thinkbase/pkg/vm/value"
 )
 
@@ -20,6 +21,39 @@ func New(name string, attrs []string) *mem {
 func (r *mem) Destroy() error {
 	return nil
 }
+
+func (r *mem) Size() float64 {
+	size := 0
+	for _, t := range r.ts {
+		size += t.Size()
+	}
+	return float64(size)
+}
+
+func (r *mem) Cost() float64 {
+	return r.Size()
+}
+
+func (r *mem) Dup() op.OP {
+	return &mem{
+		ts:    r.ts,
+		mp:    r.mp,
+		name:  r.name,
+		start: r.start,
+		attrs: r.attrs,
+	}
+}
+
+func (r *mem) Operate() int {
+	return op.Relation
+}
+
+func (r *mem) Children() []op.OP {
+	return nil
+}
+
+func (r *mem) SetChild(_ op.OP, _ int) {}
+func (r *mem) IsOrdered() bool         { return false }
 
 func (r *mem) Split(n int) ([]relation.Relation, error) {
 	var rs []relation.Relation
@@ -52,6 +86,10 @@ func (r *mem) Split(n int) ([]relation.Relation, error) {
 		}
 	}
 	return rs, nil
+}
+
+func (r *mem) String() string {
+	return r.name
 }
 
 func (r *mem) Name() (string, error) {

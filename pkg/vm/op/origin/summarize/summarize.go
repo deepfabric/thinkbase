@@ -20,6 +20,53 @@ func New(prev op.OP, es []*Extend, c context.Context) *summarize {
 	return &summarize{false, false, prev, es, c}
 }
 
+func (n *summarize) Size() float64 {
+	var ops []int
+
+	for _, e := range n.es {
+		ops = append(ops, e.Op)
+	}
+	return n.c.SummarizeSize(n.prev, ops)
+}
+
+func (n *summarize) Cost() float64 {
+	var ops []int
+
+	for _, e := range n.es {
+		ops = append(ops, e.Op)
+	}
+	return n.c.SummarizeCost(n.prev, ops)
+}
+
+func (n *summarize) Dup() op.OP {
+	return &summarize{
+		c:       n.c,
+		es:      n.es,
+		prev:    n.prev,
+		isUsed:  n.isUsed,
+		isCheck: n.isCheck,
+	}
+}
+
+func (n *summarize) SetChild(o op.OP, _ int) { n.prev = o }
+func (n *summarize) Operate() int            { return op.Summarize }
+func (n *summarize) Children() []op.OP       { return []op.OP{n.prev} }
+func (n *summarize) IsOrdered() bool         { return n.prev.IsOrdered() }
+
+func (n *summarize) String() string {
+	r := fmt.Sprintf("γ([")
+	for i, e := range n.es {
+		switch i {
+		case 0:
+			r += fmt.Sprintf("%s(%s) -> %s", overload.AggName[e.Op], e.Name, e.Alias)
+		case 1:
+			r += fmt.Sprintf(", %s(%s) -> %s", overload.AggName[e.Op], e.Name, e.Alias)
+		}
+	}
+	r += fmt.Sprintf("], %s)", n.prev)
+	return r
+}
+
 func (n *summarize) Name() (string, error) {
 	return n.prev.Name()
 }

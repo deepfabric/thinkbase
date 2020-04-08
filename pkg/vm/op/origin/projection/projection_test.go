@@ -18,7 +18,7 @@ import (
 func TestProjection(t *testing.T) {
 	{
 		r := newRelation()
-		fmt.Printf("%s\n", r)
+		fmt.Printf("%s\n", r.DataString())
 	}
 	{
 		var es []*Extend
@@ -36,6 +36,9 @@ func TestProjection(t *testing.T) {
 			},
 		})
 		n := New(prev, es, testContext.New(1, 1, 1024*1024*1024, 1024*1024*1024*1024))
+		{
+			fmt.Printf("%s\n", n)
+		}
 		{
 			attrs, err := n.AttributeList()
 			fmt.Printf("%v, %v\n", attrs, err)
@@ -69,6 +72,9 @@ func TestProjection(t *testing.T) {
 			},
 		})
 		n := New(prev, es, testContext.New(1, 1, 1024*1024*1024, 1024*1024*1024*1024))
+		{
+			fmt.Printf("%s\n", n)
+		}
 		{
 			attrs, err := n.AttributeList()
 			fmt.Printf("%v, %v\n", attrs, err)

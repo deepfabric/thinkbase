@@ -19,7 +19,7 @@ import (
 func TestA2t(t *testing.T) {
 	{
 		r := newRelation()
-		fmt.Printf("%s\n", r)
+		fmt.Printf("%s\n", r.DataString())
 	}
 	{
 		r := newRelation()
@@ -29,6 +29,9 @@ func TestA2t(t *testing.T) {
 			Right: value.NewInt(1),
 		}
 		n := restrict.New(r, e, testContext.New(1, 1, 1024*1024*1024, 1024*1024*1024*1024))
+		{
+			fmt.Printf("%s\n", n)
+		}
 		{
 			attrs, err := n.AttributeList()
 			fmt.Printf("%v, %v\n", attrs, err)
@@ -54,6 +57,9 @@ func TestA2t(t *testing.T) {
 			Right: value.NewInt(1),
 		}
 		n := restrict.New(r, e, testContext.New(1, 1, 1024*1024*1024, 1024*1024*1024*1024))
+		{
+			fmt.Printf("%s\n", n)
+		}
 		{
 			attrs, err := n.AttributeList()
 			fmt.Printf("%v, %v\n", attrs, err)

@@ -18,10 +18,13 @@ import (
 func TestRename(t *testing.T) {
 	{
 		r := newRelation()
-		fmt.Printf("%s\n", r)
+		fmt.Printf("%s\n", r.DataString())
 	}
 	{
 		n := newRename()
+		{
+			fmt.Printf("%s\n", n)
+		}
 		{
 			name, err := n.Name()
 			fmt.Printf("%v, %v\n", name, err)
@@ -45,6 +48,9 @@ func TestRename(t *testing.T) {
 	}
 	{
 		n := newRename()
+		{
+			fmt.Printf("%s\n", n)
+		}
 		{
 			name, err := n.Name()
 			fmt.Printf("%v, %v\n", name, err)

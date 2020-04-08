@@ -21,6 +21,55 @@ func New(prev op.OP, descs []bool, attrs []string, c context.Context) *order {
 	}
 }
 
+func (n *order) NewLT() func(value.Value, value.Value) bool {
+	attrs, _ := n.prev.AttributeList()
+	return n.newLt(attrs)
+}
+
+func (n *order) Size() float64 {
+	return n.c.OrderSize(n.prev, n.attrs)
+}
+
+func (n *order) Cost() float64 {
+	return n.c.OrderCost(n.prev, n.attrs)
+}
+
+func (n *order) Dup() op.OP {
+	return &order{
+		c:       n.c,
+		vs:      n.vs,
+		prev:    n.prev,
+		descs:   n.descs,
+		attrs:   n.attrs,
+		isCheck: n.isCheck,
+	}
+}
+
+func (n *order) SetChild(o op.OP, _ int) { n.prev = o }
+func (n *order) IsOrdered() bool         { return true }
+func (n *order) Operate() int            { return op.Order }
+func (n *order) Children() []op.OP       { return []op.OP{n.prev} }
+
+func (n *order) String() string {
+	r := fmt.Sprintf("τ([")
+	for i, attr := range n.attrs {
+		switch i {
+		case 0:
+			r += fmt.Sprintf("%s", attr)
+			if n.descs[i] {
+				r += " desc"
+			}
+		default:
+			r += fmt.Sprintf(", %s", attr)
+			if n.descs[i] {
+				r += " desc"
+			}
+		}
+	}
+	r += fmt.Sprintf("], %s)", n.prev)
+	return r
+}
+
 func (n *order) Name() (string, error) {
 	return n.prev.Name()
 }
@@ -218,7 +267,7 @@ func (n *order) newLt(attrs []string) func(value.Value, value.Value) bool {
 				return r < 0
 			}
 		}
-		return false
+		return value.Compare(x, y) < 0
 	}
 }
 

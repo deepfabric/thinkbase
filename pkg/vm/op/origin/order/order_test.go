@@ -19,7 +19,7 @@ import (
 func TestOrder(t *testing.T) {
 	{
 		r := newRelation()
-		fmt.Printf("%s\n", r)
+		fmt.Printf("%s\n", r.DataString())
 	}
 	{
 		var es []*projection.Extend
@@ -36,6 +36,10 @@ func TestOrder(t *testing.T) {
 			},
 		})
 		n := projection.New(prev, es, testContext.New(1, 1, 1024*1024*1024, 1024*1024*1024*1024))
+		{
+			fmt.Printf("%s\n", n)
+			fmt.Printf("\tisordered %v\n", n.IsOrdered())
+		}
 		{
 			attrs, err := n.AttributeList()
 			fmt.Printf("%v, %v\n", attrs, err)
@@ -69,6 +73,10 @@ func TestOrder(t *testing.T) {
 		})
 		n := projection.New(prev, es, testContext.New(1, 1, 1024*1024*1024, 1024*1024*1024*1024))
 		{
+			fmt.Printf("%s\n", n)
+			fmt.Printf("\tisordered %v\n", n.IsOrdered())
+		}
+		{
 			attrs, err := n.AttributeList()
 			fmt.Printf("%v, %v\n", attrs, err)
 		}
@@ -87,7 +95,7 @@ func TestOrder(t *testing.T) {
 }
 
 func newOrder() op.OP {
-	return New(newRestrict(), []bool{false}, []string{"a"}, testContext.New(1, 1, 1024*1024*1024, 1024*1024*1024*1024))
+	return New(newRestrict(), []bool{true, false}, []string{"a", "b"}, testContext.New(1, 1, 1024*1024*1024, 1024*1024*1024*1024))
 }
 
 func newRestrict() op.OP {

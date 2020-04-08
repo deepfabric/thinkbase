@@ -18,14 +18,17 @@ import (
 func TestIntersect(t *testing.T) {
 	{
 		r := newRelation0()
-		fmt.Printf("%s\n", r)
+		fmt.Printf("%s\n", r.DataString())
 	}
 	{
 		r := newRelation1()
-		fmt.Printf("%s\n", r)
+		fmt.Printf("%s\n", r.DataString())
 	}
 	{
 		n := New(newRestrict0(), newRelation1(), testContext.New(1, 1, 1024*1024*1024, 1024*1024*1024*1024))
+		{
+			fmt.Printf("%s\n", n)
+		}
 		{
 			name, err := n.Name()
 			fmt.Printf("%v, %v\n", name, err)
@@ -50,6 +53,9 @@ func TestIntersect(t *testing.T) {
 	}
 	{
 		n := New(newRestrict0(), newRelation1(), testContext.New(1, 1, 1024*1024*1024, 1024*1024*1024*1024))
+		{
+			fmt.Printf("%s\n", n)
+		}
 		{
 			name, err := n.Name()
 			fmt.Printf("%v, %v\n", name, err)

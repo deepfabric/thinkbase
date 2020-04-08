@@ -21,6 +21,48 @@ func New(left, right op.OP, c context.Context) *product {
 	}
 }
 
+func (n *product) Size() float64 {
+	return n.c.ProductSize(n.left, n.right)
+}
+
+func (n *product) Cost() float64 {
+	return n.c.ProductCost(n.left, n.right)
+}
+
+func (n *product) Dup() op.OP {
+	return &product{
+		c:       n.c,
+		left:    n.left,
+		right:   n.right,
+		isCheck: n.isCheck,
+	}
+}
+
+func (n *product) Operate() int {
+	return op.Product
+}
+
+func (n *product) Children() []op.OP {
+	return []op.OP{n.left, n.right}
+}
+
+func (n *product) SetChild(o op.OP, idx int) {
+	switch idx {
+	case 0:
+		n.left = o
+	default:
+		n.right = o
+	}
+}
+
+func (n *product) IsOrdered() bool {
+	return false
+}
+
+func (n *product) String() string {
+	return fmt.Sprintf("(%s ⨯  %s)", n.left, n.right)
+}
+
 func (n *product) Name() (string, error) {
 	ln, err := n.left.Name()
 	if err != nil {

@@ -16,7 +16,7 @@ import (
 func TestRestrict(t *testing.T) {
 	{
 		r := newRelation()
-		fmt.Printf("%s\n", r)
+		fmt.Printf("%s\n", r.DataString())
 	}
 	{
 		r := newRelation()
@@ -26,6 +26,9 @@ func TestRestrict(t *testing.T) {
 			Right: value.NewInt(1),
 		}
 		n := New(e, testContext.New(1, 4, 1024*1024*1024, 1024*1024*1024*1024), r)
+		{
+			fmt.Printf("%s\n", n)
+		}
 		{
 			attrs, err := n.AttributeList()
 			fmt.Printf("%v, %v\n", attrs, err)
@@ -51,6 +54,9 @@ func TestRestrict(t *testing.T) {
 			Right: value.NewInt(1),
 		}
 		n := New(e, testContext.New(1, 2, 1024*1024*1024, 1024*1024*1024*1024), r)
+		{
+			fmt.Printf("%s\n", n)
+		}
 		{
 			attrs, err := n.AttributeList()
 			fmt.Printf("%v, %v\n", attrs, err)

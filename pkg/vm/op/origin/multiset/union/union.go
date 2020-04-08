@@ -20,6 +20,49 @@ func New(left, right op.OP, c context.Context) *union {
 	}
 }
 
+func (n *union) Size() float64 {
+	return n.c.MultisetUnionSize(n.left, n.right)
+}
+
+func (n *union) Cost() float64 {
+	return n.c.MultisetUnionCost(n.left, n.right)
+}
+
+func (n *union) Dup() op.OP {
+	return &union{
+		c:           n.c,
+		left:        n.left,
+		right:       n.right,
+		isCheck:     n.isCheck,
+		isLeftEmpty: n.isLeftEmpty,
+	}
+}
+
+func (n *union) Operate() int {
+	return op.MultisetUnion
+}
+
+func (n *union) Children() []op.OP {
+	return []op.OP{n.left, n.right}
+}
+
+func (n *union) SetChild(o op.OP, idx int) {
+	switch idx {
+	case 0:
+		n.left = o
+	default:
+		n.right = o
+	}
+}
+
+func (n *union) IsOrdered() bool {
+	return false
+}
+
+func (n *union) String() string {
+	return fmt.Sprintf("(%s ∪  %s)", n.left, n.right)
+}
+
 func (n *union) Name() (string, error) {
 	ln, err := n.left.Name()
 	if err != nil {
