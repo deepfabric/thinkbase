@@ -5,6 +5,7 @@ import (
 	"github.com/deepfabric/thinkbase/pkg/vm/opt/rule"
 	"github.com/deepfabric/thinkbase/pkg/vm/opt/rule/rule0"
 	"github.com/deepfabric/thinkbase/pkg/vm/opt/rule/rule1"
+	"github.com/deepfabric/thinkbase/pkg/vm/opt/rule/rule100"
 	"github.com/deepfabric/thinkbase/pkg/vm/opt/rule/rule2"
 )
 
@@ -13,8 +14,10 @@ func New(o op.OP) *optimizer {
 }
 
 func (o *optimizer) Optimize() op.OP {
-	g, _ := o.optimizeGroup(o.o, make(map[string]op.OP))
-	return g
+	mp := make(map[string]op.OP)
+	mp[""] = o.o
+	o.optimizeGroup(o.o, mp)
+	return mp[""]
 }
 
 func (o *optimizer) optimizeGroup(g op.OP, mp map[string]op.OP) (op.OP, bool) {
@@ -38,7 +41,7 @@ func (o *optimizer) optimizeGroup(g op.OP, mp map[string]op.OP) (op.OP, bool) {
 func (o *optimizer) explore(g op.OP, mp map[string]op.OP) (op.OP, bool) {
 	if rs, ok := Rules[g.Operate()]; ok {
 		for _, r := range rs {
-			if r.Match(g) {
+			if r.Match(g, mp) {
 				return r.Rewrite(g, mp)
 			}
 		}
@@ -49,5 +52,5 @@ func (o *optimizer) explore(g op.OP, mp map[string]op.OP) (op.OP, bool) {
 var Rules = map[int][]rule.Rule{
 	op.Restrict: []rule.Rule{rule0.New(), rule1.New(), rule2.New()},
 
-	//	op.SetUnion: []rule.Rule{rule100.New()},
+	op.SetUnion: []rule.Rule{rule100.New()},
 }

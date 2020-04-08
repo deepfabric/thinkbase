@@ -8,37 +8,29 @@ func New() *rule {
 	return &rule{}
 }
 
-func (r *rule) Match(o op.OP) bool {
-	return o.Operate() == op.SetUnion
+func (r *rule) Match(o op.OP, mp map[string]op.OP) bool {
+	return o.Operate() == op.SetUnion && r.findSortOp(o, mp) == nil
 }
 
 func (r *rule) Rewrite(o op.OP, mp map[string]op.OP) (op.OP, bool) {
-	if sp := r.findSortOp(o, mp); sp == nil {
-		return r.rewriteWithOutOrder(o, mp)
-	} else {
-		return r.rewriteWithOrder(o, sp, mp)
-	}
-}
-
-func (r *rule) rewriteWithOutOrder(o op.OP, mp map[string]op.OP) (op.OP, bool) {
 	left := r.removeSortOp(o.Children()[0], mp)
 	right := r.removeSortOp(o.Children()[1], mp)
-	if no := o.(op.SetUnionOP).NewHashUnion(left, right); no.Cost() < o.Cost() {
-		if parent, ok := mp[o.String()]; ok {
-			children := parent.Children()
-			for i, child := range children {
-				if child == o {
-					parent.SetChild(no, i)
-					break
+	if n, ok := o.(op.SetUnionOP); ok {
+		if no := n.NewHashUnion(left, right); no.Cost() < o.Cost() {
+			if parent, ok := mp[o.String()]; ok {
+				children := parent.Children()
+				for i, child := range children {
+					if child == o {
+						parent.SetChild(no, i)
+						break
+					}
 				}
+			} else {
+				mp[""] = no
 			}
+			return no, true
 		}
-		return no, true
 	}
-	return o, false
-}
-
-func (r *rule) rewriteWithOrder(o, _ op.OP, mp map[string]op.OP) (op.OP, bool) {
 	return o, false
 }
 
