@@ -13,6 +13,42 @@ func New(prev op.OP, attrs []string, c context.Context) *nub {
 	return &nub{isCheck: false, prev: prev, attrs: attrs, c: c}
 }
 
+func (n *nub) Size() float64 {
+	return n.c.NubSize(n.prev, n.attrs)
+}
+
+func (n *nub) Cost() float64 {
+	return n.c.NubCost(n.prev, n.attrs)
+}
+
+func (n *nub) Dup() op.OP {
+	return &nub{
+		c:       n.c,
+		prev:    n.prev,
+		attrs:   n.attrs,
+		isCheck: n.isCheck,
+	}
+}
+
+func (n *nub) SetChild(o op.OP, _ int) { n.prev = o }
+func (n *nub) Operate() int            { return op.Nub }
+func (n *nub) Children() []op.OP       { return []op.OP{n.prev} }
+func (n *nub) IsOrdered() bool         { return n.prev.IsOrdered() }
+
+func (n *nub) String() string {
+	r := fmt.Sprintf("δ([")
+	for i, attr := range n.attrs {
+		switch i {
+		case 0:
+			r += fmt.Sprintf("%s", attr)
+		default:
+			r += fmt.Sprintf(", %s", attr)
+		}
+	}
+	r += fmt.Sprintf("], %s)", n.prev)
+	return r
+}
+
 func (n *nub) Name() (string, error) {
 	return n.prev.Name()
 }

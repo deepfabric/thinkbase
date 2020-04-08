@@ -15,6 +15,64 @@ func New(prev op.OP, es []*Extend, c context.Context) *projection {
 	return &projection{false, prev, es, c}
 }
 
+func (n *projection) Size() float64 {
+	var as []string
+	var es []extend.Extend
+
+	for _, e := range n.es {
+		es = append(es, e.E)
+		as = append(as, e.Alias)
+	}
+	return n.c.ProjectionSize(n.prev, as, es)
+}
+
+func (n *projection) Cost() float64 {
+	var as []string
+	var es []extend.Extend
+
+	for _, e := range n.es {
+		es = append(es, e.E)
+		as = append(as, e.Alias)
+	}
+	return n.c.ProjectionCost(n.prev, as, es)
+}
+
+func (n *projection) Dup() op.OP {
+	return &projection{
+		c:       n.c,
+		es:      n.es,
+		prev:    n.prev,
+		isCheck: n.isCheck,
+	}
+}
+
+func (n *projection) SetChild(o op.OP, _ int) { n.prev = o }
+func (n *projection) Operate() int            { return op.Projection }
+func (n *projection) Children() []op.OP       { return []op.OP{n.prev} }
+func (n *projection) IsOrdered() bool         { return n.prev.IsOrdered() }
+
+func (n *projection) String() string {
+	r := fmt.Sprintf("π([")
+	for i, e := range n.es {
+		switch i {
+		case 0:
+			if len(e.Alias) == 0 {
+				r += fmt.Sprintf("%s", e.E)
+			} else {
+				r += fmt.Sprintf("%s -> %s", e.E, e.Alias)
+			}
+		default:
+			if len(e.Alias) == 0 {
+				r += fmt.Sprintf(", %s", e.E)
+			} else {
+				r += fmt.Sprintf(", %s -> %s", e.E, e.Alias)
+			}
+		}
+	}
+	r += fmt.Sprintf("], %s)", n.prev)
+	return r
+}
+
 func (n *projection) Name() (string, error) {
 	return n.prev.Name()
 }

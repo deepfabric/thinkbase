@@ -15,6 +15,32 @@ func New(prev op.OP, e extend.Extend, c context.Context) *restrict {
 	return &restrict{false, prev, e, c}
 }
 
+func (n *restrict) Size() float64 {
+	return n.c.RestrictSize(n.prev, n.e)
+}
+
+func (n *restrict) Cost() float64 {
+	return n.c.RestrictCost(n.prev, n.e)
+}
+
+func (n *restrict) Dup() op.OP {
+	return &restrict{
+		e:       n.e,
+		c:       n.c,
+		prev:    n.prev,
+		isCheck: n.isCheck,
+	}
+}
+
+func (n *restrict) SetChild(o op.OP, _ int) { n.prev = o }
+func (n *restrict) Operate() int            { return op.Restrict }
+func (n *restrict) Children() []op.OP       { return []op.OP{n.prev} }
+func (n *restrict) IsOrdered() bool         { return n.prev.IsOrdered() }
+
+func (n *restrict) String() string {
+	return fmt.Sprintf("σ(%s, %s)", n.e, n.prev)
+}
+
 func (n *restrict) Name() (string, error) {
 	return n.prev.Name()
 }

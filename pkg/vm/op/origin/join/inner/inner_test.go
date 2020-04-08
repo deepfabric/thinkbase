@@ -16,11 +16,11 @@ import (
 func TestInner(t *testing.T) {
 	{
 		r := newRelation0()
-		fmt.Printf("%s\n", r)
+		fmt.Printf("%s\n", r.DataString())
 	}
 	{
 		r := newRelation1()
-		fmt.Printf("%s\n", r)
+		fmt.Printf("%s\n", r.DataString())
 	}
 	{
 		el := &extend.BinaryExtend{
@@ -39,6 +39,9 @@ func TestInner(t *testing.T) {
 			Right: er,
 		}
 		n := New(newRelation0(), newRelation1(), e, testContext.New(1, 1, 1024*1024*1024, 1024*1024*1024*1024))
+		{
+			fmt.Printf("%s\n", n)
+		}
 		{
 			name, err := n.Name()
 			fmt.Printf("%v, %v\n", name, err)
@@ -78,6 +81,9 @@ func TestInner(t *testing.T) {
 			Right: er,
 		}
 		n := New(newRelation0(), newRelation1(), e, testContext.New(1, 1, 1024*1024*1024, 1024*1024*1024*1024))
+		{
+			fmt.Printf("%s\n", n)
+		}
 		{
 			name, err := n.Name()
 			fmt.Printf("%v, %v\n", name, err)

@@ -18,6 +18,48 @@ func New(left, right op.OP, c context.Context) *join {
 	return &join{isCheck: false, left: left, right: right, c: c}
 }
 
+func (n *join) Size() float64 {
+	return n.c.NaturalJoinSize(n.left, n.right)
+}
+
+func (n *join) Cost() float64 {
+	return n.c.NaturalJoinCost(n.left, n.right)
+}
+
+func (n *join) Dup() op.OP {
+	return &join{
+		c:       n.c,
+		left:    n.left,
+		right:   n.right,
+		isCheck: n.isCheck,
+	}
+}
+
+func (n *join) Operate() int {
+	return op.NaturalJoin
+}
+
+func (n *join) Children() []op.OP {
+	return []op.OP{n.left, n.right}
+}
+
+func (n *join) SetChild(o op.OP, idx int) {
+	switch idx {
+	case 0:
+		n.left = o
+	default:
+		n.right = o
+	}
+}
+
+func (n *join) IsOrdered() bool {
+	return false
+}
+
+func (n *join) String() string {
+	return fmt.Sprintf("(%s ⋈  %s)", n.left, n.right)
+}
+
 func (n *join) Name() (string, error) {
 	ln, err := n.left.Name()
 	if err != nil {

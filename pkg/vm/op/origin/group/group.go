@@ -23,6 +23,62 @@ func New(prev op.OP, gs []string, es []*summarize.Extend, c context.Context) *gr
 	return &group{isCheck: false, prev: prev, gs: gs, c: c, es: es}
 }
 
+func (n *group) Size() float64 {
+	var ops []int
+
+	for _, e := range n.es {
+		ops = append(ops, e.Op)
+	}
+	return n.c.GroupSize(n.prev, n.gs, ops)
+}
+
+func (n *group) Cost() float64 {
+	var ops []int
+
+	for _, e := range n.es {
+		ops = append(ops, e.Op)
+	}
+	return n.c.GroupCost(n.prev, n.gs, ops)
+}
+
+func (n *group) Dup() op.OP {
+	return &group{
+		c:       n.c,
+		es:      n.es,
+		gs:      n.gs,
+		prev:    n.prev,
+		isCheck: n.isCheck,
+	}
+}
+
+func (n *group) SetChild(o op.OP, _ int) { n.prev = o }
+func (n *group) Operate() int            { return op.Group }
+func (n *group) Children() []op.OP       { return []op.OP{n.prev} }
+func (n *group) IsOrdered() bool         { return n.prev.IsOrdered() }
+
+func (n *group) String() string {
+	r := fmt.Sprintf("γ([")
+	for i, g := range n.gs {
+		switch i {
+		case 0:
+			r += fmt.Sprintf("%s", g)
+		default:
+			r += fmt.Sprintf(", %s", g)
+		}
+	}
+	r += "], ["
+	for i, e := range n.es {
+		switch i {
+		case 0:
+			r += fmt.Sprintf("%s(%s) -> %s", overload.AggName[e.Op], e.Name, e.Alias)
+		case 1:
+			r += fmt.Sprintf(", %s(%s) -> %s", overload.AggName[e.Op], e.Name, e.Alias)
+		}
+	}
+	r += fmt.Sprintf("], %s)", n.prev)
+	return r
+}
+
 func (n *group) Name() (string, error) {
 	return n.prev.Name()
 }

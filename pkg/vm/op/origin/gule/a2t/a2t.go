@@ -14,6 +14,31 @@ func New(prev op.OP, c context.Context) *a2t {
 	}
 }
 
+func (n *a2t) Size() float64 {
+	return n.prev.Size()
+}
+
+func (n *a2t) Cost() float64 {
+	return n.prev.Cost()
+}
+
+func (n *a2t) Dup() op.OP {
+	return &a2t{
+		c:       n.c,
+		prev:    n.prev,
+		isCheck: n.isCheck,
+	}
+}
+
+func (n *a2t) SetChild(o op.OP, _ int) { n.prev = o }
+func (n *a2t) Operate() int            { return op.A2t }
+func (n *a2t) Children() []op.OP       { return []op.OP{n.prev} }
+func (n *a2t) IsOrdered() bool         { return n.prev.IsOrdered() }
+
+func (n *a2t) String() string {
+	return n.prev.String()
+}
+
 func (n *a2t) Name() (string, error) {
 	return n.prev.Name()
 }

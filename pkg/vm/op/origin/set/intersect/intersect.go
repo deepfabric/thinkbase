@@ -22,6 +22,48 @@ func New(left, right op.OP, c context.Context) *intersect {
 	}
 }
 
+func (n *intersect) Size() float64 {
+	return n.c.SetIntersectSize(n.left, n.right)
+}
+
+func (n *intersect) Cost() float64 {
+	return n.c.SetIntersectCost(n.left, n.right)
+}
+
+func (n *intersect) Dup() op.OP {
+	return &intersect{
+		c:       n.c,
+		left:    n.left,
+		right:   n.right,
+		isCheck: n.isCheck,
+	}
+}
+
+func (n *intersect) Operate() int {
+	return op.SetIntersect
+}
+
+func (n *intersect) Children() []op.OP {
+	return []op.OP{n.left, n.right}
+}
+
+func (n *intersect) SetChild(o op.OP, idx int) {
+	switch idx {
+	case 0:
+		n.left = o
+	default:
+		n.right = o
+	}
+}
+
+func (n *intersect) IsOrdered() bool {
+	return false
+}
+
+func (n *intersect) String() string {
+	return fmt.Sprintf("(%s ∩  %s)", n.left, n.right)
+}
+
 func (n *intersect) Name() (string, error) {
 	ln, err := n.left.Name()
 	if err != nil {

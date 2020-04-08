@@ -25,6 +25,18 @@ func New(e extend.Extend, c context.Context, r relation.Relation) *restrict {
 	return &restrict{c: c, isCheck: false, ops: ops}
 }
 
+func (n *restrict) Operate() int            { return -1 }
+func (n *restrict) Dup() op.OP              { return nil }
+func (n *restrict) Size() float64           { return 0.0 }
+func (n *restrict) Cost() float64           { return 0.0 }
+func (n *restrict) Children() []op.OP       { return nil }
+func (n *restrict) IsOrdered() bool         { return false }
+func (n *restrict) SetChild(_ op.OP, _ int) {}
+
+func (n *restrict) String() string {
+	return n.ops[0].String()
+}
+
 func (n *restrict) Name() (string, error) {
 	return n.ops[0].Name()
 }

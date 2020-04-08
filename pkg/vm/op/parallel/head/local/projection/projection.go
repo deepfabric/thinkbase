@@ -24,6 +24,18 @@ func New(c context.Context, r relation.Relation, es []*oprojection.Extend) *proj
 	return &projection{c: c, isCheck: false, ops: ops}
 }
 
+func (n *projection) Operate() int            { return -1 }
+func (n *projection) Dup() op.OP              { return nil }
+func (n *projection) Size() float64           { return 0.0 }
+func (n *projection) Cost() float64           { return 0.0 }
+func (n *projection) Children() []op.OP       { return nil }
+func (n *projection) IsOrdered() bool         { return false }
+func (n *projection) SetChild(_ op.OP, _ int) {}
+
+func (n *projection) String() string {
+	return n.ops[0].String()
+}
+
 func (n *projection) Name() (string, error) {
 	return n.ops[0].Name()
 }

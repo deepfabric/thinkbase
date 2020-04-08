@@ -20,6 +20,49 @@ func New(left, right op.OP, c context.Context) *difference {
 	}
 }
 
+func (n *difference) Size() float64 {
+	return n.c.MultisetDifferenceSize(n.left, n.right)
+}
+
+func (n *difference) Cost() float64 {
+	return n.c.MultisetDifferenceCost(n.left, n.right)
+}
+
+func (n *difference) Dup() op.OP {
+	return &difference{
+		c:         n.c,
+		left:      n.left,
+		right:     n.right,
+		isCheck:   n.isCheck,
+		isLeftMin: n.isLeftMin,
+	}
+}
+
+func (n *difference) Operate() int {
+	return op.MultisetDifference
+}
+
+func (n *difference) Children() []op.OP {
+	return []op.OP{n.left, n.right}
+}
+
+func (n *difference) SetChild(o op.OP, idx int) {
+	switch idx {
+	case 0:
+		n.left = o
+	default:
+		n.right = o
+	}
+}
+
+func (n *difference) IsOrdered() bool {
+	return false
+}
+
+func (n *difference) String() string {
+	return fmt.Sprintf("(%s \\ %s)", n.left, n.right)
+}
+
 func (n *difference) Name() (string, error) {
 	ln, err := n.left.Name()
 	if err != nil {

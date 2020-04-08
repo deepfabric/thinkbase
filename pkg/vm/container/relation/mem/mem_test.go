@@ -55,5 +55,5 @@ func TestRelation(t *testing.T) {
 		t = append(t, value.NewString("x"))
 		r.AddTuples([]value.Array{t})
 	}
-	fmt.Printf("%s\n", r)
+	fmt.Printf("%s\n", r.DataString())
 }

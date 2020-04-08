@@ -18,6 +18,37 @@ func New(prev op.OP, limit, offset int, c context.Context) *fetch {
 	}
 }
 
+func (n *fetch) Context() context.Context {
+	return n.c
+}
+
+func (n *fetch) Size() float64 {
+	return n.c.FetchSize(n.prev, n.limit, n.offset)
+}
+
+func (n *fetch) Cost() float64 {
+	return n.c.FetchCost(n.prev, n.limit, n.offset)
+}
+
+func (n *fetch) Dup() op.OP {
+	return &fetch{
+		c:       n.c,
+		prev:    n.prev,
+		limit:   n.limit,
+		offset:  n.offset,
+		isCheck: n.isCheck,
+	}
+}
+
+func (n *fetch) SetChild(o op.OP, _ int) { n.prev = o }
+func (n *fetch) Operate() int            { return op.Fetch }
+func (n *fetch) Children() []op.OP       { return []op.OP{n.prev} }
+func (n *fetch) IsOrdered() bool         { return n.prev.IsOrdered() }
+
+func (n *fetch) String() string {
+	return fmt.Sprintf("fetch(%v, %v, %s)", n.limit, n.offset, n.prev)
+}
+
 func (n *fetch) Name() (string, error) {
 	return n.prev.Name()
 }

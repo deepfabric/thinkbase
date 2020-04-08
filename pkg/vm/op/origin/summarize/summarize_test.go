@@ -20,7 +20,7 @@ import (
 func TestSummarize(t *testing.T) {
 	{
 		r := newRelation()
-		fmt.Printf("%s\n", r)
+		fmt.Printf("%s\n", r.DataString())
 	}
 	{
 		var es []*projection.Extend
@@ -33,6 +33,9 @@ func TestSummarize(t *testing.T) {
 			E: &extend.Attribute{"B"},
 		})
 		n := projection.New(prev, es, testContext.New(1, 1, 1024*1024*1024, 1024*1024*1024*1024))
+		{
+			fmt.Printf("%s\n", n)
+		}
 		{
 			attrs, err := n.AttributeList()
 			fmt.Printf("%v, %v\n", attrs, err)
@@ -61,6 +64,9 @@ func TestSummarize(t *testing.T) {
 			E: &extend.Attribute{"B"},
 		})
 		n := projection.New(prev, es, testContext.New(1, 1, 1024*1024*1024, 1024*1024*1024*1024))
+		{
+			fmt.Printf("%s\n", n)
+		}
 		{
 			attrs, err := n.AttributeList()
 			fmt.Printf("%v, %v\n", attrs, err)

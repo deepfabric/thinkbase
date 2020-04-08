@@ -14,7 +14,7 @@ type mem struct {
 	mp    map[string]int
 }
 
-func (r *mem) String() string {
+func (r *mem) DataString() string {
 	s := r.name + "\n"
 	for i, as := range r.attrs {
 		if i > 0 {

@@ -3,6 +3,7 @@ package extend
 import "github.com/deepfabric/thinkbase/pkg/vm/value"
 
 type Extend interface {
+	String() string
 	IsLogical() bool
 	Attributes() []string
 	Eval(map[string]value.Value) (value.Value, error)
