@@ -8,7 +8,7 @@ func New() *rule {
 	return &rule{}
 }
 
-func (r *rule) Match(o op.OP) bool {
+func (r *rule) Match(o op.OP, _ map[string]op.OP) bool {
 	chidren := o.Children()
 	return o.Operate() == op.Restrict && len(chidren) > 0 && chidren[0].Operate() == op.Nub
 }
@@ -23,6 +23,8 @@ func (r *rule) Rewrite(o op.OP, mp map[string]op.OP) (op.OP, bool) {
 					break
 				}
 			}
+		} else {
+			mp[""] = no
 		}
 		return no, true
 	}

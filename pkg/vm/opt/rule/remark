@@ -9,6 +9,16 @@ rule2
 
 
 rule100: SetUnion
-    τ(τ(R) ∪  τ(S))  -> τ(R) ∪  τ(S)
-                     -> τ(R ∪  S)
-    τ(R) ∪  τ(S)     -> R ∪  S
+    τ(R) ∪ τ(S)     -> R ∪ S
+
+rule101: SetUnion
+    τ(τ(R) ∪ τ(S))  -> τ(R) ∪ τ(S)
+                    -> τ(R ∪ S)
+
+rule102:
+    δ(R) ∪ δ(S)     -> R ∪ S
+                    -> δ(R) ∪ δ(S)
+
+rule103: SetUnion
+    δ(δ(R) ∪ δ(S))  -> δ(R) ∪ δ(S)
+                    -> R ∪ S
