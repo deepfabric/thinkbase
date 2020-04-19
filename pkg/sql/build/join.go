@@ -30,9 +30,20 @@ func (b *build) buildJoin(n *tree.JoinClause) (op.OP, error) {
 	case n.Type == tree.CrossOp:
 		return product.New(r, s, b.c), nil
 	case n.Type == tree.InnerOp:
-		e, err := b.buildConditionWithoutSubquery(n.Cond.(*tree.OnJoinCond).E)
+		{
+			o := product.New(r, s, b.c)
+			attrs, err := o.AttributeList()
+			if err != nil {
+				return nil, err
+			}
+			b.ts[0].ts = append(b.ts[0].ts, &table{o: o, attrs: attrs})
+		}
+		e, err := b.buildOn(n.Cond.(*tree.OnJoinCond))
 		if err != nil {
 			return nil, err
+		}
+		if !e.IsLogical() {
+			return nil, fmt.Errorf("'%s' is not logical expression", e)
 		}
 		return inner.New(r, s, e, b.c), nil
 	case n.Type == tree.NaturalOp:

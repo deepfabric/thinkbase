@@ -1,18 +1,9 @@
 package tree
 
 type TableName struct {
-	NumParts int
-	Parts    [2]Name
+	N ColunmNameList
 }
 
 func (n *TableName) String() string {
-	var s string
-
-	for i := 0; i < n.NumParts; i++ {
-		if i > 0 {
-			s += "."
-		}
-		s += n.Parts[i].String()
-	}
-	return s
+	return n.N.String()
 }

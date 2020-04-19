@@ -713,20 +713,16 @@ table_ref: table_name opt_alias_clause
          | subquery opt_alias_clause
            {
                 $$.val = &tree.AliasedTable {
-                    Tbl:    &tree.Subquery{Select: $1.selectStatement() },
+                    Tbl:    $1.subqueryStatement(),
                     As:     $2.aliasClause(),
                 }
            }
 
 
 
-table_name: name
+table_name: column_name
             {
-                $$.val = &tree.TableName{NumParts: 1, Parts: [2]tree.Name{tree.Name($1)}}
-            }
-          | name '.' name
-            {
-                $$.val = &tree.TableName{NumParts: 2, Parts: [2]tree.Name{tree.Name($1), tree.Name($3)}}
+                $$.val = &tree.TableName{$1.colunmNameList()}
             }
 
 

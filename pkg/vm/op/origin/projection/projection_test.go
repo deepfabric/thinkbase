@@ -26,10 +26,14 @@ func TestProjection(t *testing.T) {
 		prev := newRestrict()
 		es = append(es, &Extend{
 			Alias: "C",
-			E:     &extend.Attribute{"a"},
+			E: &extend.BinaryExtend{
+				Op:    overload.Plus,
+				Right: value.NewInt(1),
+				Left:  &extend.Attribute{"a"},
+			},
 		})
 		es = append(es, &Extend{
-			Alias: "A",
+			Alias: "X",
 			E: &extend.UnaryExtend{
 				Op: overload.Typeof,
 				E:  &extend.Attribute{"b"},

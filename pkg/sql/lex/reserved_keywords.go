@@ -30,6 +30,8 @@ func GetKeywordID(k string) int32 {
 		return DESC
 	case "distinct":
 		return DISTINCT
+	case "exists":
+		return EXISTS
 	case "false":
 		return FALSE
 	case "fetch":
@@ -52,6 +54,8 @@ func GetKeywordID(k string) int32 {
 		return INT
 	case "intersect":
 		return INTERSECT
+	case "is":
+		return IS
 	case "except":
 		return EXCEPT
 	case "join":
