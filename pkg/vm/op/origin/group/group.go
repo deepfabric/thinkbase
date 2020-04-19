@@ -6,6 +6,7 @@ import (
 
 	"github.com/deepfabric/thinkbase/pkg/vm/container/dictVec"
 	"github.com/deepfabric/thinkbase/pkg/vm/context"
+	"github.com/deepfabric/thinkbase/pkg/vm/extend"
 	"github.com/deepfabric/thinkbase/pkg/vm/op"
 	"github.com/deepfabric/thinkbase/pkg/vm/op/origin/summarize"
 	"github.com/deepfabric/thinkbase/pkg/vm/op/origin/summarize/overload"
@@ -19,8 +20,8 @@ import (
 	"github.com/deepfabric/thinkbase/pkg/vm/value"
 )
 
-func New(prev op.OP, gs []string, es []*summarize.Extend, c context.Context) *group {
-	return &group{isCheck: false, prev: prev, gs: gs, c: c, es: es}
+func New(prev op.OP, e extend.Extend, gs []string, es []*summarize.Extend, c context.Context) *group {
+	return &group{isCheck: false, prev: prev, e: e, gs: gs, c: c, es: es}
 }
 
 func (n *group) Size() float64 {
@@ -44,6 +45,7 @@ func (n *group) Cost() float64 {
 func (n *group) Dup() op.OP {
 	return &group{
 		c:       n.c,
+		e:       n.e,
 		es:      n.es,
 		gs:      n.gs,
 		prev:    n.prev,
@@ -75,7 +77,7 @@ func (n *group) String() string {
 			r += fmt.Sprintf(", %s(%s) -> %s", overload.AggName[e.Op], e.Name, e.Alias)
 		}
 	}
-	r += fmt.Sprintf("], %s)", n.prev)
+	r += fmt.Sprintf("], %v, %s)", n.e, n.prev)
 	return r
 }
 
@@ -135,12 +137,21 @@ func (n *group) GetTuples(limit int) (value.Array, error) {
 					n.dv.Destroy()
 					return nil, err
 				} else {
-					size += v.Size()
 					t = append(t, v)
 				}
 				e.Agg.Reset()
 			}
-			a = append(a, t)
+			if n.e != nil {
+				if ok, err := n.e.Eval(util.Tuple2Map(t, aliasList(n.es, n.gs))); err != nil {
+					return nil, err
+				} else if value.MustBeBool(ok) {
+					a = append(a, t)
+					size += t.Size()
+				}
+			} else {
+				a = append(a, t)
+				size += t.Size()
+			}
 			n.k = ""
 			continue
 		case err != nil:
@@ -159,77 +170,32 @@ func (n *group) GetTuples(limit int) (value.Array, error) {
 }
 
 func (n *group) GetAttributes(attrs []string, limit int) (map[string]value.Array, error) {
-	var as [][]string
-
-	es := subExtend(n.es, attrs)
-	as = append(as, attributeList(es, n.gs))
 	if !n.isCheck {
-		if err := n.check(as[0]); err != nil {
+		if err := n.check(attributeList(n.es, n.gs)); err != nil {
 			return nil, err
 		}
 		if err := util.Contain(attrs, aliasList(n.es, n.gs)); err != nil {
 			return nil, err
 		}
-		if err := n.newByAttributes(as[0]); err != nil {
+		if err := n.newByAttributes(attributeList(n.es, n.gs)); err != nil {
 			n.dv.Destroy()
 			return nil, err
 		}
 		n.isCheck = true
 	}
-	size := 0
+	ts, err := n.GetTuples(limit)
+	if err != nil {
+		return nil, err
+	}
+	if len(ts) == 0 {
+		return nil, nil
+	}
 	rq := make(map[string]value.Array)
-	for {
-		if size >= limit {
-			break
-		}
-		if len(n.k) == 0 {
-			k, err := n.dv.PopKey()
-			if err != nil {
-				n.dv.Destroy()
-				return nil, err
-			}
-			if len(k) == 0 {
-				n.dv.Destroy()
-				return rq, nil
-			}
-			n.k = k
-		}
-		ts, err := n.dv.Pops(n.k, -1, n.c.MemSize())
-		switch {
-		case err == dictVec.NotExist || (err == nil && len(ts) == 0):
-			{
-				v, _, err := encoding.DecodeValue([]byte(n.k))
-				if err != nil {
-					n.dv.Destroy()
-					return nil, err
-				}
-				size += v.(value.Array).Size()
-				for i, attr := range n.gs {
-					rq[attr] = append(rq[attr], v.(value.Array)[i])
-				}
-			}
-			for _, e := range es {
-				if v, err := e.Agg.Eval(); err != nil {
-					n.dv.Destroy()
-					return nil, err
-				} else {
-					size += v.Size()
-					rq[e.Alias] = append(rq[e.Alias], v)
-				}
-				e.Agg.Reset()
-			}
-			n.k = ""
-			continue
-		case err != nil:
-			n.dv.Destroy()
-			return nil, err
-		}
-		mp := util.Tuples2Map(ts, as[0])
-		for _, e := range es {
-			if err := e.Agg.Fill(mp[e.Name]); err != nil {
-				n.dv.Destroy()
-				return nil, err
-			}
+	is := util.Indexs(attrs, aliasList(n.es, n.gs))
+	for _, t := range ts {
+		a := t.(value.Array)
+		for i := range is {
+			rq[attrs[i]] = append(rq[attrs[i]], a[is[i]])
 		}
 	}
 	return rq, nil
@@ -320,19 +286,4 @@ func attributeList(es []*summarize.Extend, attrs []string) []string {
 		rs = append(rs, e.Name)
 	}
 	return util.MergeAttributes(attrs, rs)
-}
-
-func subExtend(es []*summarize.Extend, attrs []string) []*summarize.Extend {
-	var rs []*summarize.Extend
-
-	mp := make(map[string]struct{})
-	for i, j := 0, len(attrs); i < j; i++ {
-		mp[attrs[i]] = struct{}{}
-	}
-	for i, j := 0, len(es); i < j; i++ {
-		if _, ok := mp[es[i].Alias]; ok {
-			rs = append(rs, es[i])
-		}
-	}
-	return rs
 }

@@ -153,28 +153,23 @@ func (n *summarize) newByAttributes(attrs []string) error {
 }
 
 func (n *summarize) check(attrs []string) error {
-	{
-		for i, j := 0, len(n.es); i < j; i++ {
-			if len(n.es[i].Name) == 0 {
-				return errors.New("need attribute")
-			}
-			if len(n.es[i].Alias) == 0 {
-				return errors.New("need alias")
-			}
-			switch n.es[i].Op {
-			case overload.Avg:
-				n.es[i].Agg = avg.New()
-			case overload.Max:
-				n.es[i].Agg = max.New()
-			case overload.Min:
-				n.es[i].Agg = min.New()
-			case overload.Sum:
-				n.es[i].Agg = sum.New()
-			case overload.Count:
-				n.es[i].Agg = count.New()
-			default:
-				return fmt.Errorf("unsupport aggreation operator '%v'", n.es[i].Op)
-			}
+	for i, j := 0, len(n.es); i < j; i++ {
+		if len(n.es[i].Name) == 0 {
+			return errors.New("need attribute")
+		}
+		switch n.es[i].Op {
+		case overload.Avg:
+			n.es[i].Agg = avg.New()
+		case overload.Max:
+			n.es[i].Agg = max.New()
+		case overload.Min:
+			n.es[i].Agg = min.New()
+		case overload.Sum:
+			n.es[i].Agg = sum.New()
+		case overload.Count:
+			n.es[i].Agg = count.New()
+		default:
+			return fmt.Errorf("unsupport aggreation operator '%v'", n.es[i].Op)
 		}
 	}
 	as, err := n.prev.AttributeList()

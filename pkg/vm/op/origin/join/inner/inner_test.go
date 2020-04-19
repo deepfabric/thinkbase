@@ -24,8 +24,8 @@ func TestInner(t *testing.T) {
 	}
 	{
 		el := &extend.BinaryExtend{
-			Op:    overload.EQ,
-			Left:  &extend.Attribute{"a"},
+			Op:    overload.GT,
+			Left:  &extend.Attribute{"A.a"},
 			Right: value.NewInt(1),
 		}
 		er := &extend.BinaryExtend{
@@ -66,8 +66,8 @@ func TestInner(t *testing.T) {
 	}
 	{
 		el := &extend.BinaryExtend{
-			Op:    overload.EQ,
-			Left:  &extend.Attribute{"a"},
+			Op:    overload.GT,
+			Left:  &extend.Attribute{"A.a"},
 			Right: value.NewInt(1),
 		}
 		er := &extend.BinaryExtend{
@@ -93,15 +93,15 @@ func TestInner(t *testing.T) {
 			fmt.Printf("%v, %v\n", attrs, err)
 		}
 		for {
-			mp, err := n.GetAttributes([]string{"c", "d"}, 1024*1024)
+			mp, err := n.GetAttributes([]string{"A.c", "B.d"}, 1024*1024)
 			if err != nil {
 				log.Fatal(err)
 			}
-			if len(mp["c"]) == 0 {
+			if len(mp["A.c"]) == 0 {
 				break
 			}
-			fmt.Printf("c = %v\n", mp["c"])
-			fmt.Printf("d = %v\n", mp["d"])
+			fmt.Printf("c = %v\n", mp["A.c"])
+			fmt.Printf("d = %v\n", mp["B.d"])
 		}
 
 	}

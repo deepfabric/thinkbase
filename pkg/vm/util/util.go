@@ -93,11 +93,14 @@ func MergeAttributes(xs, ys []string) []string {
 
 	mp := make(map[string]struct{})
 	for i, j := 0, len(xs); i < j; i++ {
-		mp[xs[i]] = struct{}{}
-		rs = append(rs, xs[i])
+		if _, ok := mp[xs[i]]; !ok {
+			mp[xs[i]] = struct{}{}
+			rs = append(rs, xs[i])
+		}
 	}
 	for i, j := 0, len(ys); i < j; i++ {
 		if _, ok := mp[ys[i]]; !ok {
+			mp[ys[i]] = struct{}{}
 			rs = append(rs, ys[i])
 		}
 	}

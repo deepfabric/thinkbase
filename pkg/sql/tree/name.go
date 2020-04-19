@@ -42,7 +42,7 @@ func (n ColunmNameList) String() string {
 
 	for i := range n {
 		if i > 0 {
-			s += ", "
+			s += "."
 		}
 		s += n[i].String()
 	}

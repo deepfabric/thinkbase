@@ -1,6 +1,9 @@
 package testContext
 
-import "github.com/deepfabric/thinkbase/pkg/vm/estimator"
+import (
+	"github.com/deepfabric/thinkbase/pkg/vm/estimator"
+	"github.com/deepfabric/thinkbase/pkg/vm/workspace"
+)
 
 type testContext struct {
 	mcpu     int
@@ -8,4 +11,5 @@ type testContext struct {
 	memSize  int
 	diskSize int
 	est      estimator.Estimator
+	wsp      workspace.Workspace
 }

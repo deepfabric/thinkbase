@@ -2,6 +2,7 @@ package product
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/deepfabric/thinkbase/pkg/vm/context"
 	"github.com/deepfabric/thinkbase/pkg/vm/op"
@@ -93,19 +94,35 @@ func (n *product) AttributeList() ([]string, error) {
 		return nil, err
 	}
 	var rs []string
-	mp := make(map[string]int)
-	for i, attr := range rattrs {
-		mp[attr] = i
-		rs = append(rs, attr)
-	}
-	for _, attr := range lattrs {
-		if i, ok := mp[attr]; !ok {
-			rs = append(rs, attr)
+	for _, attr := range rattrs {
+		if len(strings.Split(attr, ".")) == 1 {
+			rs = append(rs, rn+"."+attr)
 		} else {
-			rs[i] = rn + "." + rs[i]
-			rs = append(rs, ln+"."+attr)
+			rs = append(rs, attr)
 		}
 	}
+	for _, attr := range lattrs {
+		if len(strings.Split(attr, ".")) == 1 {
+			rs = append(rs, ln+"."+attr)
+		} else {
+			rs = append(rs, attr)
+		}
+	}
+	/*
+		mp := make(map[string]int)
+		for i, attr := range rattrs {
+			mp[attr] = i
+			rs = append(rs, attr)
+		}
+		for _, attr := range lattrs {
+			if i, ok := mp[attr]; !ok {
+				rs = append(rs, attr)
+			} else {
+				rs[i] = rn + "." + rs[i]
+				rs = append(rs, ln+"."+attr)
+			}
+		}
+	*/
 	return rs, nil
 }
 

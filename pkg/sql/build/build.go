@@ -6,13 +6,18 @@ import (
 
 	"github.com/deepfabric/thinkbase/pkg/sql/parser"
 	"github.com/deepfabric/thinkbase/pkg/sql/tree"
+	"github.com/deepfabric/thinkbase/pkg/vm/context"
 	"github.com/deepfabric/thinkbase/pkg/vm/op"
 	"github.com/deepfabric/thinkbase/pkg/vm/op/origin/fetch"
 	"github.com/deepfabric/thinkbase/pkg/vm/op/origin/order"
 )
 
-func New(sql string) *build {
-	return &build{sql: sql}
+func New(sql string, c context.Context) *build {
+	return &build{
+		c:   c,
+		sql: sql,
+		mp:  make(map[string]struct{}),
+	}
 }
 
 func (b *build) Build() (op.OP, error) {
@@ -64,11 +69,6 @@ func (b *build) buildLimit(o op.OP, lt *tree.Limit) (op.OP, error) {
 		}
 		off = int(offset)
 	}
-	{
-		fmt.Printf("limit\n")
-		fmt.Printf("\tlimit: %v\n", cnt)
-		fmt.Printf("\toffset: %v\n", off)
-	}
 	return fetch.New(o, cnt, off, b.c), nil
 }
 
@@ -82,16 +82,15 @@ func (b *build) buildOrderBy(o op.OP, ords tree.OrderBy) (op.OP, error) {
 		} else {
 			descs = append(descs, false)
 		}
-		attr, err := b.buildExprColumn(ord.E)
-		if err != nil {
-			return nil, err
+		if e, ok := ord.E.(tree.ColunmNameList); ok {
+			attr, err := b.buildExprColumn(e)
+			if err != nil {
+				return nil, err
+			}
+			attrs = append(attrs, attr)
+		} else {
+			return nil, fmt.Errorf("wrong 'ORDER BY %s' statement", ord.E)
 		}
-		attrs = append(attrs, attr)
-	}
-	{
-		fmt.Printf("orderBy\n")
-		fmt.Printf("\tdescs: %v\n", descs)
-		fmt.Printf("\tattrs: %v\n", attrs)
 	}
 	return order.New(o, descs, attrs, b.c), nil
 }

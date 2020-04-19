@@ -9,15 +9,17 @@ import (
 	dmem "github.com/deepfabric/thinkbase/pkg/vm/container/dictionary/mem"
 	"github.com/deepfabric/thinkbase/pkg/vm/container/hash"
 	hmem "github.com/deepfabric/thinkbase/pkg/vm/container/hash/mem"
+	"github.com/deepfabric/thinkbase/pkg/vm/container/relation"
 	"github.com/deepfabric/thinkbase/pkg/vm/container/vector"
 	vmem "github.com/deepfabric/thinkbase/pkg/vm/container/vector/mem"
 	"github.com/deepfabric/thinkbase/pkg/vm/estimator/testEstimator"
 	"github.com/deepfabric/thinkbase/pkg/vm/extend"
 	"github.com/deepfabric/thinkbase/pkg/vm/op"
+	"github.com/deepfabric/thinkbase/pkg/vm/workspace/testWorkspace"
 )
 
 func New(mcpu, rcpu, memSize, diskSize int) *testContext {
-	return &testContext{mcpu, rcpu, memSize, diskSize, testEstimator.New()}
+	return &testContext{mcpu, rcpu, memSize, diskSize, testEstimator.New(), testWorkspace.New()}
 }
 
 func (c *testContext) Min(left, right op.OP) op.OP {
@@ -162,6 +164,18 @@ func (c *testContext) SetUnionCostByHash(r, s op.OP) float64 {
 
 func (c *testContext) SetUnionCostByOrder(r, s op.OP) float64 {
 	return c.est.SetUnionCostByOrder(r, s)
+}
+
+func (c *testContext) Id() string {
+	return c.wsp.Id()
+}
+
+func (c *testContext) Database() string {
+	return c.wsp.Database()
+}
+
+func (c *testContext) Relation(name string) (relation.Relation, error) {
+	return c.wsp.Relation(name)
 }
 
 func (c *testContext) NumMcpu() int {

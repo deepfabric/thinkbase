@@ -152,16 +152,9 @@ func (n *projection) GetAttributes(attrs []string, limit int) (map[string]value.
 }
 
 func (n *projection) check(attrs []string) error {
-	{
-		for _, e := range n.es {
-			if _, ok := e.E.(*extend.Attribute); !ok {
-				if len(e.Alias) == 0 {
-					return errors.New("need alias")
-				}
-			}
-			if len(e.E.Attributes()) <= 0 {
-				return errors.New("must act on attributes")
-			}
+	for _, e := range n.es {
+		if len(e.E.Attributes()) <= 0 {
+			return errors.New("must act on attributes")
 		}
 	}
 	as, err := n.prev.AttributeList()

@@ -21,7 +21,7 @@ import (
 func TestGroup(t *testing.T) {
 	{
 		r := newRelation()
-		fmt.Printf("%s\n", r.String())
+		fmt.Printf("%s\n", r.DataString())
 	}
 	{
 		var es []*projection.Extend
@@ -101,8 +101,18 @@ func newGroup() op.OP {
 		Alias: "C",
 		Op:    aoverload.Max,
 	})
+	es = append(es, &summarize.Extend{
+		Name:  "b",
+		Alias: "_0",
+		Op:    aoverload.Sum,
+	})
 	prev := newRestrict()
-	return New(prev, []string{"a"}, es, testContext.New(1, 1, 1024*1024*1024, 1024*1024*1024*1024))
+	e := &extend.BinaryExtend{
+		Op:    overload.GT,
+		Right: value.NewFloat(2.0),
+		Left:  &extend.Attribute{"_0"},
+	}
+	return New(prev, e, []string{"a"}, es, testContext.New(1, 1, 1024*1024*1024, 1024*1024*1024*1024))
 }
 
 func newRestrict() op.OP {
