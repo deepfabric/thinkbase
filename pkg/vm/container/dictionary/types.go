@@ -1,21 +1,23 @@
 package dictionary
 
 import (
-	"errors"
+	"sync"
 
+	"github.com/deepfabric/thinkbase/pkg/vm/container/store"
 	"github.com/deepfabric/thinkbase/pkg/vm/value"
-)
-
-var (
-	NotExist = errors.New("Not Exist")
 )
 
 type Dictionary interface {
 	Destroy() error
 
-	IsExit(value.Value) error
+	GetOrSet(value.Value) (bool, error) // 如果value是set的则返回false，如果是加载的则返回true
+}
 
-	Set(value.Value, interface{}) error
-	Get(value.Value) (interface{}, error)
-	GetOrSet(value.Value, interface{}) (bool, interface{}, error) // 如果value是set的则返回false，如果是加载的则返回true
+type dictionary struct {
+	sync.RWMutex
+	size  int
+	limit int
+	name  string
+	db    store.Store
+	mp    map[string]struct{}
 }

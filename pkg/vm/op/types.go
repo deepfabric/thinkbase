@@ -5,27 +5,19 @@ import (
 )
 
 const (
-	A2t = iota
-	T2a
-	Nub
+	Nub = iota
 	Order
 	Group
 	Fetch
 	Rename
-	Product
 	Relation
 	Restrict
 	Summarize
 	Projection
-	SetUnion
-	SetIntersect
-	SetDifference
-	MultisetUnion
-	MultisetIntersect
-	MultisetDifference
-	SemiJoin
-	InnerJoin
-	NaturalJoin
+
+	GroupWithIndex
+	RestrictWithIndex
+	SummarizeWithIndex
 )
 
 type OP interface {
@@ -42,17 +34,5 @@ type OP interface {
 	String() string
 	Name() (string, error)
 	AttributeList() ([]string, error)
-	GetTuples(int) (value.Array, error)
 	GetAttributes([]string, int) (map[string]value.Array, error)
-}
-
-type OrderOP interface {
-	OP
-	NewLT() func(value.Value, value.Value) bool
-}
-
-type SetUnionOP interface {
-	OP
-	NewHashUnion(OP, OP) OP
-	NewOrderUnion(OP, OP) OP
 }

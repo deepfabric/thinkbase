@@ -8,8 +8,8 @@ import (
 	"github.com/deepfabric/thinkbase/pkg/vm/value"
 )
 
-func New() *sum {
-	return &sum{}
+func New(typ int32) *sum {
+	return &sum{typ: typ}
 }
 
 func (s *sum) Reset() {
@@ -21,6 +21,16 @@ func (s *sum) Fill(a value.Array) error {
 		return nil
 	}
 	for _, v := range a {
+		switch s.typ {
+		case types.T_any:
+			if typ := v.ResolvedType().Oid; typ != types.T_int && typ != types.T_float {
+				continue
+			}
+		default:
+			if v.ResolvedType().Oid != s.typ {
+				continue
+			}
+		}
 		switch v.ResolvedType().Oid {
 		case types.T_int:
 			if s.isFloat {
@@ -38,7 +48,6 @@ func (s *sum) Fill(a value.Array) error {
 				s.fv = float64(s.iv)
 			}
 			s.fv += value.MustBeFloat(v)
-		default: // skip
 		}
 	}
 	return nil

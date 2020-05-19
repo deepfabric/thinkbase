@@ -8,9 +8,15 @@ import (
 
 type Extend struct {
 	Op    int
+	Typ   int
 	Name  string
 	Alias string
 	Agg   overload.Aggregation
+}
+
+type SummarizeOP interface {
+	op.OP
+	Extends() []*Extend
 }
 
 type summarize struct {

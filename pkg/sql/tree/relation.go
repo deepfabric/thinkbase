@@ -11,6 +11,8 @@ func (*UnionClause) relationStatement()   {}
 func (*SelectClause) relationStatement()  {}
 func (*AliasedSelect) relationStatement() {}
 
+func (*AliasedTable) relationStatement() {}
+
 type AliasedSelect struct {
 	Sel *Select
 	As  *AliasClause

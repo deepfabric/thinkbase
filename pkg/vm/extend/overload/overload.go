@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"regexp"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -21,6 +22,16 @@ func IsLogical(op int) bool {
 	case Not:
 		return true
 	case And:
+		return true
+	case Like:
+		return true
+	case Index:
+		return true
+	case IndexTry:
+		return true
+	case Group:
+		return true
+	case GroupTry:
 		return true
 	case EQ, LT, GT, LE, GE, NE:
 		return true
@@ -80,6 +91,16 @@ func OperatorType(op int) int {
 	case GE:
 		return Binary
 	case NE:
+		return Binary
+	case Like:
+		return Binary
+	case Index:
+		return Binary
+	case IndexTry:
+		return Binary
+	case Group:
+		return Binary
+	case GroupTry:
 		return Binary
 	case Concat:
 		return Multi
@@ -605,7 +626,7 @@ var BinOps = map[int][]*BinOp{
 					if math.IsNaN(f) || f <= float64(math.MinInt64) || f >= float64(math.MaxInt64) {
 						return nil, ErrIntOutOfRange
 					}
-					return value.NewFloat(f), nil
+					return value.NewInt(int64(f)), nil
 				case types.T_string:
 					return value.ParseInt(value.MustBeString(v))
 				}
@@ -737,6 +758,60 @@ var BinOps = map[int][]*BinOp{
 			ReturnType: types.Bool,
 			Fn: func(left, right value.Value) (value.Value, error) {
 				return value.NewBool(value.Compare(left, right) != 0), nil
+			},
+		},
+	},
+	Like: {
+		&BinOp{
+			LeftType:   types.String,
+			RightType:  types.String,
+			ReturnType: types.Bool,
+			Fn: func(left, right value.Value) (value.Value, error) {
+				rgp, err := regexp.Compile(value.MustBeString(right))
+				if err != nil {
+					return nil, err
+				}
+				return value.NewBool(rgp.MatchString(value.MustBeString(left))), nil
+			},
+		},
+	},
+	Index: {
+		&BinOp{
+			LeftType:   types.Any,
+			RightType:  types.String,
+			ReturnType: types.Any,
+			Fn: func(left, _ value.Value) (value.Value, error) {
+				return left, nil
+			},
+		},
+	},
+	IndexTry: {
+		&BinOp{
+			LeftType:   types.Any,
+			RightType:  types.String,
+			ReturnType: types.Any,
+			Fn: func(left, _ value.Value) (value.Value, error) {
+				return left, nil
+			},
+		},
+	},
+	Group: {
+		&BinOp{
+			LeftType:   types.Any,
+			RightType:  types.String,
+			ReturnType: types.Any,
+			Fn: func(left, right value.Value) (value.Value, error) {
+				return left, nil
+			},
+		},
+	},
+	GroupTry: {
+		&BinOp{
+			LeftType:   types.Any,
+			RightType:  types.String,
+			ReturnType: types.Any,
+			Fn: func(left, _ value.Value) (value.Value, error) {
+				return left, nil
 			},
 		},
 	},

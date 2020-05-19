@@ -6,8 +6,8 @@ import (
 	"github.com/deepfabric/thinkbase/pkg/vm/value"
 )
 
-func New() *avg {
-	return &avg{agg: sum.New()}
+func New(typ int32) *avg {
+	return &avg{typ: typ, agg: sum.New(typ)}
 }
 
 func (av *avg) Reset() {
@@ -23,14 +23,25 @@ func (av *avg) Fill(a value.Array) error {
 		return err
 	}
 	for _, v := range a {
-		if oid := v.ResolvedType().Oid; oid == types.T_int || oid == types.T_float {
-			av.cnt++
+		switch av.typ {
+		case types.T_any:
+			if typ := v.ResolvedType().Oid; typ != types.T_int && typ != types.T_float {
+				continue
+			}
+		default:
+			if v.ResolvedType().Oid != av.typ {
+				continue
+			}
 		}
+		av.cnt++
 	}
 	return nil
 }
 
 func (av *avg) Eval() (value.Value, error) {
+	if av.cnt == 0 {
+		return value.NewFloat(0.0), nil
+	}
 	v, err := av.agg.Eval()
 	if err != nil {
 		return nil, err

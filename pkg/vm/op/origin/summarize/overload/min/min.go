@@ -5,8 +5,8 @@ import (
 	"github.com/deepfabric/thinkbase/pkg/vm/value"
 )
 
-func New() *min {
-	return &min{}
+func New(typ int32) *min {
+	return &min{typ: typ}
 }
 
 func (m *min) Reset() {
@@ -18,8 +18,15 @@ func (m *min) Fill(a value.Array) error {
 		return nil
 	}
 	for _, v := range a {
-		if v.ResolvedType().Oid == types.T_null {
-			continue
+		switch m.typ {
+		case types.T_any:
+			if v.ResolvedType().Oid == types.T_null {
+				continue
+			}
+		default:
+			if v.ResolvedType().Oid != m.typ {
+				continue
+			}
 		}
 		if m.v == nil || value.Compare(v, m.v) < 0 {
 			m.v = v
@@ -29,5 +36,8 @@ func (m *min) Fill(a value.Array) error {
 }
 
 func (m *min) Eval() (value.Value, error) {
+	if m.v == nil {
+		return value.ConstNull, nil
+	}
 	return m.v, nil
 }

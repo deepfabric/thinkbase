@@ -36,6 +36,9 @@ func EncodeValue(v interface{}) ([]byte, error) {
 	case value.Null:
 		buf.Write([]byte{byte(types.T_null & 0xFF)})
 		return buf.Bytes(), nil
+	case value.Empty:
+		buf.Write([]byte{byte(types.T_empty & 0xFF)})
+		return buf.Bytes(), nil
 	case *value.Bool:
 		buf.Write([]byte{byte(types.T_bool & 0xFF)})
 		if value.MustBeBool(t) {
@@ -86,6 +89,8 @@ func DecodeValue(data []byte) (interface{}, []byte, error) {
 		return value.NewInt(int64(DecodeUint64(data[1:]))), data[9:], nil
 	case types.T_null:
 		return value.ConstNull, data[1:], nil
+	case types.T_empty:
+		return value.ConstEmpty, data[1:], nil
 	case types.T_bool:
 		if data[1] == 1 {
 			return value.NewBool(true), data[2:], nil

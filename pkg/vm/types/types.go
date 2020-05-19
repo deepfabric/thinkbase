@@ -10,6 +10,7 @@ const (
 	T_time
 	T_float
 	T_array
+	T_empty
 	T_table
 	T_string
 )
@@ -26,6 +27,8 @@ var (
 	Bool = &T{T_bool}
 
 	Array = &T{T_array}
+
+	Empty = &T{T_empty}
 
 	Table = &T{T_table}
 
@@ -54,6 +57,8 @@ func (t *T) SQLString() string {
 		return "TIME"
 	case T_float:
 		return "FLOAT"
+	case T_empty:
+		return "EMPTY"
 	case T_table:
 		return "TABLE"
 	case T_array:

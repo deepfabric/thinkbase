@@ -323,7 +323,7 @@ const sqlEofCode = 1
 const sqlErrCode = 2
 const sqlInitialStackSize = 16
 
-//line sql.y:770
+//line sql.y:774
 
 //line yacctab:1
 var sqlExca = [...]int{
@@ -336,100 +336,95 @@ var sqlExca = [...]int{
 	41, 5,
 	68, 5,
 	-2, 108,
-	-1, 54,
+	-1, 58,
 	67, 138,
 	-2, 129,
 }
 
 const sqlPrivate = 57344
 
-const sqlLast = 463
+const sqlLast = 415
 
 var sqlAct = [...]int{
 
-	54, 13, 39, 212, 167, 42, 190, 185, 122, 177,
-	13, 143, 135, 127, 124, 200, 138, 229, 85, 201,
-	68, 35, 230, 5, 200, 193, 13, 180, 87, 19,
-	90, 83, 235, 14, 165, 33, 92, 67, 186, 23,
-	43, 10, 112, 111, 53, 129, 107, 108, 109, 27,
-	10, 59, 30, 91, 13, 140, 25, 26, 62, 80,
-	93, 17, 89, 84, 41, 63, 10, 29, 128, 227,
-	13, 178, 179, 13, 13, 13, 13, 64, 65, 13,
-	197, 113, 151, 150, 211, 78, 13, 119, 123, 92,
-	14, 145, 28, 65, 10, 11, 53, 152, 153, 154,
-	155, 156, 157, 158, 159, 160, 161, 162, 163, 144,
-	10, 148, 149, 10, 10, 10, 10, 147, 146, 10,
-	141, 76, 115, 117, 174, 90, 10, 128, 114, 90,
-	120, 75, 74, 168, 169, 118, 12, 96, 97, 98,
-	184, 91, 31, 213, 3, 128, 128, 188, 91, 64,
-	90, 187, 91, 9, 18, 223, 191, 89, 189, 194,
-	195, 89, 192, 196, 218, 130, 225, 199, 131, 132,
-	133, 134, 222, 91, 137, 86, 175, 176, 79, 170,
-	214, 203, 89, 77, 4, 228, 173, 210, 66, 207,
-	226, 224, 208, 4, 13, 204, 70, 164, 110, 145,
-	90, 217, 123, 216, 69, 215, 71, 81, 82, 94,
-	95, 96, 97, 98, 206, 23, 205, 144, 22, 232,
-	233, 234, 219, 91, 198, 27, 72, 73, 30, 14,
-	21, 236, 25, 26, 10, 231, 168, 4, 136, 14,
-	47, 48, 49, 29, 46, 14, 14, 47, 48, 49,
-	20, 56, 55, 58, 126, 172, 220, 221, 40, 51,
-	58, 125, 37, 34, 139, 40, 51, 116, 28, 94,
-	95, 96, 97, 98, 38, 52, 94, 95, 96, 97,
-	98, 38, 52, 90, 171, 182, 24, 60, 50, 61,
-	142, 183, 44, 45, 209, 50, 121, 15, 16, 44,
-	45, 36, 53, 166, 23, 32, 91, 22, 57, 53,
-	14, 47, 48, 49, 27, 89, 181, 30, 14, 21,
-	8, 25, 26, 7, 58, 6, 90, 88, 2, 40,
-	51, 1, 29, 14, 47, 48, 49, 0, 0, 20,
-	0, 0, 0, 90, 202, 38, 52, 58, 0, 91,
-	0, 0, 40, 51, 0, 0, 0, 28, 89, 50,
-	0, 23, 0, 44, 45, 36, 91, 0, 38, 52,
-	0, 27, 0, 53, 30, 89, 21, 0, 25, 26,
-	0, 0, 50, 0, 0, 0, 44, 45, 0, 29,
-	14, 47, 48, 49, 0, 0, 53, 0, 0, 0,
-	0, 0, 0, 0, 58, 0, 102, 103, 104, 0,
-	51, 0, 0, 105, 28, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 52, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 50,
-	0, 0, 0, 44, 45, 0, 0, 0, 0, 0,
-	0, 0, 0, 53, 106, 94, 95, 96, 97, 98,
-	99, 100, 101,
+	44, 40, 175, 218, 5, 197, 150, 47, 10, 130,
+	145, 185, 142, 84, 4, 3, 208, 10, 94, 209,
+	200, 18, 90, 4, 208, 23, 38, 188, 192, 28,
+	92, 24, 27, 193, 239, 207, 74, 73, 10, 32,
+	120, 119, 35, 72, 26, 100, 30, 31, 115, 116,
+	117, 136, 143, 67, 46, 63, 147, 34, 87, 118,
+	58, 13, 14, 97, 25, 121, 22, 17, 66, 233,
+	13, 127, 131, 186, 187, 91, 101, 102, 103, 104,
+	105, 22, 33, 69, 10, 75, 98, 10, 10, 10,
+	10, 13, 204, 10, 97, 96, 135, 151, 155, 156,
+	10, 99, 159, 160, 161, 162, 163, 164, 165, 166,
+	167, 168, 169, 170, 154, 132, 153, 98, 148, 234,
+	122, 176, 177, 10, 128, 115, 96, 182, 97, 4,
+	36, 172, 158, 157, 134, 22, 123, 13, 194, 97,
+	13, 13, 13, 13, 85, 196, 13, 11, 14, 199,
+	173, 98, 229, 13, 195, 125, 99, 103, 104, 105,
+	96, 97, 98, 231, 203, 68, 82, 126, 93, 228,
+	152, 96, 206, 201, 202, 81, 13, 98, 83, 183,
+	184, 69, 217, 212, 98, 219, 28, 232, 230, 181,
+	131, 211, 198, 178, 12, 68, 32, 220, 215, 35,
+	70, 26, 224, 30, 31, 151, 223, 221, 10, 222,
+	225, 9, 22, 22, 34, 171, 114, 14, 51, 52,
+	53, 235, 176, 236, 137, 238, 237, 138, 139, 140,
+	141, 62, 97, 144, 190, 97, 45, 55, 21, 33,
+	191, 76, 86, 14, 51, 52, 53, 101, 102, 103,
+	104, 105, 43, 56, 216, 98, 14, 62, 98, 71,
+	39, 13, 45, 55, 96, 20, 54, 96, 79, 80,
+	48, 49, 28, 77, 214, 27, 88, 89, 43, 56,
+	57, 174, 32, 78, 213, 35, 14, 26, 50, 30,
+	31, 60, 54, 59, 180, 226, 48, 49, 41, 227,
+	34, 14, 51, 52, 53, 19, 57, 25, 14, 51,
+	52, 53, 42, 28, 146, 62, 124, 97, 210, 179,
+	45, 55, 62, 32, 29, 33, 35, 45, 55, 205,
+	30, 31, 14, 51, 52, 53, 43, 56, 64, 14,
+	98, 34, 65, 43, 56, 149, 62, 97, 95, 96,
+	54, 133, 55, 129, 48, 49, 41, 54, 109, 110,
+	111, 48, 49, 15, 57, 112, 33, 16, 56, 37,
+	98, 57, 61, 189, 101, 102, 103, 104, 105, 96,
+	8, 54, 7, 6, 2, 48, 49, 1, 0, 0,
+	0, 0, 0, 0, 0, 57, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 113, 101, 102, 103,
+	104, 105, 106, 107, 108,
 }
 var sqlPact = [...]int{
 
-	86, -1000, -1000, -1000, 16, -1000, -1000, -1000, -1000, 86,
-	-40, 285, 242, -14, -1000, 52, -1000, 171, -31, 225,
-	185, 185, 185, 96, 95, 86, 49, 13, 13, 13,
-	-1000, -10, 306, -1000, -1000, 314, -1000, -1000, 329, 398,
-	-23, -1000, -1000, -40, 386, 386, -1000, -1000, -1000, -1000,
-	-1000, -1000, -1000, 86, -14, -1000, -1000, -24, -25, 329,
-	-1000, -1000, 37, 124, 97, 329, 329, 241, -20, 86,
-	-1000, -1000, 86, 86, 86, 86, 196, -1000, 86, -1000,
-	-1000, -1000, -1000, 0, 306, 29, -10, -1000, 225, 329,
-	329, 43, -1000, 106, 386, 386, 386, 386, 386, 386,
-	386, 386, 386, 386, 386, 386, 182, -1000, 78, 78,
-	-34, 235, 329, 113, -1000, -1000, 119, -1000, -1000, 138,
-	23, -46, -1000, 271, -1000, -1000, 225, -29, -1000, 329,
-	342, 20, 342, -1000, 196, -1000, 329, -1000, 126, -1000,
-	329, -1000, -48, -1000, 241, 241, 0, -1000, 188, 106,
-	-1000, 40, 78, 78, -1000, -1000, -1000, 219, 219, 219,
-	219, 219, 219, 212, 386, -1000, -1000, -49, 138, 331,
-	-1000, 23, -1000, 329, -1000, 211, 209, -1000, -1000, -1000,
-	329, -1000, -1000, -1000, -29, -1000, 225, 18, -1000, 138,
-	112, 163, 138, 29, -1000, -1000, 126, -1000, 386, 152,
-	329, -1000, 139, 26, 117, -1000, -1000, -1000, -1000, -51,
-	-1000, -1000, -1000, 329, 329, -1000, 112, 219, 386, 138,
-	-36, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
-	225, 138, -58, -1000, 219, -1000, -1000,
+	144, -1000, -1000, -1000, 22, 252, -1000, -1000, -1000, 144,
+	-38, 253, 239, -10, -1000, 140, -1000, 183, -1000, -1000,
+	282, -30, -1000, -32, 282, 262, 262, 262, 139, 130,
+	144, 108, 12, 12, 12, -1000, 2, 297, -1000, -1000,
+	335, -1000, -1000, 304, 350, -19, -1000, -38, 328, 328,
+	-1000, -1000, -1000, -1000, -1000, -1000, -1000, 304, -10, -1000,
+	-1000, -26, -27, 304, -1000, -1000, 42, 170, 129, 304,
+	304, -30, -1000, 282, 252, -14, 144, -1000, -1000, 144,
+	144, 144, 144, 10, -1000, 144, -1000, -1000, -1000, -1000,
+	1, 297, 58, 2, -1000, 282, 304, 304, 93, -1000,
+	142, 328, 328, 328, 328, 328, 328, 328, 328, 328,
+	328, 328, 328, 200, -1000, 144, 98, 98, 82, 213,
+	304, 127, -1000, -1000, 122, -1000, -1000, 223, 25, -46,
+	-1000, 220, -1000, -40, -1000, -1000, 304, 167, 294, 167,
+	-1000, 10, -1000, 304, -1000, 162, -1000, 304, -1000, -53,
+	-1000, 252, 252, 1, -1000, 149, 142, -1000, 52, 98,
+	98, -1000, -1000, -1000, 19, 19, 19, 19, 19, 19,
+	317, 328, -33, -1000, -1000, -49, 223, 305, -1000, 25,
+	-1000, 304, -1000, 279, 269, -1000, -1000, -1000, 304, -1000,
+	-1000, -1000, -1000, 282, 116, -1000, 223, 154, 180, 223,
+	58, -1000, -1000, 162, -1000, 328, 190, -1000, 304, -1000,
+	136, 26, 51, -1000, -1000, -1000, -1000, -1000, -1000, 304,
+	304, -1000, 154, 19, 328, 223, -34, -1000, -1000, -1000,
+	-1000, -1000, -1000, -1000, -1000, 223, -57, -1000, 19, -1000,
 }
 var sqlPgo = [...]int{
 
-	0, 331, 328, 144, 183, 325, 323, 95, 320, 5,
-	316, 0, 308, 13, 28, 23, 40, 305, 7, 298,
-	297, 296, 294, 31, 290, 4, 142, 6, 289, 287,
-	204, 178, 12, 286, 58, 65, 284, 9, 267, 264,
-	16, 21, 2, 262, 64, 3, 261, 14, 8, 11,
-	35, 257, 256, 255, 252, 251, 244,
+	0, 387, 384, 15, 13, 383, 382, 147, 380, 170,
+	373, 60, 372, 238, 18, 4, 7, 369, 43, 367,
+	363, 353, 351, 22, 345, 2, 130, 5, 342, 338,
+	241, 242, 12, 324, 68, 53, 319, 11, 316, 314,
+	10, 1, 0, 312, 54, 3, 305, 21, 9, 6,
+	26, 299, 295, 294, 293, 291, 288,
 }
 var sqlR1 = [...]int{
 
@@ -440,8 +435,8 @@ var sqlR1 = [...]int{
 	50, 50, 50, 23, 23, 24, 24, 40, 40, 39,
 	27, 27, 45, 45, 25, 25, 41, 41, 41, 41,
 	41, 41, 41, 42, 42, 42, 42, 42, 42, 42,
-	42, 42, 42, 42, 43, 43, 43, 43, 43, 43,
-	43, 43, 43, 44, 44, 44, 44, 44, 44, 53,
+	42, 42, 42, 43, 43, 43, 43, 43, 43, 43,
+	43, 43, 44, 44, 44, 44, 44, 44, 44, 53,
 	53, 53, 56, 56, 54, 54, 55, 52, 51, 51,
 	51, 51, 51, 46, 46, 47, 47, 9, 7, 6,
 	6, 6, 30, 30, 30, 5, 5, 5, 5, 32,
@@ -453,13 +448,13 @@ var sqlR2 = [...]int{
 
 	0, 1, 1, 3, 1, 0, 3, 1, 3, 2,
 	1, 1, 0, 1, 0, 2, 2, 1, 1, 5,
-	2, 3, 1, 3, 0, 1, 1, 1, 1, 1,
+	2, 3, 1, 3, 0, 1, 1, 1, 1, 2,
 	1, 1, 1, 4, 6, 7, 1, 1, 3, 1,
 	2, 3, 1, 2, 0, 1, 3, 1, 0, 2,
 	3, 0, 2, 0, 1, 3, 1, 2, 3, 3,
-	3, 4, 1, 1, 1, 1, 2, 2, 3, 3,
-	3, 3, 3, 1, 3, 3, 3, 3, 3, 3,
-	5, 6, 2, 1, 1, 1, 1, 1, 1, 1,
+	3, 4, 1, 1, 1, 2, 2, 3, 3, 3,
+	3, 3, 1, 3, 3, 3, 3, 3, 3, 5,
+	6, 2, 1, 1, 1, 1, 1, 1, 3, 1,
 	2, 2, 1, 1, 3, 4, 6, 1, 1, 1,
 	1, 1, 1, 3, 2, 1, 0, 3, 1, 4,
 	4, 4, 1, 1, 0, 4, 5, 4, 4, 2,
@@ -470,56 +465,56 @@ var sqlR2 = [...]int{
 var sqlChk = [...]int{
 
 	-1000, -1, -2, -3, -4, -15, -5, -6, -8, 67,
-	-16, -7, 50, -11, 4, -20, -19, 45, -3, 69,
-	54, 34, 22, 19, -33, 36, 37, 29, 72, 47,
-	32, -26, -17, -50, 21, -41, 59, -43, 39, -42,
-	23, -44, -9, -16, 57, 58, -56, 5, 6, 7,
-	53, 24, 40, 67, -11, -54, -55, -12, 18, 65,
-	-29, -28, -34, -35, 25, 41, 17, 68, -11, -30,
-	11, 21, -30, -30, 36, 36, -7, -4, 36, -31,
-	46, -31, -31, -23, 73, 28, -26, -14, 13, 44,
-	12, 35, -11, -41, 57, 58, 59, 60, 61, 62,
-	63, 64, 8, 9, 10, 15, 56, -9, -42, -42,
-	-3, 67, 67, -41, -35, -34, -38, 26, 38, -41,
-	-44, -21, -48, -41, -47, -46, 13, -13, -11, 65,
-	-7, -7, -7, -7, -7, -32, 42, -7, -40, -39,
-	55, -50, -24, -49, -15, -9, -23, -14, -41, -41,
-	40, 39, -42, -42, -42, -42, -42, -42, -42, -42,
-	-42, -42, -42, -42, 15, 68, 68, -25, -41, -41,
-	66, -36, -53, 67, 5, 57, 58, -37, 48, 49,
-	73, -10, 14, 20, -13, -18, 67, -41, -32, -41,
-	-27, 30, -41, 73, -47, -47, -40, 40, 12, -42,
-	73, 68, 13, -37, -41, 5, 5, -48, -18, -22,
-	-11, 66, -45, 31, 17, -49, -27, -42, 12, -41,
-	-52, -51, 33, 16, 52, 27, 51, 43, 68, 68,
-	73, -41, -25, -45, -42, 68, -11,
+	-16, -7, 50, -11, 4, -20, -19, 45, -47, -46,
+	13, -13, -11, -3, 69, 54, 34, 22, 19, -33,
+	36, 37, 29, 72, 47, 32, -26, -17, -50, 21,
+	-41, 59, -43, 39, -42, 23, -44, -16, 57, 58,
+	-56, 5, 6, 7, 53, 24, 40, 67, -11, -54,
+	-55, -12, 18, 65, -29, -28, -34, -35, 25, 41,
+	17, -13, -18, 67, 68, -11, -30, 11, 21, -30,
+	-30, 36, 36, -7, -4, 36, -31, 46, -31, -31,
+	-23, 73, 28, -26, -14, 13, 44, 12, 35, -11,
+	-41, 57, 58, 59, 60, 61, 62, 63, 64, 8,
+	9, 10, 15, 56, -9, 67, -42, -42, -41, 67,
+	67, -41, -35, -34, -38, 26, 38, -41, -44, -21,
+	-48, -41, -18, -22, -11, -47, 65, -7, -7, -7,
+	-7, -7, -32, 42, -7, -40, -39, 55, -50, -24,
+	-49, -15, -9, -23, -14, -41, -41, 40, 39, -42,
+	-42, -42, -42, -42, -42, -42, -42, -42, -42, -42,
+	-42, 15, -3, 68, 68, -25, -41, -41, 66, -36,
+	-53, 67, 5, 57, 58, -37, 48, 49, 73, -10,
+	14, 20, 68, 73, -41, -32, -41, -27, 30, -41,
+	73, -47, -47, -40, 40, 12, -42, 68, 73, 68,
+	13, -37, -41, 5, 5, -48, -11, 66, -45, 31,
+	17, -49, -27, -42, 12, -41, -52, -51, 33, 16,
+	52, 27, 51, 43, 68, -41, -25, -45, -42, 68,
 }
 var sqlDef = [...]int{
 
-	0, -2, 1, 2, -2, 29, 30, 31, 32, 0,
-	128, 0, 0, 129, 137, 14, 4, 0, 0, 0,
-	114, 114, 114, 0, 0, 0, 0, 125, 125, 125,
-	123, 44, 0, 37, 36, 39, 42, 56, 0, 62,
-	0, 63, 64, 65, 0, 0, 73, 83, 84, 85,
-	86, 87, 88, 0, -2, 92, 93, 0, 0, 0,
-	3, 13, 17, 18, 0, 0, 0, 106, 131, 0,
-	112, 113, 0, 0, 0, 0, 0, 108, 0, 120,
-	124, 121, 122, 48, 0, 0, 44, 40, 0, 0,
-	0, 0, 139, 57, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 82, 66, 67,
-	0, 0, 0, 0, 15, 16, 24, 27, 28, 20,
-	63, 6, 7, 12, 33, 105, 0, 134, 140, 0,
-	109, 110, 111, 115, 0, 117, 0, 118, 51, 47,
-	0, 38, 43, 45, 106, 106, 48, 41, 58, 59,
-	60, 0, 68, 69, 70, 71, 72, 74, 75, 76,
-	77, 78, 79, 0, 0, 107, 94, 0, 54, 0,
-	130, 0, 22, 0, 89, 0, 0, 21, 25, 26,
-	0, 9, 10, 11, 134, 104, 0, 0, 116, 119,
-	53, 0, 49, 0, 126, 127, 51, 61, 0, 0,
-	0, 95, 0, 0, 0, 90, 91, 8, 103, 0,
-	135, 132, 34, 0, 0, 46, 53, 80, 0, 55,
-	0, 97, 98, 99, 100, 101, 102, 19, 23, 133,
-	0, 52, 50, 35, 81, 96, 136,
+	0, -2, 1, 2, -2, 106, 30, 31, 32, 0,
+	128, 0, 0, 129, 137, 14, 4, 0, 29, 105,
+	0, 134, 140, 0, 0, 114, 114, 114, 0, 0,
+	0, 0, 125, 125, 125, 123, 44, 0, 37, 36,
+	39, 42, 56, 0, 62, 0, 63, 64, 0, 0,
+	72, 82, 83, 84, 85, 86, 87, 0, -2, 92,
+	93, 0, 0, 0, 3, 13, 17, 18, 0, 0,
+	0, 134, 104, 0, 106, 131, 0, 112, 113, 0,
+	0, 0, 0, 0, 108, 0, 120, 124, 121, 122,
+	48, 0, 0, 44, 40, 0, 0, 0, 0, 139,
+	57, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 81, 0, 65, 66, 0, 0,
+	0, 0, 15, 16, 24, 27, 28, 20, 63, 6,
+	7, 12, 103, 0, 135, 33, 0, 109, 110, 111,
+	115, 0, 117, 0, 118, 51, 47, 0, 38, 43,
+	45, 106, 106, 48, 41, 58, 59, 60, 0, 67,
+	68, 69, 70, 71, 73, 74, 75, 76, 77, 78,
+	0, 0, 0, 88, 94, 0, 54, 0, 130, 0,
+	22, 0, 89, 0, 0, 21, 25, 26, 0, 9,
+	10, 11, 133, 0, 0, 116, 119, 53, 0, 49,
+	0, 126, 127, 51, 61, 0, 0, 107, 0, 95,
+	0, 0, 0, 90, 91, 8, 136, 132, 34, 0,
+	0, 46, 53, 79, 0, 55, 0, 97, 98, 99,
+	100, 101, 102, 19, 23, 52, 50, 35, 80, 96,
 }
 var sqlTok1 = [...]int{
 
@@ -1064,32 +1059,35 @@ sqldefault:
 		{
 		}
 	case 29:
-		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
+		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
 //line sql.y:404
 		{
-			sqlVAL.union.val = sqlDollar[1].union.tableName()
+			sqlVAL.union.val = &tree.AliasedTable{
+				As:  sqlDollar[2].union.aliasClause(),
+				Tbl: sqlDollar[1].union.tableName(),
+			}
 		}
 	case 30:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql.y:405
+//line sql.y:409
 		{
 			sqlVAL.union.val = sqlDollar[1].union.joinStatement()
 		}
 	case 31:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql.y:406
+//line sql.y:410
 		{
 			sqlVAL.union.val = sqlDollar[1].union.unionStatement()
 		}
 	case 32:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql.y:407
+//line sql.y:411
 		{
 			sqlVAL.union.val = sqlDollar[1].union.simpleSelectStatement()
 		}
 	case 33:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql.y:408
+//line sql.y:412
 		{
 			sqlVAL.union.val = &tree.AliasedSelect{
 				As:  sqlDollar[4].union.aliasClause(),
@@ -1098,7 +1096,7 @@ sqldefault:
 		}
 	case 34:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql.y:416
+//line sql.y:420
 		{
 			sqlVAL.union.val = &tree.SelectClause{
 				Distinct: false,
@@ -1111,7 +1109,7 @@ sqldefault:
 		}
 	case 35:
 		sqlDollar = sqlS[sqlpt-7 : sqlpt+1]
-//line sql.y:427
+//line sql.y:431
 		{
 			sqlVAL.union.val = &tree.SelectClause{
 				Distinct: sqlDollar[2].union.bool(),
@@ -1124,13 +1122,13 @@ sqldefault:
 		}
 	case 36:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql.y:440
+//line sql.y:444
 		{
 			sqlVAL.union.val = true
 		}
 	case 37:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql.y:445
+//line sql.y:449
 		{
 			if sqlDollar[1].union.isNull() {
 				sqlVAL.union.val = tree.SelectExprs{}
@@ -1140,7 +1138,7 @@ sqldefault:
 		}
 	case 38:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql.y:453
+//line sql.y:457
 		{
 			if sqlDollar[3].union.isNull() {
 				sqlVAL.union.val = sqlDollar[1].union.selectExprs()
@@ -1150,428 +1148,428 @@ sqldefault:
 		}
 	case 39:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql.y:462
+//line sql.y:466
 		{
 			sqlVAL.union.val = &tree.SelectExpr{E: sqlDollar[1].union.exprStatement()}
 		}
 	case 40:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql.y:466
+//line sql.y:470
 		{
 			sqlVAL.union.val = &tree.SelectExpr{E: sqlDollar[1].union.exprStatement(), As: tree.Name(sqlDollar[2].str)}
 		}
 	case 41:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql.y:470
+//line sql.y:474
 		{
 			sqlVAL.union.val = &tree.SelectExpr{E: sqlDollar[1].union.exprStatement(), As: tree.Name(sqlDollar[3].str)}
 		}
 	case 42:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql.y:474
+//line sql.y:478
 		{
 			sqlVAL.union.val = nil
 		}
 	case 43:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql.y:481
+//line sql.y:485
 		{
 			sqlVAL.union.val = &tree.From{sqlDollar[2].union.tableStatements()}
 		}
 	case 44:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql.y:484
+//line sql.y:488
 		{
 			sqlVAL.union.val = nil
 		}
 	case 45:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql.y:487
+//line sql.y:491
 		{
 			sqlVAL.union.val = tree.TableStatements{sqlDollar[1].union.tableStatement()}
 		}
 	case 46:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql.y:491
+//line sql.y:495
 		{
 			sqlVAL.union.val = append(sqlDollar[1].union.tableStatements(), sqlDollar[3].union.tableStatement())
 		}
 	case 47:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql.y:498
+//line sql.y:502
 		{
 			sqlVAL.union.val = &tree.Where{Type: tree.AstWhere, E: sqlDollar[1].union.exprStatement()}
 		}
 	case 48:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql.y:501
+//line sql.y:505
 		{
 			sqlVAL.union.val = nil
 		}
 	case 49:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql.y:503
+//line sql.y:507
 		{
 			sqlVAL.union.val = sqlDollar[2].union.exprStatement()
 		}
 	case 50:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql.y:507
+//line sql.y:511
 		{
 			sqlVAL.union.val = &tree.GroupBy{sqlDollar[3].union.exprStatements()}
 		}
 	case 51:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql.y:508
+//line sql.y:512
 		{
 			sqlVAL.union.val = nil
 		}
 	case 52:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql.y:513
+//line sql.y:517
 		{
 			sqlVAL.union.val = &tree.Where{Type: tree.AstHaving, E: sqlDollar[2].union.exprStatement()}
 		}
 	case 53:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql.y:516
+//line sql.y:520
 		{
 			sqlVAL.union.val = nil
 		}
 	case 54:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql.y:520
+//line sql.y:524
 		{
 			sqlVAL.union.val = tree.ExprStatements{sqlDollar[1].union.exprStatement()}
 		}
 	case 55:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql.y:521
+//line sql.y:525
 		{
 			sqlVAL.union.val = append(sqlDollar[1].union.exprStatements(), sqlDollar[3].union.exprStatement())
 		}
 	case 56:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql.y:523
+//line sql.y:527
 		{
 			sqlVAL.union.val = sqlDollar[1].union.exprStatement()
 		}
 	case 57:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql.y:524
+//line sql.y:528
 		{
 			sqlVAL.union.val = &tree.NotExpr{E: sqlDollar[2].union.exprStatement()}
 		}
 	case 58:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql.y:525
+//line sql.y:529
 		{
 			sqlVAL.union.val = &tree.OrExpr{Left: sqlDollar[1].union.exprStatement(), Right: sqlDollar[3].union.exprStatement()}
 		}
 	case 59:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql.y:526
+//line sql.y:530
 		{
 			sqlVAL.union.val = &tree.AndExpr{Left: sqlDollar[1].union.exprStatement(), Right: sqlDollar[3].union.exprStatement()}
 		}
 	case 60:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql.y:527
+//line sql.y:531
 		{
 			sqlVAL.union.val = &tree.IsNullExpr{E: sqlDollar[1].union.exprStatement()}
 		}
 	case 61:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql.y:528
+//line sql.y:532
 		{
 			sqlVAL.union.val = &tree.IsNotNullExpr{E: sqlDollar[1].union.exprStatement()}
 		}
 	case 62:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql.y:529
+//line sql.y:533
 		{
 			sqlVAL.union.val = sqlDollar[1].union.exprStatement()
 		}
 	case 63:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql.y:531
+//line sql.y:535
 		{
 			sqlVAL.union.val = sqlDollar[1].union.exprStatement()
 		}
 	case 64:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql.y:532
-		{
-			sqlVAL.union.val = sqlDollar[1].union.subqueryStatement()
-		}
-	case 65:
-		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql.y:533
+//line sql.y:536
 		{
 			sqlVAL.union.val = sqlDollar[1].union.colunmNameList()
 		}
-	case 66:
+	case 65:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql.y:534
+//line sql.y:537
 		{
 			sqlVAL.union.val = sqlDollar[2].union.exprStatement()
 		}
-	case 67:
+	case 66:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql.y:535
+//line sql.y:538
 		{
 			sqlVAL.union.val = &tree.UnaryMinusExpr{E: sqlDollar[2].union.exprStatement()}
 		}
-	case 68:
-		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql.y:536
-		{
-			sqlVAL.union.val = &tree.PlusExpr{Left: sqlDollar[1].union.exprStatement(), Right: sqlDollar[3].union.exprStatement()}
-		}
-	case 69:
-		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql.y:537
-		{
-			sqlVAL.union.val = &tree.MinusExpr{Left: sqlDollar[1].union.exprStatement(), Right: sqlDollar[3].union.exprStatement()}
-		}
-	case 70:
-		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql.y:538
-		{
-			sqlVAL.union.val = &tree.MultExpr{Left: sqlDollar[1].union.exprStatement(), Right: sqlDollar[3].union.exprStatement()}
-		}
-	case 71:
+	case 67:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
 //line sql.y:539
 		{
-			sqlVAL.union.val = &tree.DivExpr{Left: sqlDollar[1].union.exprStatement(), Right: sqlDollar[3].union.exprStatement()}
+			sqlVAL.union.val = &tree.PlusExpr{Left: sqlDollar[1].union.exprStatement(), Right: sqlDollar[3].union.exprStatement()}
 		}
-	case 72:
+	case 68:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
 //line sql.y:540
 		{
-			sqlVAL.union.val = &tree.ModExpr{Left: sqlDollar[1].union.exprStatement(), Right: sqlDollar[3].union.exprStatement()}
+			sqlVAL.union.val = &tree.MinusExpr{Left: sqlDollar[1].union.exprStatement(), Right: sqlDollar[3].union.exprStatement()}
 		}
-	case 73:
-		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
+	case 69:
+		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
 //line sql.y:541
 		{
-			sqlVAL.union.val = sqlDollar[1].union.funcStatement()
+			sqlVAL.union.val = &tree.MultExpr{Left: sqlDollar[1].union.exprStatement(), Right: sqlDollar[3].union.exprStatement()}
 		}
-	case 74:
+	case 70:
+		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
+//line sql.y:542
+		{
+			sqlVAL.union.val = &tree.DivExpr{Left: sqlDollar[1].union.exprStatement(), Right: sqlDollar[3].union.exprStatement()}
+		}
+	case 71:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
 //line sql.y:543
 		{
-			sqlVAL.union.val = &tree.LtExpr{Left: sqlDollar[1].union.exprStatement(), Right: sqlDollar[3].union.exprStatement()}
+			sqlVAL.union.val = &tree.ModExpr{Left: sqlDollar[1].union.exprStatement(), Right: sqlDollar[3].union.exprStatement()}
 		}
-	case 75:
-		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
+	case 72:
+		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
 //line sql.y:544
 		{
-			sqlVAL.union.val = &tree.GtExpr{Left: sqlDollar[1].union.exprStatement(), Right: sqlDollar[3].union.exprStatement()}
+			sqlVAL.union.val = sqlDollar[1].union.funcStatement()
 		}
-	case 76:
-		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql.y:545
-		{
-			sqlVAL.union.val = &tree.EqExpr{Left: sqlDollar[1].union.exprStatement(), Right: sqlDollar[3].union.exprStatement()}
-		}
-	case 77:
+	case 73:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
 //line sql.y:546
 		{
-			sqlVAL.union.val = &tree.LeExpr{Left: sqlDollar[1].union.exprStatement(), Right: sqlDollar[3].union.exprStatement()}
+			sqlVAL.union.val = &tree.LtExpr{Left: sqlDollar[1].union.exprStatement(), Right: sqlDollar[3].union.exprStatement()}
 		}
-	case 78:
+	case 74:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
 //line sql.y:547
 		{
-			sqlVAL.union.val = &tree.GeExpr{Left: sqlDollar[1].union.exprStatement(), Right: sqlDollar[3].union.exprStatement()}
+			sqlVAL.union.val = &tree.GtExpr{Left: sqlDollar[1].union.exprStatement(), Right: sqlDollar[3].union.exprStatement()}
 		}
-	case 79:
+	case 75:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
 //line sql.y:548
 		{
+			sqlVAL.union.val = &tree.EqExpr{Left: sqlDollar[1].union.exprStatement(), Right: sqlDollar[3].union.exprStatement()}
+		}
+	case 76:
+		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
+//line sql.y:549
+		{
+			sqlVAL.union.val = &tree.LeExpr{Left: sqlDollar[1].union.exprStatement(), Right: sqlDollar[3].union.exprStatement()}
+		}
+	case 77:
+		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
+//line sql.y:550
+		{
+			sqlVAL.union.val = &tree.GeExpr{Left: sqlDollar[1].union.exprStatement(), Right: sqlDollar[3].union.exprStatement()}
+		}
+	case 78:
+		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
+//line sql.y:551
+		{
 			sqlVAL.union.val = &tree.NeExpr{Left: sqlDollar[1].union.exprStatement(), Right: sqlDollar[3].union.exprStatement()}
 		}
-	case 80:
+	case 79:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql.y:549
+//line sql.y:552
 		{
 			sqlVAL.union.val = &tree.BetweenExpr{E: sqlDollar[1].union.exprStatement(), From: sqlDollar[3].union.exprStatement(), To: sqlDollar[5].union.exprStatement()}
 		}
-	case 81:
+	case 80:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql.y:550
+//line sql.y:553
 		{
 			sqlVAL.union.val = &tree.NotBetweenExpr{E: sqlDollar[1].union.exprStatement(), From: sqlDollar[4].union.exprStatement(), To: sqlDollar[6].union.exprStatement()}
 		}
-	case 82:
+	case 81:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql.y:551
+//line sql.y:554
 		{
 			sqlVAL.union.val = sqlDollar[2].union.subqueryStatement()
 			sqlVAL.union.val.(*tree.Subquery).Exists = true
 		}
+	case 82:
+		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
+//line sql.y:559
+		{
+			sqlVAL.union.val = sqlDollar[1].union.valueStatement()
+		}
 	case 83:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql.y:556
+//line sql.y:560
 		{
 			sqlVAL.union.val = sqlDollar[1].union.valueStatement()
 		}
 	case 84:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql.y:557
+//line sql.y:561
 		{
 			sqlVAL.union.val = sqlDollar[1].union.valueStatement()
 		}
 	case 85:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql.y:558
-		{
-			sqlVAL.union.val = sqlDollar[1].union.valueStatement()
-		}
-	case 86:
-		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql.y:559
+//line sql.y:562
 		{
 			sqlVAL.union.val = &tree.Value{&value.ConstTrue}
 		}
-	case 87:
+	case 86:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql.y:560
+//line sql.y:563
 		{
 			sqlVAL.union.val = &tree.Value{&value.ConstFalse}
 		}
-	case 88:
+	case 87:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql.y:561
+//line sql.y:564
 		{
 			sqlVAL.union.val = &tree.Value{&value.ConstNull}
 		}
+	case 88:
+		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
+//line sql.y:565
+		{
+			sqlVAL.union.val = sqlDollar[2].union.exprStatement()
+		}
 	case 89:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql.y:563
+//line sql.y:567
 		{
 			sqlVAL.union.val = sqlDollar[1].union.valueStatement()
 		}
 	case 90:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql.y:564
+//line sql.y:568
 		{
 			sqlVAL.union.val = sqlDollar[2].union.valueStatement()
 		}
 	case 91:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql.y:565
+//line sql.y:569
 		{
 			sqlVAL.union.val = sqlDollar[2].union.setNegative()
 		}
 	case 92:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql.y:570
+//line sql.y:574
 		{
 			sqlVAL.union.val = sqlDollar[1].union.funcStatement()
 		}
 	case 93:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql.y:574
+//line sql.y:578
 		{
 			sqlVAL.union.val = sqlDollar[1].union.funcStatement()
 		}
 	case 94:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql.y:579
+//line sql.y:583
 		{
 			sqlVAL.union.val = &tree.FuncExpr{Name: sqlDollar[1].str}
 		}
 	case 95:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql.y:583
+//line sql.y:587
 		{
 			sqlVAL.union.val = &tree.FuncExpr{Name: sqlDollar[1].str, Es: sqlDollar[3].union.exprStatements()}
 		}
 	case 96:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql.y:588
+//line sql.y:592
 		{
 			sqlVAL.union.val = &tree.FuncExpr{Name: "cast", Es: tree.ExprStatements{sqlDollar[3].union.exprStatement(), sqlDollar[5].union.exprStatement()}}
 		}
 	case 97:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql.y:592
+//line sql.y:596
 		{
 			sqlVAL.union.val = sqlDollar[1].union.exprStatement()
 		}
 	case 98:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql.y:594
+//line sql.y:598
 		{
 			sqlVAL.union.val = &tree.Value{value.NewString("int")}
 		}
 	case 99:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql.y:595
+//line sql.y:599
 		{
 			sqlVAL.union.val = &tree.Value{value.NewString("bool")}
 		}
 	case 100:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql.y:596
+//line sql.y:600
 		{
 			sqlVAL.union.val = &tree.Value{value.NewString("time")}
 		}
 	case 101:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql.y:597
+//line sql.y:601
 		{
 			sqlVAL.union.val = &tree.Value{value.NewString("float")}
 		}
 	case 102:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql.y:598
+//line sql.y:602
 		{
 			sqlVAL.union.val = &tree.Value{value.NewString("string")}
 		}
 	case 103:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql.y:603
+//line sql.y:607
 		{
 			sqlVAL.union.val = &tree.AliasClause{Alias: tree.Name(sqlDollar[2].str), Cols: sqlDollar[3].union.nameList()}
 		}
 	case 104:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql.y:607
+//line sql.y:611
 		{
 			sqlVAL.union.val = &tree.AliasClause{Alias: tree.Name(sqlDollar[1].str), Cols: sqlDollar[2].union.nameList()}
 		}
 	case 105:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql.y:611
+//line sql.y:615
 		{
 			sqlVAL.union.val = sqlDollar[1].union.aliasClause()
 		}
 	case 106:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql.y:612
+//line sql.y:616
 		{
 			sqlVAL.union.val = nil
 		}
 	case 107:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql.y:616
+//line sql.y:620
 		{
 			sqlVAL.union.val = &tree.Subquery{Select: sqlDollar[2].union.selectStatement(), Exists: false}
 		}
 	case 108:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql.y:619
+//line sql.y:623
 		{
 			sqlVAL.union.val = sqlDollar[1].union.relationStatement()
 		}
 	case 109:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql.y:624
+//line sql.y:628
 		{
 			sqlVAL.union.val = &tree.UnionClause{
 				Type:  tree.UnionOp,
@@ -1582,7 +1580,7 @@ sqldefault:
 		}
 	case 110:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql.y:633
+//line sql.y:637
 		{
 			sqlVAL.union.val = &tree.UnionClause{
 				Type:  tree.IntersectOp,
@@ -1593,7 +1591,7 @@ sqldefault:
 		}
 	case 111:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql.y:642
+//line sql.y:646
 		{
 			sqlVAL.union.val = &tree.UnionClause{
 				Type:  tree.ExceptOp,
@@ -1604,25 +1602,25 @@ sqldefault:
 		}
 	case 112:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql.y:651
+//line sql.y:655
 		{
 			sqlVAL.union.val = true
 		}
 	case 113:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql.y:652
+//line sql.y:656
 		{
 			sqlVAL.union.val = false
 		}
 	case 114:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql.y:653
+//line sql.y:657
 		{
 			sqlVAL.union.val = false
 		}
 	case 115:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql.y:658
+//line sql.y:662
 		{
 			sqlVAL.union.val = &tree.JoinClause{
 				Type:  tree.CrossOp,
@@ -1633,7 +1631,7 @@ sqldefault:
 		}
 	case 116:
 		sqlDollar = sqlS[sqlpt-5 : sqlpt+1]
-//line sql.y:667
+//line sql.y:671
 		{
 			sqlVAL.union.val = &tree.JoinClause{
 				Type:  sqlDollar[2].union.joinType(),
@@ -1644,7 +1642,7 @@ sqldefault:
 		}
 	case 117:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql.y:676
+//line sql.y:680
 		{
 			sqlVAL.union.val = &tree.JoinClause{
 				Type:  tree.InnerOp,
@@ -1655,7 +1653,7 @@ sqldefault:
 		}
 	case 118:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql.y:685
+//line sql.y:689
 		{
 			sqlVAL.union.val = &tree.JoinClause{
 				Type:  tree.NaturalOp,
@@ -1666,47 +1664,47 @@ sqldefault:
 		}
 	case 119:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql.y:694
+//line sql.y:698
 		{
 			sqlVAL.union.val = &tree.OnJoinCond{E: sqlDollar[2].union.exprStatement()}
 		}
 	case 120:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql.y:696
+//line sql.y:700
 		{
 			sqlVAL.union.val = tree.FullOp
 		}
 	case 121:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql.y:697
+//line sql.y:701
 		{
 			sqlVAL.union.val = tree.LeftOp
 		}
 	case 122:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql.y:698
+//line sql.y:702
 		{
 			sqlVAL.union.val = tree.RightOp
 		}
 	case 123:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql.y:699
+//line sql.y:703
 		{
 			sqlVAL.union.val = tree.InnerOp
 		}
 	case 124:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql.y:701
+//line sql.y:705
 		{
 		}
 	case 125:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql.y:702
+//line sql.y:706
 		{
 		}
 	case 126:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql.y:707
+//line sql.y:711
 		{
 			sqlVAL.union.val = &tree.AliasedTable{
 				Tbl: sqlDollar[1].union.tableName(),
@@ -1715,7 +1713,7 @@ sqldefault:
 		}
 	case 127:
 		sqlDollar = sqlS[sqlpt-2 : sqlpt+1]
-//line sql.y:714
+//line sql.y:718
 		{
 			sqlVAL.union.val = &tree.AliasedTable{
 				Tbl: sqlDollar[1].union.subqueryStatement(),
@@ -1724,55 +1722,55 @@ sqldefault:
 		}
 	case 128:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql.y:724
+//line sql.y:728
 		{
 			sqlVAL.union.val = &tree.TableName{sqlDollar[1].union.colunmNameList()}
 		}
 	case 129:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql.y:731
+//line sql.y:735
 		{
 			sqlVAL.union.val = tree.ColunmNameList{tree.ColunmName{Path: tree.Name(sqlDollar[1].str)}}
 		}
 	case 130:
 		sqlDollar = sqlS[sqlpt-4 : sqlpt+1]
-//line sql.y:735
+//line sql.y:739
 		{
 			sqlVAL.union.val = tree.ColunmNameList{tree.ColunmName{Path: tree.Name(sqlDollar[1].str), Index: sqlDollar[3].union.exprStatement()}}
 		}
 	case 131:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql.y:739
+//line sql.y:743
 		{
 			sqlVAL.union.val = append(sqlDollar[1].union.colunmNameList(), tree.ColunmName{Path: tree.Name(sqlDollar[3].str)})
 		}
 	case 132:
 		sqlDollar = sqlS[sqlpt-6 : sqlpt+1]
-//line sql.y:743
+//line sql.y:747
 		{
 			sqlVAL.union.val = append(sqlDollar[1].union.colunmNameList(), tree.ColunmName{Path: tree.Name(sqlDollar[3].str), Index: sqlDollar[5].union.exprStatement()})
 		}
 	case 133:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql.y:748
+//line sql.y:752
 		{
 			sqlVAL.union.val = sqlDollar[2].union.nameList()
 		}
 	case 134:
 		sqlDollar = sqlS[sqlpt-0 : sqlpt+1]
-//line sql.y:749
+//line sql.y:753
 		{
 			sqlVAL.union.val = tree.NameList(nil)
 		}
 	case 135:
 		sqlDollar = sqlS[sqlpt-1 : sqlpt+1]
-//line sql.y:752
+//line sql.y:756
 		{
 			sqlVAL.union.val = tree.NameList{tree.Name(sqlDollar[1].str)}
 		}
 	case 136:
 		sqlDollar = sqlS[sqlpt-3 : sqlpt+1]
-//line sql.y:756
+//line sql.y:760
 		{
 			sqlVAL.union.val = append(sqlDollar[1].union.nameList(), tree.Name(sqlDollar[3].str))
 		}

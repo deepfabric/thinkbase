@@ -57,49 +57,10 @@ func (n *nub) AttributeList() ([]string, error) {
 	return n.prev.AttributeList()
 }
 
-func (n *nub) GetTuples(limit int) (value.Array, error) {
-	var a value.Array
-
-	if !n.isCheck {
-		if err := n.check(n.attrs); err != nil {
-			return nil, err
-		}
-		if dict, err := n.c.NewDictionary(); err != nil {
-			return nil, err
-		} else {
-			n.dict = dict
-		}
-		n.isCheck = true
-	}
-	attrs, err := n.prev.AttributeList()
-	if err != nil {
-		n.dict.Destroy()
-		return nil, err
-	}
-	ts, err := n.prev.GetTuples(limit)
-	if err != nil {
-		n.dict.Destroy()
-		return nil, err
-	}
-	if len(ts) == 0 {
-		n.dict.Destroy()
-		return ts, nil
-	}
-	is := util.Indexs(n.attrs, attrs)
-	for i, j := 0, len(ts); i < j; i++ {
-		if ok, _, err := n.dict.GetOrSet(util.SubTuple(ts[i].(value.Array), is), nil); err != nil {
-			n.dict.Destroy()
-			return nil, err
-		} else if !ok {
-			a = append(a, ts[i])
-		}
-	}
-	return a, nil
-}
-
 func (n *nub) GetAttributes(attrs []string, limit int) (map[string]value.Array, error) {
 	var as [][]string
 
+	attrs = util.MergeAttributes(attrs, []string{})
 	as = append(as, util.MergeAttributes(attrs, n.attrs))
 	if !n.isCheck {
 		if err := n.check(as[0]); err != nil {
@@ -112,24 +73,29 @@ func (n *nub) GetAttributes(attrs []string, limit int) (map[string]value.Array, 
 		}
 		n.isCheck = true
 	}
-	mp, err := n.prev.GetAttributes(as[0], limit)
-	if err != nil {
-		n.dict.Destroy()
-		return nil, err
-	}
-	if len(mp) == 0 || len(mp[attrs[0]]) == 0 {
-		n.dict.Destroy()
-		return mp, nil
-	}
 	rq := make(map[string]value.Array)
-	for i, j := 0, len(mp[attrs[0]]); i < j; i++ {
-		if ok, _, err := n.dict.GetOrSet(util.Map2Tuple(mp, attrs, i), nil); err != nil {
+	for {
+		mp, err := n.prev.GetAttributes(as[0], limit)
+		if err != nil {
 			n.dict.Destroy()
 			return nil, err
-		} else if !ok {
-			for _, attr := range attrs {
-				rq[attr] = append(rq[attr], mp[attr][i])
+		}
+		if len(mp) == 0 || len(mp[attrs[0]]) == 0 {
+			n.dict.Destroy()
+			return nil, nil
+		}
+		for i, j := 0, len(mp[attrs[0]]); i < j; i++ {
+			if ok, err := n.dict.GetOrSet(util.Map2Tuple(mp, n.attrs, i)); err != nil {
+				n.dict.Destroy()
+				return nil, err
+			} else if !ok {
+				for _, attr := range attrs {
+					rq[attr] = append(rq[attr], mp[attr][i])
+				}
 			}
+		}
+		if len(rq) > 0 {
+			break
 		}
 	}
 	return rq, nil

@@ -7,7 +7,7 @@ import (
 
 	"github.com/deepfabric/thinkbase/pkg/vm/container/relation"
 	"github.com/deepfabric/thinkbase/pkg/vm/container/relation/mem"
-	"github.com/deepfabric/thinkbase/pkg/vm/context/testContext"
+	"github.com/deepfabric/thinkbase/pkg/vm/context"
 	"github.com/deepfabric/thinkbase/pkg/vm/extend"
 	"github.com/deepfabric/thinkbase/pkg/vm/extend/overload"
 	"github.com/deepfabric/thinkbase/pkg/vm/op"
@@ -21,10 +21,11 @@ func TestOrder(t *testing.T) {
 		r := newRelation()
 		fmt.Printf("%s\n", r.DataString())
 	}
+	c := context.New(context.NewConfig("tom"), nil, nil)
 	{
 		var es []*projection.Extend
 
-		prev := newOrder()
+		prev := newOrder(c)
 		es = append(es, &projection.Extend{
 			E: &extend.Attribute{"a"},
 		})
@@ -35,7 +36,7 @@ func TestOrder(t *testing.T) {
 				E:  &extend.Attribute{"b"},
 			},
 		})
-		n := projection.New(prev, es, testContext.New(1, 1, 1024*1024*1024, 1024*1024*1024*1024))
+		n := projection.New(prev, es, c)
 		{
 			fmt.Printf("%s\n", n)
 			fmt.Printf("\tisordered %v\n", n.IsOrdered())
@@ -44,44 +45,9 @@ func TestOrder(t *testing.T) {
 			attrs, err := n.AttributeList()
 			fmt.Printf("%v, %v\n", attrs, err)
 		}
+		bs := c.BlockSize()
 		for {
-			ts, err := n.GetTuples(1024 * 1024)
-			if err != nil {
-				log.Fatal(err)
-			}
-			if len(ts) == 0 {
-				break
-			}
-			for i, t := range ts {
-				fmt.Printf("[%v] = %v\n", i, t)
-			}
-		}
-	}
-	{
-		var es []*projection.Extend
-
-		prev := newOrder()
-		es = append(es, &projection.Extend{
-			E: &extend.Attribute{"a"},
-		})
-		es = append(es, &projection.Extend{
-			Alias: "A",
-			E: &extend.UnaryExtend{
-				Op: overload.Typeof,
-				E:  &extend.Attribute{"b"},
-			},
-		})
-		n := projection.New(prev, es, testContext.New(1, 1, 1024*1024*1024, 1024*1024*1024*1024))
-		{
-			fmt.Printf("%s\n", n)
-			fmt.Printf("\tisordered %v\n", n.IsOrdered())
-		}
-		{
-			attrs, err := n.AttributeList()
-			fmt.Printf("%v, %v\n", attrs, err)
-		}
-		for {
-			mp, err := n.GetAttributes([]string{"a", "A"}, 1024*1024)
+			mp, err := n.GetAttributes([]string{"a", "A"}, bs)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -94,18 +60,18 @@ func TestOrder(t *testing.T) {
 	}
 }
 
-func newOrder() op.OP {
-	return New(newRestrict(), []bool{true, false}, []string{"a", "b"}, testContext.New(1, 1, 1024*1024*1024, 1024*1024*1024*1024))
+func newOrder(c context.Context) op.OP {
+	return New(newRestrict(c), []bool{false}, []string{"a"}, c)
 }
 
-func newRestrict() op.OP {
+func newRestrict(c context.Context) op.OP {
 	r := newRelation()
 	e := &extend.BinaryExtend{
 		Op:    overload.GT,
 		Left:  &extend.Attribute{"a"},
 		Right: value.NewInt(1),
 	}
-	return restrict.New(r, e, testContext.New(1, 1, 1024*1024*1024, 1024*1024*1024*1024))
+	return restrict.New(r, e, c)
 }
 
 func newRelation() relation.Relation {
@@ -138,15 +104,15 @@ func newRelation() relation.Relation {
 	{
 		var t value.Array
 
+		t = append(t, value.NewInt(10))
 		t = append(t, value.NewFloat(3.1))
-		t = append(t, value.NewInt(3))
 		r.AddTuples([]value.Array{t})
 	}
 	{
 		var t value.Array
 
+		t = append(t, value.NewInt(5))
 		t = append(t, value.NewFloat(3.1))
-		t = append(t, value.NewInt(3))
 		r.AddTuples([]value.Array{t})
 	}
 	{

@@ -8,14 +8,34 @@ const (
 	Min
 	Sum
 	Count
+	AvgI
+	MaxI
+	MinI
+	SumI
+	CountI
+	AvgIt
+	MaxIt
+	MinIt
+	SumIt
+	CountIt
 )
 
 var AggName = [...]string{
-	Avg:   "avg",
-	Max:   "max",
-	Min:   "min",
-	Sum:   "sum",
-	Count: "count",
+	Avg:     "avg",
+	Max:     "max",
+	Min:     "min",
+	Sum:     "sum",
+	Count:   "count",
+	AvgI:    "avgi",
+	MaxI:    "maxi",
+	MinI:    "mini",
+	SumI:    "sumi",
+	CountI:  "counti",
+	AvgIt:   "avgit",
+	MaxIt:   "maxit",
+	MinIt:   "minit",
+	SumIt:   "sumit",
+	CountIt: "countit",
 }
 
 type Aggregation interface {

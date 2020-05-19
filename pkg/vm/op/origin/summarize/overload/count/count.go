@@ -5,8 +5,8 @@ import (
 	"github.com/deepfabric/thinkbase/pkg/vm/value"
 )
 
-func New() *count {
-	return &count{}
+func New(typ int32) *count {
+	return &count{typ: typ}
 }
 
 func (c *count) Reset() {
@@ -15,8 +15,15 @@ func (c *count) Reset() {
 
 func (c *count) Fill(a value.Array) error { // skip NULL
 	for _, v := range a {
-		if v.ResolvedType().Oid != types.T_null {
-			c.cnt++
+		switch c.typ {
+		case types.T_any:
+			if v.ResolvedType().Oid != types.T_null {
+				c.cnt++
+			}
+		default:
+			if v.ResolvedType().Oid == c.typ {
+				c.cnt++
+			}
 		}
 	}
 	return nil

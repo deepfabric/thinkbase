@@ -15,6 +15,10 @@ func New(prev op.OP, e extend.Extend, c context.Context) *restrict {
 	return &restrict{false, prev, e, c}
 }
 
+func (n *restrict) Extend() extend.Extend {
+	return n.e
+}
+
 func (n *restrict) Size() float64 {
 	return n.c.RestrictSize(n.prev, n.e)
 }
@@ -49,30 +53,10 @@ func (n *restrict) AttributeList() ([]string, error) {
 	return n.prev.AttributeList()
 }
 
-func (n *restrict) GetTuples(limit int) (value.Array, error) {
-	var a value.Array
-
-	attrs, err := n.prev.AttributeList()
-	if err != nil {
-		return nil, err
-	}
-	ts, err := n.prev.GetTuples(limit)
-	if err != nil {
-		return nil, err
-	}
-	for i, j := 0, len(ts); i < j; i++ {
-		if ok, err := n.e.Eval(util.Tuple2Map(ts[i].(value.Array), attrs)); err != nil {
-			return nil, err
-		} else if value.MustBeBool(ok) {
-			a = append(a, ts[i])
-		}
-	}
-	return a, nil
-}
-
 func (n *restrict) GetAttributes(attrs []string, limit int) (map[string]value.Array, error) {
 	var as [][]string
 
+	attrs = util.MergeAttributes(attrs, []string{})
 	as = append(as, n.e.Attributes()) // extend's Attributes
 	as = append(as, util.MergeAttributes(attrs, as[0]))
 	if !n.isCheck {

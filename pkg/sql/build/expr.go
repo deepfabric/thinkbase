@@ -9,6 +9,7 @@ import (
 	"github.com/deepfabric/thinkbase/pkg/vm/extend"
 	"github.com/deepfabric/thinkbase/pkg/vm/extend/overload"
 	"github.com/deepfabric/thinkbase/pkg/vm/op/origin/summarize"
+	"github.com/deepfabric/thinkbase/pkg/vm/types"
 	"github.com/deepfabric/thinkbase/pkg/vm/value"
 )
 
@@ -265,9 +266,38 @@ func (b *build) buildExprFunc(n *tree.FuncExpr, typ int) (extend.Extend, error) 
 		if err != nil {
 			return nil, err
 		}
+		aTyp := types.T_any
 		pattr := fmt.Sprintf("%s(%s)", n.Name, attr)
+		if isIndexAggFunc(op) {
+			if len(n.Es) < 2 {
+				return nil, fmt.Errorf("not enough arguments in call to '%s'", n.Name)
+			}
+			e, ok := n.Es[1].(*tree.Value)
+			if !ok {
+				return nil, fmt.Errorf("'%s' is not type name", n.Es[1])
+			}
+			typName, err := value.GetString(e.E)
+			if err != nil {
+				return nil, fmt.Errorf("'%s' is not type name: %v", n.Es[1], err)
+			}
+			switch strings.ToLower(string(typName)) {
+			case "int":
+				aTyp = types.T_int
+			case "null":
+				aTyp = types.T_null
+			case "bool":
+				aTyp = types.T_bool
+			case "time":
+				aTyp = types.T_time
+			case "float":
+				aTyp = types.T_float
+			case "string":
+				aTyp = types.T_string
+			}
+		}
 		b.addSummarize(&summarize.Extend{
 			Op:    op,
+			Typ:   aTyp,
 			Name:  attr,
 			Alias: pattr,
 		})
@@ -403,15 +433,20 @@ func (b *build) buildExprIntConstant(n tree.ExprStatement) (int64, error) {
 }
 
 var ExtendFuncs map[string]int = map[string]int{
-	"abs":    overload.Abs,
-	"ceil":   overload.Ceil,
-	"sign":   overload.Sign,
-	"floor":  overload.Floor,
-	"round":  overload.Round,
-	"lower":  overload.Lower,
-	"upper":  overload.Upper,
-	"length": overload.Length,
-	"typeof": overload.Typeof,
-	"concat": overload.Concat,
-	"cast":   overload.Typecast,
+	"abs":           overload.Abs,
+	"ceil":          overload.Ceil,
+	"sign":          overload.Sign,
+	"floor":         overload.Floor,
+	"round":         overload.Round,
+	"lower":         overload.Lower,
+	"upper":         overload.Upper,
+	"length":        overload.Length,
+	"typeof":        overload.Typeof,
+	"concat":        overload.Concat,
+	"cast":          overload.Typecast,
+	"like":          overload.Like,
+	"index":         overload.Index,
+	"indextry":      overload.IndexTry,
+	"groupindex":    overload.Group,
+	"groupindextry": overload.GroupTry,
 }

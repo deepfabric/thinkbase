@@ -13,20 +13,16 @@ func (b *build) buildRelation(n tree.RelationStatement) (op.OP, error) {
 		b.ts = b.ts[1:]
 	}()
 	switch t := n.(type) {
-	case *tree.TableName:
-		tbl, err := b.buildTableName(t)
-		if err != nil {
-			return nil, err
-		}
-		return tbl.r, nil
+	case *tree.AliasedTable:
+		return nil, fmt.Errorf("'%s' not support now", n)
 	case *tree.JoinClause:
-		return b.buildJoin(t)
+		return nil, fmt.Errorf("'%s' not support now", n)
 	case *tree.UnionClause:
-		return b.buildUnion(t)
+		return nil, fmt.Errorf("'%s' not support now", n)
 	case *tree.SelectClause:
 		return b.buildSelect(t)
 	case *tree.AliasedSelect:
-		return b.buildAliasedSelect(t)
+		return nil, fmt.Errorf("'%s' not support now", n)
 	default:
 		return nil, fmt.Errorf("unknown relation statement '%s'", n)
 	}

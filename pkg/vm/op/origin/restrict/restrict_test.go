@@ -7,7 +7,7 @@ import (
 
 	"github.com/deepfabric/thinkbase/pkg/vm/container/relation"
 	"github.com/deepfabric/thinkbase/pkg/vm/container/relation/mem"
-	"github.com/deepfabric/thinkbase/pkg/vm/context/testContext"
+	"github.com/deepfabric/thinkbase/pkg/vm/context"
 	"github.com/deepfabric/thinkbase/pkg/vm/extend"
 	"github.com/deepfabric/thinkbase/pkg/vm/extend/overload"
 	"github.com/deepfabric/thinkbase/pkg/vm/value"
@@ -18,60 +18,32 @@ func TestRestrict(t *testing.T) {
 		r := newRelation()
 		fmt.Printf("%s\n", r.DataString())
 	}
+	r := newRelation()
+	e := &extend.BinaryExtend{
+		Op:    overload.GT,
+		Left:  &extend.Attribute{"a"},
+		Right: value.NewInt(1),
+	}
+	c := context.New(context.NewConfig("tom"), nil, nil)
+	n := New(r, e, c)
 	{
-		r := newRelation()
-		e := &extend.BinaryExtend{
-			Op:    overload.GT,
-			Left:  &extend.Attribute{"a"},
-			Right: value.NewInt(1),
-		}
-		n := New(r, e, testContext.New(1, 1, 1024*1024*1024, 1024*1024*1024*1024))
-		{
-			fmt.Printf("%s\n", n)
-		}
-		{
-			attrs, err := n.AttributeList()
-			fmt.Printf("%v, %v\n", attrs, err)
-		}
-		for {
-			ts, err := n.GetTuples(1024 * 1024)
-			if err != nil {
-				log.Fatal(err)
-			}
-			if len(ts) == 0 {
-				break
-			}
-			for i, t := range ts {
-				fmt.Printf("[%v] = %v\n", i, t)
-			}
-		}
+		fmt.Printf("%s\n", n)
 	}
 	{
-		r := newRelation()
-		e := &extend.BinaryExtend{
-			Op:    overload.GT,
-			Left:  &extend.Attribute{"a"},
-			Right: value.NewInt(1),
+		attrs, err := n.AttributeList()
+		fmt.Printf("%v, %v\n", attrs, err)
+	}
+	bs := n.c.BlockSize()
+	for {
+		mp, err := n.GetAttributes([]string{"a", "b"}, bs)
+		if err != nil {
+			log.Fatal(err)
 		}
-		n := New(r, e, testContext.New(1, 1, 1024*1024*1024, 1024*1024*1024*1024))
-		{
-			fmt.Printf("%s\n", n)
+		if len(mp["a"]) == 0 {
+			break
 		}
-		{
-			attrs, err := n.AttributeList()
-			fmt.Printf("%v, %v\n", attrs, err)
-		}
-		for {
-			mp, err := n.GetAttributes([]string{"a", "b"}, 1024*1024)
-			if err != nil {
-				log.Fatal(err)
-			}
-			if len(mp["a"]) == 0 {
-				break
-			}
-			fmt.Printf("a = %v\n", mp["a"])
-			fmt.Printf("b = %v\n", mp["b"])
-		}
+		fmt.Printf("a = %v\n", mp["a"])
+		fmt.Printf("b = %v\n", mp["b"])
 	}
 }
 

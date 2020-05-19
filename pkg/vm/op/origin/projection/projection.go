@@ -81,40 +81,10 @@ func (n *projection) AttributeList() ([]string, error) {
 	return aliasList(n.es), nil
 }
 
-func (n *projection) GetTuples(limit int) (value.Array, error) {
-	var a value.Array
-
-	attrs := attributeList(n.es)
-	if !n.isCheck {
-		if err := n.check(attrs); err != nil {
-			return nil, err
-		}
-		n.isCheck = true
-	}
-	mp, err := n.prev.GetAttributes(attrs, limit)
-	if err != nil {
-		return nil, err
-	}
-	if len(mp) == 0 || len(mp[attrs[0]]) == 0 {
-		return nil, nil
-	}
-	for i, j := 0, len(mp[attrs[0]]); i < j; i++ {
-		var t value.Array
-		for _, e := range n.es {
-			v, err := e.E.Eval(util.SubMap(mp, attrs, i))
-			if err != nil {
-				return nil, err
-			}
-			t = append(t, v)
-		}
-		a = append(a, t)
-	}
-	return a, nil
-}
-
 func (n *projection) GetAttributes(attrs []string, limit int) (map[string]value.Array, error) {
 	var as [][]string
 
+	attrs = util.MergeAttributes(attrs, []string{})
 	as = append(as, attributeList(n.es)) // extend's Attributes
 	if !n.isCheck {
 		if err := n.check(as[0]); err != nil {

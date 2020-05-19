@@ -1,6 +1,9 @@
 package relation
 
 import (
+	"github.com/deepfabric/thinkbase/pkg/storage/ranging"
+	"github.com/deepfabric/thinkbase/pkg/storage/ranging/roaring"
+	"github.com/deepfabric/thinkbase/pkg/vm/container/mdictionary"
 	"github.com/deepfabric/thinkbase/pkg/vm/op"
 	"github.com/deepfabric/thinkbase/pkg/vm/value"
 )
@@ -19,14 +22,40 @@ type Relation interface {
 
 	IsOrdered() bool
 
-	Split(int) ([]Relation, error)
+	DataString() string            // used for memory table
+	AddTuples([]value.Array) error // used for memory table
 
+	Id() string
+	Rows() uint64
 	String() string
-	DataString() string
 	Name() (string, error)
 	AttributeList() ([]string, error)
-	GetTuples(int) (value.Array, error)
+	AddTuplesByJson([]map[string]interface{}) error
 	GetAttributes([]string, int) (map[string]value.Array, error)
+	GetAttributesByIndex([]string, []uint64, int) (map[string]value.Array, error)
 
-	AddTuples([]value.Array) error
+	StrMin(string, uint64, *roaring.Bitmap) (string, error)
+	StrMax(string, uint64, *roaring.Bitmap) (string, error)
+
+	StrCount(string, uint64, *roaring.Bitmap) (uint64, error)
+	NullCount(string, uint64, *roaring.Bitmap) (uint64, error)
+	BoolCount(string, uint64, *roaring.Bitmap) (uint64, error)
+
+	IntRangeBitmap(string, uint64) (*ranging.Ranging, error)
+	TimeRangeBitmap(string, uint64) (*ranging.Ranging, error)
+	FloatRangeBitmap(string, uint64) (*ranging.Ranging, error)
+
+	IntBitmapFold(string, uint64, mdictionary.Mdictionary) error
+	NullBitmapFold(string, uint64, mdictionary.Mdictionary) error
+	BoolBitmapFold(string, uint64, mdictionary.Mdictionary) error
+	TimeBitmapFold(string, uint64, mdictionary.Mdictionary) error
+	FloatBitmapFold(string, uint64, mdictionary.Mdictionary) error
+	StringBitmapFold(string, uint64, mdictionary.Mdictionary) error
+
+	Eq(string, value.Value, uint64) (*roaring.Bitmap, error)
+	Ne(string, value.Value, uint64) (*roaring.Bitmap, error)
+	Lt(string, value.Value, uint64) (*roaring.Bitmap, error)
+	Le(string, value.Value, uint64) (*roaring.Bitmap, error)
+	Gt(string, value.Value, uint64) (*roaring.Bitmap, error)
+	Ge(string, value.Value, uint64) (*roaring.Bitmap, error)
 }

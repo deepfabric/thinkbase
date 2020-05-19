@@ -7,7 +7,7 @@ import (
 
 	"github.com/deepfabric/thinkbase/pkg/vm/container/relation"
 	"github.com/deepfabric/thinkbase/pkg/vm/container/relation/mem"
-	"github.com/deepfabric/thinkbase/pkg/vm/context/testContext"
+	"github.com/deepfabric/thinkbase/pkg/vm/context"
 	"github.com/deepfabric/thinkbase/pkg/vm/extend"
 	"github.com/deepfabric/thinkbase/pkg/vm/extend/overload"
 	"github.com/deepfabric/thinkbase/pkg/vm/op"
@@ -20,8 +20,9 @@ func TestRename(t *testing.T) {
 		r := newRelation()
 		fmt.Printf("%s\n", r.DataString())
 	}
+	c := context.New(context.NewConfig("tom"), nil, nil)
 	{
-		n := newRename()
+		n := newRename(c)
 		{
 			fmt.Printf("%s\n", n)
 		}
@@ -33,34 +34,9 @@ func TestRename(t *testing.T) {
 			attrs, err := n.AttributeList()
 			fmt.Printf("%v, %v\n", attrs, err)
 		}
+		bs := c.BlockSize()
 		for {
-			ts, err := n.GetTuples(1024 * 1024)
-			if err != nil {
-				log.Fatal(err)
-			}
-			if len(ts) == 0 {
-				break
-			}
-			for i, t := range ts {
-				fmt.Printf("[%v] = %v\n", i, t)
-			}
-		}
-	}
-	{
-		n := newRename()
-		{
-			fmt.Printf("%s\n", n)
-		}
-		{
-			name, err := n.Name()
-			fmt.Printf("%v, %v\n", name, err)
-		}
-		{
-			attrs, err := n.AttributeList()
-			fmt.Printf("%v, %v\n", attrs, err)
-		}
-		for {
-			mp, err := n.GetAttributes([]string{"x", "b"}, 1024*1024)
+			mp, err := n.GetAttributes([]string{"x", "b"}, bs)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -73,19 +49,19 @@ func TestRename(t *testing.T) {
 	}
 }
 
-func newRestrict() op.OP {
+func newRestrict(c context.Context) op.OP {
 	e := &extend.BinaryExtend{
 		Op:    overload.GT,
 		Left:  &extend.Attribute{"x"},
 		Right: value.NewInt(1),
 	}
-	return restrict.New(newRestrict(), e, testContext.New(1, 1, 1024*1024*1024, 1024*1024*1024*1024))
+	return restrict.New(newRestrict(c), e, c)
 }
 
-func newRename() op.OP {
+func newRename(c context.Context) op.OP {
 	mp := make(map[string]string)
 	mp["a"] = "x"
-	return New(newRelation(), "C", mp, testContext.New(1, 1, 1024*1024*1024, 1024*1024*1024*1024))
+	return New(newRelation(), "C", mp, c)
 }
 
 func newRelation() relation.Relation {

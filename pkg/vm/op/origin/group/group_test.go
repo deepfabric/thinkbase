@@ -7,7 +7,7 @@ import (
 
 	"github.com/deepfabric/thinkbase/pkg/vm/container/relation"
 	"github.com/deepfabric/thinkbase/pkg/vm/container/relation/mem"
-	"github.com/deepfabric/thinkbase/pkg/vm/context/testContext"
+	"github.com/deepfabric/thinkbase/pkg/vm/context"
 	"github.com/deepfabric/thinkbase/pkg/vm/extend"
 	"github.com/deepfabric/thinkbase/pkg/vm/extend/overload"
 	"github.com/deepfabric/thinkbase/pkg/vm/op"
@@ -23,10 +23,11 @@ func TestGroup(t *testing.T) {
 		r := newRelation()
 		fmt.Printf("%s\n", r.DataString())
 	}
+	c := context.New(context.NewConfig("tom"), nil, nil)
 	{
 		var es []*projection.Extend
 
-		prev := newGroup()
+		prev := newGroup(c)
 		es = append(es, &projection.Extend{
 			E: &extend.Attribute{"a"},
 		})
@@ -36,7 +37,7 @@ func TestGroup(t *testing.T) {
 		es = append(es, &projection.Extend{
 			E: &extend.Attribute{"C"},
 		})
-		n := projection.New(prev, es, testContext.New(1, 1, 1024*1024*1024, 1024*1024*1024*1024))
+		n := projection.New(prev, es, c)
 		{
 			fmt.Printf("%s\n", n)
 		}
@@ -44,51 +45,23 @@ func TestGroup(t *testing.T) {
 			attrs, err := n.AttributeList()
 			fmt.Printf("%v, %v\n", attrs, err)
 		}
+		bs := c.BlockSize()
 		for {
-			ts, err := n.GetTuples(1024 * 1024)
-			if err != nil {
-				log.Fatal(err)
-			}
-			if len(ts) == 0 {
-				break
-			}
-			for i, t := range ts {
-				fmt.Printf("[%v] = %v\n", i, t)
-			}
-		}
-	}
-	{
-		var es []*projection.Extend
-
-		prev := newGroup()
-		es = append(es, &projection.Extend{
-			E: &extend.Attribute{"B"},
-		})
-		es = append(es, &projection.Extend{
-			E: &extend.Attribute{"C"},
-		})
-		n := projection.New(prev, es, testContext.New(1, 1, 1024*1024*1024, 1024*1024*1024*1024))
-		{
-			fmt.Printf("%s\n", n)
-		}
-		{
-			attrs, err := n.AttributeList()
-			fmt.Printf("%v, %v\n", attrs, err)
-		}
-		for {
-			mp, err := n.GetAttributes([]string{"B"}, 1024*1024)
+			mp, err := n.GetAttributes([]string{"a", "B", "C"}, bs)
 			if err != nil {
 				log.Fatal(err)
 			}
 			if len(mp["B"]) == 0 {
 				break
 			}
+			fmt.Printf("a = %v\n", mp["a"])
 			fmt.Printf("B = %v\n", mp["B"])
+			fmt.Printf("C = %v\n", mp["C"])
 		}
 	}
 }
 
-func newGroup() op.OP {
+func newGroup(c context.Context) op.OP {
 	var es []*summarize.Extend
 
 	es = append(es, &summarize.Extend{
@@ -103,19 +76,19 @@ func newGroup() op.OP {
 	})
 	es = append(es, &summarize.Extend{
 		Name:  "b",
-		Alias: "_0",
+		Alias: "sum(b)",
 		Op:    aoverload.Sum,
 	})
-	prev := newRestrict()
+	prev := newRestrict(c)
 	e := &extend.BinaryExtend{
 		Op:    overload.GT,
 		Right: value.NewFloat(2.0),
-		Left:  &extend.Attribute{"_0"},
+		Left:  &extend.Attribute{"sum(b)"},
 	}
-	return New(prev, e, []string{"a"}, es, testContext.New(1, 1, 1024*1024*1024, 1024*1024*1024*1024))
+	return New(prev, e, []string{"a"}, es, c)
 }
 
-func newRestrict() op.OP {
+func newRestrict(c context.Context) op.OP {
 	r := newRelation()
 	e := &extend.BinaryExtend{
 		Op: overload.EQ,
@@ -125,7 +98,7 @@ func newRestrict() op.OP {
 		},
 		Right: value.NewString("string"),
 	}
-	return restrict.New(r, e, testContext.New(1, 1, 1024*1024*1024, 1024*1024*1024*1024))
+	return restrict.New(r, e, c)
 }
 
 func newRelation() relation.Relation {

@@ -1,24 +1,6 @@
-rule0
-    σ(τ(R)) -> τ(σ(R))
+rule0: restrict
+    限制 -> 索引限制
 
-rule1
-    σ(δ(R)) -> δ(σ(R))
+rule100: summarize
 
-rule2
-    σ(π(R)) -> π(σ(R))
-
-
-rule100: SetUnion
-    τ(R) ∪ τ(S)     -> R ∪ S
-
-rule101: SetUnion
-    τ(τ(R) ∪ τ(S))  -> τ(R) ∪ τ(S)
-                    -> τ(R ∪ S)
-
-rule102:
-    δ(R) ∪ δ(S)     -> R ∪ S
-                    -> δ(R) ∪ δ(S)
-
-rule103: SetUnion
-    δ(δ(R) ∪ δ(S))  -> δ(R) ∪ δ(S)
-                    -> R ∪ S
+rule200: group

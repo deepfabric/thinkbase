@@ -34,6 +34,11 @@ const (
 	Div
 	Mod
 	Typecast
+	Like
+	Index
+	IndexTry
+	Group
+	GroupTry
 
 	// binary operator - comparison operator
 	EQ
@@ -68,6 +73,11 @@ var OpName = [...]string{
 	Div:      "/",
 	Mod:      "%",
 	Typecast: "typecast",
+	Like:     "like",
+	Index:    "index",
+	IndexTry: "indextry",
+	Group:    "groupindex",
+	GroupTry: "groupindextry",
 
 	EQ: "=",
 	LT: "<",

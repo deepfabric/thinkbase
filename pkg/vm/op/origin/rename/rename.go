@@ -5,6 +5,7 @@ import (
 
 	"github.com/deepfabric/thinkbase/pkg/vm/context"
 	"github.com/deepfabric/thinkbase/pkg/vm/op"
+	"github.com/deepfabric/thinkbase/pkg/vm/util"
 	"github.com/deepfabric/thinkbase/pkg/vm/value"
 )
 
@@ -78,11 +79,8 @@ func (n *rename) AttributeList() ([]string, error) {
 	return attrs, nil
 }
 
-func (n *rename) GetTuples(limit int) (value.Array, error) {
-	return n.prev.GetTuples(limit)
-}
-
 func (n *rename) GetAttributes(attrs []string, limit int) (map[string]value.Array, error) {
+	attrs = util.MergeAttributes(attrs, []string{})
 	if !n.isCheck {
 		if err := n.check(attrs); err != nil {
 			return nil, err

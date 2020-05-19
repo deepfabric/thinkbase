@@ -7,7 +7,7 @@ import (
 
 	"github.com/deepfabric/thinkbase/pkg/vm/container/relation"
 	"github.com/deepfabric/thinkbase/pkg/vm/container/relation/mem"
-	"github.com/deepfabric/thinkbase/pkg/vm/context/testContext"
+	"github.com/deepfabric/thinkbase/pkg/vm/context"
 	"github.com/deepfabric/thinkbase/pkg/vm/extend"
 	"github.com/deepfabric/thinkbase/pkg/vm/extend/overload"
 	"github.com/deepfabric/thinkbase/pkg/vm/op"
@@ -20,50 +20,11 @@ func TestProjection(t *testing.T) {
 		r := newRelation()
 		fmt.Printf("%s\n", r.DataString())
 	}
+	c := context.New(context.NewConfig("tom"), nil, nil)
 	{
 		var es []*Extend
 
-		prev := newRestrict()
-		es = append(es, &Extend{
-			Alias: "C",
-			E: &extend.BinaryExtend{
-				Op:    overload.Plus,
-				Right: value.NewInt(1),
-				Left:  &extend.Attribute{"a"},
-			},
-		})
-		es = append(es, &Extend{
-			Alias: "X",
-			E: &extend.UnaryExtend{
-				Op: overload.Typeof,
-				E:  &extend.Attribute{"b"},
-			},
-		})
-		n := New(prev, es, testContext.New(1, 1, 1024*1024*1024, 1024*1024*1024*1024))
-		{
-			fmt.Printf("%s\n", n)
-		}
-		{
-			attrs, err := n.AttributeList()
-			fmt.Printf("%v, %v\n", attrs, err)
-		}
-		for {
-			ts, err := n.GetTuples(1024 * 1024)
-			if err != nil {
-				log.Fatal(err)
-			}
-			if len(ts) == 0 {
-				break
-			}
-			for i, t := range ts {
-				fmt.Printf("[%v] = %v\n", i, t)
-			}
-		}
-	}
-	{
-		var es []*Extend
-
-		prev := newRestrict()
+		prev := newRestrict(c)
 		es = append(es, &Extend{
 			Alias: "C",
 			E:     &extend.Attribute{"a"},
@@ -75,7 +36,7 @@ func TestProjection(t *testing.T) {
 				E:  &extend.Attribute{"b"},
 			},
 		})
-		n := New(prev, es, testContext.New(1, 1, 1024*1024*1024, 1024*1024*1024*1024))
+		n := New(prev, es, c)
 		{
 			fmt.Printf("%s\n", n)
 		}
@@ -83,8 +44,9 @@ func TestProjection(t *testing.T) {
 			attrs, err := n.AttributeList()
 			fmt.Printf("%v, %v\n", attrs, err)
 		}
+		bs := n.c.BlockSize()
 		for {
-			mp, err := n.GetAttributes([]string{"C", "A"}, 1024*1024)
+			mp, err := n.GetAttributes([]string{"C", "A"}, bs)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -97,14 +59,14 @@ func TestProjection(t *testing.T) {
 	}
 }
 
-func newRestrict() op.OP {
+func newRestrict(c context.Context) op.OP {
 	r := newRelation()
 	e := &extend.BinaryExtend{
 		Op:    overload.GT,
 		Left:  &extend.Attribute{"a"},
 		Right: value.NewInt(1),
 	}
-	return restrict.New(r, e, testContext.New(1, 1, 1024*1024*1024, 1024*1024*1024*1024))
+	return restrict.New(r, e, c)
 }
 
 func newRelation() relation.Relation {

@@ -8,7 +8,6 @@ import (
 	"github.com/deepfabric/thinkbase/pkg/vm/op"
 	"github.com/deepfabric/thinkbase/pkg/vm/op/origin/group"
 	"github.com/deepfabric/thinkbase/pkg/vm/op/origin/nub"
-	"github.com/deepfabric/thinkbase/pkg/vm/op/origin/product"
 	"github.com/deepfabric/thinkbase/pkg/vm/op/origin/projection"
 	"github.com/deepfabric/thinkbase/pkg/vm/op/origin/rename"
 	"github.com/deepfabric/thinkbase/pkg/vm/op/origin/restrict"
@@ -42,27 +41,10 @@ func (b *build) buildSelect(n *tree.SelectClause) (op.OP, error) {
 	return b.buildAlgebra(n.Distinct, e, he, ps, gs)
 }
 
-func (b *build) buildAliasedSelect(n *tree.AliasedSelect) (op.OP, error) {
-	o, err := b.buildStatement(n.Sel)
-	if err != nil {
-		return nil, err
-	}
-	if n.As != nil {
-		return rename.New(o, string(n.As.Alias), make(map[string]string), b.c), nil
-	}
-	return o, nil
-}
-
 func (b *build) buildAlgebra(distinct bool, e, he extend.Extend, ps []*projection.Extend, gs []string) (op.OP, error) {
 	var o op.OP
 
-	for i, t := range b.ts[0].ts {
-		if i > 0 {
-			o = product.New(b.buildTable(t), o, b.c)
-		} else {
-			o = b.buildTable(t)
-		}
-	}
+	o = b.buildTable(b.ts[0].ts[0])
 	if e != nil {
 		o = restrict.New(o, e, b.c)
 	}

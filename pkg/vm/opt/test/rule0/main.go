@@ -5,48 +5,44 @@ import (
 
 	"github.com/deepfabric/thinkbase/pkg/vm/container/relation"
 	"github.com/deepfabric/thinkbase/pkg/vm/container/relation/mem"
-	"github.com/deepfabric/thinkbase/pkg/vm/context/testContext"
+	"github.com/deepfabric/thinkbase/pkg/vm/context"
 	"github.com/deepfabric/thinkbase/pkg/vm/extend"
 	"github.com/deepfabric/thinkbase/pkg/vm/extend/overload"
 	"github.com/deepfabric/thinkbase/pkg/vm/op"
-	"github.com/deepfabric/thinkbase/pkg/vm/op/origin/order"
-	"github.com/deepfabric/thinkbase/pkg/vm/op/origin/projection"
 	"github.com/deepfabric/thinkbase/pkg/vm/op/origin/restrict"
 	"github.com/deepfabric/thinkbase/pkg/vm/opt"
 	"github.com/deepfabric/thinkbase/pkg/vm/value"
 )
 
 func main() {
-	var es []*projection.Extend
-
-	prev := newRestrict()
-	es = append(es, &projection.Extend{
-		E: &extend.Attribute{"a"},
-	})
-	es = append(es, &projection.Extend{
-		Alias: "A",
-		E: &extend.UnaryExtend{
-			Op: overload.Typeof,
-			E:  &extend.Attribute{"b"},
-		},
-	})
-	n := projection.New(prev, es, testContext.New(1, 1, 1024*1024*1024, 1024*1024*1024*1024))
+	c := context.New(context.NewConfig("tom"), nil, nil)
+	n := newRestrict(c)
 	fmt.Printf("%s\n", n)
-	no := opt.New(n).Optimize()
+	no := opt.New(n, c).Optimize()
 	fmt.Printf("%s\n", no)
 }
 
-func newOrder() op.OP {
-	return order.New(newRelation(), []bool{true, false}, []string{"a", "b"}, testContext.New(1, 1, 1024*1024*1024, 1024*1024*1024*1024))
-}
-
-func newRestrict() op.OP {
-	e := &extend.BinaryExtend{
+func newRestrict(c context.Context) op.OP {
+	e0 := &extend.UnaryExtend{
+		Op: overload.Typeof,
+		E:  &extend.Attribute{"a"},
+	}
+	e1 := &extend.BinaryExtend{
+		Op:    overload.EQ,
+		Left:  e0,
+		Right: value.NewString("int"),
+	}
+	e2 := &extend.BinaryExtend{
 		Op:    overload.GT,
 		Left:  &extend.Attribute{"a"},
 		Right: value.NewInt(1),
 	}
-	return restrict.New(newOrder(), e, testContext.New(1, 1, 1024*1024*1024, 1024*1024*1024*1024))
+	e3 := &extend.BinaryExtend{
+		Op:    overload.And,
+		Left:  e1,
+		Right: e2,
+	}
+	return restrict.New(newRelation(), e3, c)
 }
 
 func newRelation() relation.Relation {

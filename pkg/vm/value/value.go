@@ -489,6 +489,18 @@ func (a Null) Compare(v Value) int {
 	return 1 // NULL is less than any non-NULL value
 }
 
+func (_ Empty) String() string         { return "empty" }
+func (_ Empty) ResolvedType() *types.T { return types.Empty }
+func (_ Empty) IsLogical() bool        { return false }
+func (_ Empty) Attributes() []string   { return []string{} }
+
+func (a Empty) Compare(v Value) int {
+	if v == ConstEmpty {
+		return 0
+	}
+	return -1 // Empty is more than any non-Empty value
+}
+
 func (_ Array) ResolvedType() *types.T { return types.Array }
 func (_ Array) IsLogical() bool        { return false }
 func (_ Array) Attributes() []string   { return []string{} }
@@ -538,6 +550,7 @@ func (a *Bool) Eval(_ map[string]Value) (Value, error)   { return a, nil }
 func (a *Time) Eval(_ map[string]Value) (Value, error)   { return a, nil }
 func (a *Float) Eval(_ map[string]Value) (Value, error)  { return a, nil }
 func (a Null) Eval(_ map[string]Value) (Value, error)    { return a, nil }
+func (a Empty) Eval(_ map[string]Value) (Value, error)   { return a, nil }
 func (a *Table) Eval(_ map[string]Value) (Value, error)  { return a, nil }
 func (a Array) Eval(_ map[string]Value) (Value, error)   { return a, nil }
 func (a *String) Eval(_ map[string]Value) (Value, error) { return a, nil }
@@ -547,6 +560,7 @@ func (_ *Bool) Size() int   { return 2 }
 func (_ *Time) Size() int   { return 9 }
 func (_ *Float) Size() int  { return 9 }
 func (_ Null) Size() int    { return 1 }
+func (_ Empty) Size() int   { return 1 }
 func (a *String) Size() int { return 1 + len(*a) }
 func (a *Table) Size() int  { return 1 + len(a.Id) }
 

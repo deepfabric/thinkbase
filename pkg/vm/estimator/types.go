@@ -1,15 +1,13 @@
 package estimator
 
 import (
+	"github.com/deepfabric/thinkbase/pkg/vm/container/relation"
 	"github.com/deepfabric/thinkbase/pkg/vm/extend"
 	"github.com/deepfabric/thinkbase/pkg/vm/op"
+	"github.com/deepfabric/thinkbase/pkg/vm/op/index/filter"
 )
 
 type Estimator interface {
-	Less(op.OP, op.OP) bool
-
-	Min(op.OP, op.OP) op.OP
-
 	NubSize(op.OP, []string) float64
 	FetchSize(op.OP, int, int) float64
 	OrderSize(op.OP, []string) float64
@@ -18,21 +16,9 @@ type Estimator interface {
 	RestrictSize(op.OP, extend.Extend) float64
 	ProjectionSize(op.OP, []string, []extend.Extend) float64
 
-	ProductSize(op.OP, op.OP) float64
-
-	NaturalJoinSize(op.OP, op.OP) float64
-
-	SetUnionSize(op.OP, op.OP) float64
-	SetIntersectSize(op.OP, op.OP) float64
-	SetDifferenceSize(op.OP, op.OP) float64
-
-	MultisetUnionSize(op.OP, op.OP) float64
-	MultisetIntersectSize(op.OP, op.OP) float64
-	MultisetDifferenceSize(op.OP, op.OP) float64
-
-	SetUnionSizeByHash(op.OP, op.OP) float64
-
-	SetUnionSizeByOrder(op.OP, op.OP) float64
+	SummarizeSizeWithIndex(op.OP, []int) float64
+	GroupSizeWithIndex(op.OP, []string, []int) float64
+	RestrictSizeWithIndex(relation.Relation, filter.Filter) float64
 
 	NubCost(op.OP, []string) float64
 	FetchCost(op.OP, int, int) float64
@@ -42,19 +28,12 @@ type Estimator interface {
 	RestrictCost(op.OP, extend.Extend) float64
 	ProjectionCost(op.OP, []string, []extend.Extend) float64
 
-	ProductCost(op.OP, op.OP) float64
+	SummarizeCostWithIndex(op.OP, []int) float64
+	GroupCostWithIndex(op.OP, []string, []int) float64
+	RestrictCostWithIndex(relation.Relation, filter.Filter) float64
 
-	NaturalJoinCost(op.OP, op.OP) float64
+	AttributeCount(relation.Relation, string, int) int
+}
 
-	SetUnionCost(op.OP, op.OP) float64
-	SetIntersectCost(op.OP, op.OP) float64
-	SetDifferenceCost(op.OP, op.OP) float64
-
-	MultisetUnionCost(op.OP, op.OP) float64
-	MultisetIntersectCost(op.OP, op.OP) float64
-	MultisetDifferenceCost(op.OP, op.OP) float64
-
-	SetUnionCostByHash(op.OP, op.OP) float64
-
-	SetUnionCostByOrder(op.OP, op.OP) float64
+type estimator struct {
 }

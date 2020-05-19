@@ -1,7 +1,11 @@
 package mem
 
 import (
-	"github.com/deepfabric/thinkbase/pkg/vm/container/relation"
+	"errors"
+
+	"github.com/deepfabric/thinkbase/pkg/storage/ranging"
+	"github.com/deepfabric/thinkbase/pkg/storage/ranging/roaring"
+	"github.com/deepfabric/thinkbase/pkg/vm/container/mdictionary"
 	"github.com/deepfabric/thinkbase/pkg/vm/op"
 	"github.com/deepfabric/thinkbase/pkg/vm/value"
 )
@@ -55,37 +59,12 @@ func (r *mem) Children() []op.OP {
 func (r *mem) SetChild(_ op.OP, _ int) {}
 func (r *mem) IsOrdered() bool         { return false }
 
-func (r *mem) Split(n int) ([]relation.Relation, error) {
-	var rs []relation.Relation
+func (r *mem) Id() string {
+	return r.name
+}
 
-	step := len(r.ts) / n
-	if step < 1 {
-		step = 1
-	}
-	for i, j := 0, len(r.ts); i < j; i += step {
-		switch {
-		case len(rs) == n-1:
-			rs = append(rs, &mem{
-				mp:    r.mp,
-				name:  r.name,
-				attrs: r.attrs,
-				ts:    r.ts[i:],
-			})
-			return rs, nil
-		default:
-			cnt := step
-			if cnt > j-i {
-				cnt = j - i
-			}
-			rs = append(rs, &mem{
-				mp:    r.mp,
-				name:  r.name,
-				attrs: r.attrs,
-				ts:    r.ts[i : i+cnt],
-			})
-		}
-	}
-	return rs, nil
+func (r *mem) Rows() uint64 {
+	return uint64(len(r.ts))
 }
 
 func (r *mem) String() string {
@@ -105,14 +84,8 @@ func (r *mem) AddTuples(ts []value.Array) error {
 	return nil
 }
 
-func (r *mem) GetTuples(limit int) (value.Array, error) {
-	var rs value.Array
-
-	for size := 0; size < limit && r.start < len(r.ts); r.start++ {
-		size += r.ts[r.start].Size()
-		rs = append(rs, r.ts[r.start])
-	}
-	return rs, nil
+func (r *mem) AddTuplesByJson(_ []map[string]interface{}) error {
+	return errors.New("not support now")
 }
 
 func (r *mem) GetAttributes(attrs []string, limit int) (map[string]value.Array, error) {
@@ -125,4 +98,88 @@ func (r *mem) GetAttributes(attrs []string, limit int) (map[string]value.Array, 
 		}
 	}
 	return rq, nil
+}
+
+func (r *mem) GetAttributesByIndex(_ []string, _ []uint64, _ int) (map[string]value.Array, error) {
+	return nil, errors.New("not support now")
+}
+
+func (r *mem) StrMin(_ string, _ uint64, _ *roaring.Bitmap) (string, error) {
+	return "", errors.New("not support now")
+}
+
+func (r *mem) StrMax(_ string, _ uint64, _ *roaring.Bitmap) (string, error) {
+	return "", errors.New("not support now")
+}
+
+func (r *mem) StrCount(_ string, _ uint64, _ *roaring.Bitmap) (uint64, error) {
+	return 0, errors.New("not support now")
+}
+
+func (r *mem) NullCount(_ string, _ uint64, _ *roaring.Bitmap) (uint64, error) {
+	return 0, errors.New("not support now")
+}
+
+func (r *mem) BoolCount(_ string, _ uint64, _ *roaring.Bitmap) (uint64, error) {
+	return 0, errors.New("not support now")
+}
+
+func (r *mem) IntRangeBitmap(_ string, _ uint64) (*ranging.Ranging, error) {
+	return nil, errors.New("not support now")
+}
+
+func (r *mem) TimeRangeBitmap(_ string, _ uint64) (*ranging.Ranging, error) {
+	return nil, errors.New("not support now")
+}
+
+func (r *mem) FloatRangeBitmap(_ string, _ uint64) (*ranging.Ranging, error) {
+	return nil, errors.New("not support now")
+}
+
+func (r *mem) IntBitmapFold(_ string, _ uint64, _ mdictionary.Mdictionary) error {
+	return errors.New("not support now")
+}
+
+func (r *mem) NullBitmapFold(_ string, _ uint64, _ mdictionary.Mdictionary) error {
+	return errors.New("not support now")
+}
+
+func (r *mem) BoolBitmapFold(_ string, _ uint64, _ mdictionary.Mdictionary) error {
+	return errors.New("not support now")
+}
+
+func (r *mem) TimeBitmapFold(_ string, _ uint64, _ mdictionary.Mdictionary) error {
+	return errors.New("not support now")
+}
+
+func (r *mem) FloatBitmapFold(_ string, _ uint64, _ mdictionary.Mdictionary) error {
+	return errors.New("not support now")
+}
+
+func (r *mem) StringBitmapFold(_ string, _ uint64, _ mdictionary.Mdictionary) error {
+	return errors.New("not support now")
+}
+
+func (r *mem) Eq(_ string, _ value.Value, _ uint64) (*roaring.Bitmap, error) {
+	return nil, errors.New("not support now")
+}
+
+func (r *mem) Ne(_ string, _ value.Value, _ uint64) (*roaring.Bitmap, error) {
+	return nil, errors.New("not support now")
+}
+
+func (r *mem) Lt(_ string, _ value.Value, _ uint64) (*roaring.Bitmap, error) {
+	return nil, errors.New("not support now")
+}
+
+func (r *mem) Le(_ string, _ value.Value, _ uint64) (*roaring.Bitmap, error) {
+	return nil, errors.New("not support now")
+}
+
+func (r *mem) Gt(_ string, _ value.Value, _ uint64) (*roaring.Bitmap, error) {
+	return nil, errors.New("not support now")
+}
+
+func (r *mem) Ge(_ string, _ value.Value, _ uint64) (*roaring.Bitmap, error) {
+	return nil, errors.New("not support now")
 }

@@ -2,6 +2,7 @@ package extend
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/deepfabric/thinkbase/pkg/vm/extend/overload"
 	"github.com/deepfabric/thinkbase/pkg/vm/util"
@@ -69,6 +70,22 @@ func (e *BinaryExtend) Eval(mp map[string]value.Value) (value.Value, error) {
 	if err != nil {
 		return nil, err
 	}
+	if e.Op == overload.Typecast {
+		switch typ := value.MustBeString(r); typ {
+		case "int":
+			return overload.BinaryEval(e.Op, l, value.NewInt(0))
+		case "bool":
+			return overload.BinaryEval(e.Op, l, value.NewBool(true))
+		case "time":
+			return overload.BinaryEval(e.Op, l, value.NewTime(time.Now()))
+		case "float":
+			return overload.BinaryEval(e.Op, l, value.NewFloat(0.0))
+		case "string":
+			return overload.BinaryEval(e.Op, l, value.NewString(""))
+		default:
+			return nil, fmt.Errorf("typecast '%s' to unsupport '%s'", l, typ)
+		}
+	}
 	return overload.BinaryEval(e.Op, l, r)
 }
 
@@ -102,6 +119,16 @@ func (e *BinaryExtend) String() string {
 		return fmt.Sprintf("%s - %s", e.Left.String(), e.Right.String())
 	case overload.Typecast:
 		return fmt.Sprintf("cast(%s as %s)", e.Left.String(), e.Right.String())
+	case overload.Like:
+		return fmt.Sprintf("like(%s, %s)", e.Left.String(), e.Right.String())
+	case overload.Index:
+		return fmt.Sprintf("index(%s, %s)", e.Left.String(), e.Right.String())
+	case overload.IndexTry:
+		return fmt.Sprintf("indextry(%s, %s)", e.Left.String(), e.Right.String())
+	case overload.Group:
+		return fmt.Sprintf("groupindex(%s, %s)", e.Left.String(), e.Right.String())
+	case overload.GroupTry:
+		return fmt.Sprintf("groupindextry(%s, %s)", e.Left.String(), e.Right.String())
 	}
 	return ""
 }

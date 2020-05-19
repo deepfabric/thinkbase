@@ -25,6 +25,7 @@ type String string
 
 type Null struct{}
 type Array []Value
+type Empty struct{}
 
 type Table struct {
 	Id string
@@ -39,6 +40,7 @@ var (
 	ConstFalse Bool  = false
 	ConstNull  Null  = Null{}
 	ConstTable Table = Table{}
+	ConstEmpty Empty = Empty{}
 )
 
 // time.Time formats.

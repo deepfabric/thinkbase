@@ -401,7 +401,11 @@ first_or_next: FIRST    {}
 
 
 
-relation: table_name                                { $$.val = $1.tableName() }
+relation: table_name  opt_alias_clause              { $$.val = &tree.AliasedTable{
+                                                                    As: $2.aliasClause(),
+                                                                    Tbl: $1.tableName(),
+                                                               }
+                                                    }
         | join_clause                               { $$.val = $1.joinStatement() }
         | union_clause                              { $$.val = $1.unionStatement() }
         | simple_select                             { $$.val = $1.simpleSelectStatement() }
@@ -529,7 +533,6 @@ a_expr: c_expr                  { $$.val = $1.exprStatement() }
       | b_expr                  { $$.val = $1.exprStatement() }
 
 b_expr: d_expr                  { $$.val = $1.exprStatement() }
-      | subquery                { $$.val = $1.subqueryStatement() }
       | column_name             { $$.val = $1.colunmNameList() }
       | '+' b_expr              { $$.val = $2.exprStatement() }
       | '-' b_expr              { $$.val = &tree.UnaryMinusExpr{E: $2.exprStatement()} }
@@ -553,12 +556,13 @@ c_expr: b_expr '<' b_expr                           { $$.val = &tree.LtExpr{Left
                                                         $$.val.(*tree.Subquery).Exists = true
                                                     }
 
-d_expr: ICONST  { $$.val = $1.valueStatement() }
-      | FCONST  { $$.val = $1.valueStatement() }
-      | SCONST  { $$.val = $1.valueStatement() }
-      | TRUE    { $$.val = &tree.Value{&value.ConstTrue} }
-      | FALSE   { $$.val = &tree.Value{&value.ConstFalse} }
-      | NULL    { $$.val = &tree.Value{&value.ConstNull} }
+d_expr: ICONST          { $$.val = $1.valueStatement() }
+      | FCONST          { $$.val = $1.valueStatement() }
+      | SCONST          { $$.val = $1.valueStatement() }
+      | TRUE            { $$.val = &tree.Value{&value.ConstTrue} }
+      | FALSE           { $$.val = &tree.Value{&value.ConstFalse} }
+      | NULL            { $$.val = &tree.Value{&value.ConstNull} }
+      | '(' a_expr ')'  { $$.val = $2.exprStatement() }
 
 signed_iconst: ICONST       { $$.val = $1.valueStatement() }
              | '+' ICONST   { $$.val = $2.valueStatement() }

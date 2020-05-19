@@ -5,6 +5,7 @@ import (
 
 	"github.com/deepfabric/thinkbase/pkg/vm/context"
 	"github.com/deepfabric/thinkbase/pkg/vm/op"
+	"github.com/deepfabric/thinkbase/pkg/vm/util"
 	"github.com/deepfabric/thinkbase/pkg/vm/value"
 )
 
@@ -57,25 +58,6 @@ func (n *fetch) AttributeList() ([]string, error) {
 	return n.prev.AttributeList()
 }
 
-func (n *fetch) GetTuples(limit int) (value.Array, error) {
-	if n.cnt >= n.limit {
-		return nil, nil
-	}
-	ts, err := n.prev.GetTuples(limit)
-	if err != nil {
-		return nil, err
-	}
-	for len(ts) > 0 && n.off < n.offset {
-		n.off++
-		ts = ts[1:]
-	}
-	if len(ts) > n.limit-n.cnt {
-		ts = ts[:n.limit-n.cnt]
-	}
-	n.cnt += len(ts)
-	return ts, nil
-}
-
 func (n *fetch) GetAttributes(attrs []string, limit int) (map[string]value.Array, error) {
 	if !n.isCheck {
 		if err := n.check(attrs); err != nil {
@@ -86,6 +68,7 @@ func (n *fetch) GetAttributes(attrs []string, limit int) (map[string]value.Array
 	if n.cnt >= n.limit {
 		return nil, nil
 	}
+	attrs = util.MergeAttributes(attrs, []string{})
 	mp, err := n.prev.GetAttributes(attrs, limit)
 	if err != nil {
 		return nil, err

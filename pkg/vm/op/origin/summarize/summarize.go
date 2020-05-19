@@ -12,12 +12,17 @@ import (
 	"github.com/deepfabric/thinkbase/pkg/vm/op/origin/summarize/overload/max"
 	"github.com/deepfabric/thinkbase/pkg/vm/op/origin/summarize/overload/min"
 	"github.com/deepfabric/thinkbase/pkg/vm/op/origin/summarize/overload/sum"
+	"github.com/deepfabric/thinkbase/pkg/vm/types"
 	"github.com/deepfabric/thinkbase/pkg/vm/util"
 	"github.com/deepfabric/thinkbase/pkg/vm/value"
 )
 
 func New(prev op.OP, es []*Extend, c context.Context) *summarize {
 	return &summarize{false, false, prev, es, c}
+}
+
+func (n *summarize) Extends() []*Extend {
+	return n.es
 }
 
 func (n *summarize) Size() float64 {
@@ -58,9 +63,9 @@ func (n *summarize) String() string {
 	for i, e := range n.es {
 		switch i {
 		case 0:
-			r += fmt.Sprintf("%s(%s) -> %s", overload.AggName[e.Op], e.Name, e.Alias)
-		case 1:
-			r += fmt.Sprintf(", %s(%s) -> %s", overload.AggName[e.Op], e.Name, e.Alias)
+			r += fmt.Sprintf("%s(%s, %v) -> %s", overload.AggName[e.Op], e.Name, &types.T{int32(e.Typ)}, e.Alias)
+		default:
+			r += fmt.Sprintf(", %s(%s, %v) -> %s", overload.AggName[e.Op], e.Name, &types.T{int32(e.Typ)}, e.Alias)
 		}
 	}
 	r += fmt.Sprintf("], %s)", n.prev)
@@ -75,32 +80,6 @@ func (n *summarize) AttributeList() ([]string, error) {
 	return aliasList(n.es), nil
 }
 
-func (n *summarize) GetTuples(limit int) (value.Array, error) {
-	if n.isUsed {
-		return nil, nil
-	}
-	defer func() { n.isUsed = true }()
-	attrs := attributeList(n.es)
-	if !n.isCheck {
-		if err := n.check(attrs); err != nil {
-			return nil, err
-		}
-		if err := n.newByAttributes(attrs); err != nil {
-			return nil, err
-		}
-		n.isCheck = true
-	}
-	var a value.Array
-	for _, e := range n.es {
-		if v, err := e.Agg.Eval(); err != nil {
-			return nil, err
-		} else {
-			a = append(a, v)
-		}
-	}
-	return a, nil
-}
-
 func (n *summarize) GetAttributes(attrs []string, limit int) (map[string]value.Array, error) {
 	var as [][]string
 
@@ -108,6 +87,7 @@ func (n *summarize) GetAttributes(attrs []string, limit int) (map[string]value.A
 		return nil, nil
 	}
 	defer func() { n.isUsed = true }()
+	attrs = util.MergeAttributes(attrs, []string{})
 	es := subExtend(n.es, attrs)
 	as = append(as, attributeList(es))
 	if !n.isCheck {
@@ -117,7 +97,7 @@ func (n *summarize) GetAttributes(attrs []string, limit int) (map[string]value.A
 		if err := util.Contain(attrs, aliasList(n.es)); err != nil {
 			return nil, err
 		}
-		if err := n.newByAttributes(as[0]); err != nil {
+		if err := n.newByAttributes(as[0], limit); err != nil {
 			return nil, err
 		}
 		n.isCheck = true
@@ -133,8 +113,7 @@ func (n *summarize) GetAttributes(attrs []string, limit int) (map[string]value.A
 	return rq, nil
 }
 
-func (n *summarize) newByAttributes(attrs []string) error {
-	limit := n.c.MemSize()
+func (n *summarize) newByAttributes(attrs []string, limit int) error {
 	for {
 		mp, err := n.prev.GetAttributes(attrs, limit)
 		if err != nil {
@@ -158,16 +137,16 @@ func (n *summarize) check(attrs []string) error {
 			return errors.New("need attribute")
 		}
 		switch n.es[i].Op {
-		case overload.Avg:
-			n.es[i].Agg = avg.New()
-		case overload.Max:
-			n.es[i].Agg = max.New()
-		case overload.Min:
-			n.es[i].Agg = min.New()
-		case overload.Sum:
-			n.es[i].Agg = sum.New()
-		case overload.Count:
-			n.es[i].Agg = count.New()
+		case overload.Avg, overload.AvgI, overload.AvgIt:
+			n.es[i].Agg = avg.New(int32(n.es[i].Typ))
+		case overload.Max, overload.MaxI, overload.MaxIt:
+			n.es[i].Agg = max.New(int32(n.es[i].Typ))
+		case overload.Min, overload.MinI, overload.MinIt:
+			n.es[i].Agg = min.New(int32(n.es[i].Typ))
+		case overload.Sum, overload.SumI, overload.SumIt:
+			n.es[i].Agg = sum.New(int32(n.es[i].Typ))
+		case overload.Count, overload.CountI, overload.CountIt:
+			n.es[i].Agg = count.New(int32(n.es[i].Typ))
 		default:
 			return fmt.Errorf("unsupport aggreation operator '%v'", n.es[i].Op)
 		}

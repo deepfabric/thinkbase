@@ -14,9 +14,23 @@ func (b *build) addSummarize(e *summarize.Extend) error {
 }
 
 var AggFuncs map[string]int = map[string]int{
-	"avg":   overload.Avg,
-	"max":   overload.Max,
-	"min":   overload.Min,
-	"sum":   overload.Sum,
-	"count": overload.Count,
+	"avg":     overload.Avg,
+	"max":     overload.Max,
+	"min":     overload.Min,
+	"sum":     overload.Sum,
+	"count":   overload.Count,
+	"avgi":    overload.AvgI,
+	"maxi":    overload.MaxI,
+	"mini":    overload.MinI,
+	"sumi":    overload.SumI,
+	"counti":  overload.CountI,
+	"avgit":   overload.AvgIt,
+	"maxit":   overload.MaxIt,
+	"minit":   overload.MinIt,
+	"sumit":   overload.SumIt,
+	"countit": overload.CountIt,
+}
+
+func isIndexAggFunc(op int) bool {
+	return overload.IsIndexAggFunc(op) || overload.IsIndexTryAggFunc(op)
 }
