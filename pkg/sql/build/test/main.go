@@ -21,7 +21,7 @@ import (
 func main() {
 	var c context.Context
 	{
-		db := pb.New("test.db", nil, false)
+		db := pb.New("test.db", nil, 0, false, false)
 		stg := storage.New(db, mem.New(), rmem.New(), rbmem.New(), srbmem.New())
 		est := estimator.New()
 		wsp := workspace.New("tom", "test", stg)

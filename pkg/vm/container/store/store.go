@@ -13,7 +13,7 @@ import (
 func New(name string) *store {
 	return &store{
 		name: name,
-		db:   pb.New(name, nil, false, false),
+		db:   pb.New(name, nil, 0, false, false),
 	}
 }
 

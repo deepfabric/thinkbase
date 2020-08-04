@@ -59,7 +59,7 @@ func TestRestrict(t *testing.T) {
 }
 
 func newRelation() relation.Relation {
-	db := pb.New("test.db", nil, false, false)
+	db := pb.New("test.db", nil, 0, false, false)
 	stg := storage.New(db, mem.New(), rmem.New(), rbmem.New(), srbmem.New())
 	r, err := stg.Relation("test.A")
 	if err != nil {

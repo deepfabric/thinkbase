@@ -14,7 +14,7 @@ import (
 )
 
 func main() {
-	db := pb.New("test.db", nil, false, false)
+	db := pb.New("test.db", nil, 0, false, false)
 	stg := storage.New(db, mem.New(), rmem.New(), rbmem.New(), srbmem.New())
 	server.New(8080, logger.New(os.Stderr, "thinkbase"), stg).Run()
 }

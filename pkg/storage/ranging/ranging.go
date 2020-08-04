@@ -80,6 +80,23 @@ func (r *Ranging) Read(data []byte) error {
 	return r.mp.UnmarshalBinary(data)
 }
 
+func (r *Ranging) Get(k uint64) (int64, bool) {
+	var v int64
+
+	if r.bit(uint64(bsiExistsBit), k) {
+		return -1, false
+	}
+	for i := uint(0); i < 64; i++ {
+		if r.bit(uint64(bsiOffsetBit+i), k) {
+			v |= (1 << i)
+		}
+	}
+	if r.bit(uint64(bsiSignBit), k) {
+		v = -v
+	}
+	return v, true
+}
+
 func (r *Ranging) Set(k uint64, v int64) error {
 	uv := uint64(v)
 	if v < 0 {
